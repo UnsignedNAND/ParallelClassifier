@@ -1,0 +1,46 @@
+\documentclass[10pt,a4paper,twoside]{report}
+
+\usepackage{gutthesis}
+
+\author{Piotr Dorożyński}
+\title{Thesis Template}
+
+
+
+
+
+\begin{document}
+
+\includepdf{TitlePage.pdf}
+\includepdf{Statement.pdf}
+
+\input{./tex/abstract.tex}
+\input{./tex/streszczenie.tex}
+
+\singlespacing
+\tableofcontents
+\onehalfspacing
+
+\input{./tex/symbols.tex}
+\input{./tex/introduction.tex}
+\input{./tex/chapter-2.tex}
+\input{./tex/summary.tex}
+
+\singlespacing
+\bibliography{bibliography}
+\bibliographystyle{unsrt}
+\addcontentsline{toc}{chapter}{Bibliography}
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+\onehalfspacing
+
+\begin{appendices}
+
+\input{./tex/appendix_A.tex}
+\input{./tex/appendix_B.tex}
+
+\end{appendices}
+
+\end{document}
