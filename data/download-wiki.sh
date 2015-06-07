@@ -15,10 +15,16 @@ do
 done
 read -p "Index you want to download (supports resume):" index
 
-# Download chosen database dump
+echo Downloading...
 if [ $index -ge 0 ] && [ $index -lt ${#online_dumps[*]} ]; then
     wget -c ${online_dumps[$index]}
 fi
 
-# Uncompress downloaded file
-bzip2 -dk `basename ${online_dumps[$index]}`
+archive_name=`basename ${online_dumps[$index]}`
+echo Unpacking...
+bzip2 -dk $archive_name
+
+echo Creating symlink: wiki_dump.xml
+rm wiki_dump.xml 2> /dev/null
+dump_name=${archive_name//.bz2}
+ln -s $dump_name wiki_dump.xml
