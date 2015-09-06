@@ -1,0 +1,138 @@
+\ProvidesPackage{src/mojstyl}
+
+% 
+% Instrukcje importu
+%
+\usepackage{amssymb, amsfonts, amsmath, amsthm}
+\usepackage{mathtools, relsize}
+\usepackage{listings}
+\usepackage{wrapfig}
+\usepackage{longtable}
+
+
+\lstset{language=[Objective]C, numbers=left, breaklines=true, basicstyle=\ttfamily\scriptsize,
+           keywordstyle=\color{blue}\ttfamily,
+           stringstyle=\color{red}\ttfamily,
+           commentstyle=\color{green}\ttfamily,} 
+
+
+\usepackage[british,UKenglish,USenglish,english,american]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[OT4]{fontenc}
+
+\usepackage[top=2.5cm, bottom=2.5cm, right=2.5cm, left=3.5cm]{geometry}
+\linespread{1.3}
+\usepackage{indentfirst}
+\frenchspacing
+
+\usepackage{pdfpages, graphicx}
+\usepackage[ruled, labelsep=period]{caption}
+
+\usepackage{perpage}
+\MakePerPage{footnote}
+
+\usepackage{float}
+\usepackage[section]{placeins}
+
+\usepackage[pdfusetitle, unicode=true]{hyperref}
+\hypersetup {
+	pdfauthor={Alicja Kwaśniewska},
+	pdfkeywords={},
+	pdflang={pl},
+	pdfsubject={Support of remote medical diagnostics using HTML5/WebRTC technology}
+}
+\usepackage{algorithm, algpseudocode, algorithmicx}
+\usepackage{booktabs, multirow, tabularx}
+%========================
+
+\renewcommand{\arraystretch}{1.2}
+
+%
+% Rozdziały zaczynające się na nieparzystych stronach
+%
+\let\ochapter\chapter
+\def\chapter{\cleardoublepage\ochapter}
+%========================
+
+%
+% Polskie nazwy niektórych sekcji, kropki w numeracji
+%
+\makeatletter
+\renewcommand\@seccntformat[1]{\csname the#1\endcsname.\quad}
+\renewcommand\numberline[1]{#1.\hskip0.7em}
+
+\renewcommand\listalgorithmname{Spis algorytmów}
+\renewcommand\ALG@name{Algorytm}
+
+\addto\captionspolish{\renewcommand{\refname}{Bibliografia}}
+\makeatother
+%========================
+
+\widowpenalty=2000
+\clubpenalty=2000
+
+%
+% Style twierdzeń, definicji i dowodów
+%
+\newtheorem{twierdzenie}{Twierdzenie}[section]
+\newtheorem{lemat}[twierdzenie]{Lemat}
+\newtheoremstyle{definicja}
+	{\topsep}
+	{\topsep}
+	{}
+	{}
+	{}
+	{.\\}
+	{.5em}
+	{\thmname{\textbf{#1}}\thmnumber{ \textbf{#2.}}\thmnote{ \textit{#3}}}
+\theoremstyle{definicja}
+\newtheorem{definicja}{Definicja}
+\newtheorem{przyklad}{Przykład}
+
+\renewenvironment{proof}[1][\proofname]{\noindent {\textit{#1}:} }{}
+%========================
+
+\newcommand*{\QED}{\hfill\ensuremath{\blacksquare}}%
+\newcommand{\DuzeO}[1]{\ensuremath{\mathcal{O}\left(#1\right)}}
+
+%
+% Ładne operatory
+%
+\let\obigcup=\bigcup
+\renewcommand{\bigcup}{
+	\mathop{\vcenter{\hbox{
+				\ensuremath{\mathlarger{\mathlarger{\obigcup}}}
+			}
+		}
+	}
+}
+
+\let\oexists=\exists
+\renewcommand{\exists}{
+	\mathop{\vcenter{\hbox{
+				\ensuremath{\mathlarger{\mathlarger{\oexists}}}
+			}
+		}
+	}
+}
+
+\let\oforall=\forall
+\renewcommand{\forall}{
+	\mathop{\vcenter{\hbox{
+				\ensuremath{\mathlarger{\mathlarger{\mathlarger{\oforall}}}}
+			}
+		}
+	}
+}
+
+\let\osum=\sum
+\renewcommand{\sum}{
+	\mathop{\vcenter{\hbox{
+				\ensuremath{\mathlarger{\mathlarger{\osum}}}
+			}
+		}
+	}
+}
+%========================

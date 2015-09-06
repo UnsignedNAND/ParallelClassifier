@@ -1,0 +1,100 @@
+%%
+%% This file contains necessary commands and configurations for thesis written
+%% on Gdańsk University of Technology according to formating requirements
+%% described in Appendix No. 2 to GUT Rector's Decree No. 49/2014, 5 December 2014.
+%%
+%% Author: Piotr Dorożyński <piotr.dorozynski@pg.gda.pl>
+%%
+\ProvidesPackage{gutthesis}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+
+\usepackage[left=3.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage{pdfpages}
+
+\usepackage{helvet}
+\renewcommand*\familydefault{\sfdefault}
+\usepackage[helvet]{sfmath}
+
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{indentfirst}
+\setlength{\parindent}{1.25cm}
+\frenchspacing
+
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields 
+\fancyfoot[C]{\small\thepage}}
+\pagestyle{plain}
+\renewcommand{\headrulewidth}{0pt}
+
+\usepackage{enumitem}
+\setlist{nosep}
+\setlist[itemize,2]{label=$\circ$}
+\setlist[1]{labelindent=\parindent, leftmargin=*}
+
+\usepackage[largestsep]{titlesec}
+\renewcommand{\chaptername}{}
+\renewcommand{\appendixname}{Appendix }
+\titleformat{\chapter}{\large\bfseries\uppercase}{\MakeUppercase{\chaptertitlename}\thechapter. }{0pt}{}
+\titleformat{\section}{\normalsize\bfseries\itshape}{\thesection. }{0pt}{}
+\titleformat{\subsection}{\normalsize\itshape}{\thesubsection. }{0pt}{} 	
+\titlespacing{\chapter}{0pt}{-18pt}{6pt}
+\titlespacing{\section}{0pt}{12pt}{6pt}
+\titlespacing{\subsection}{0pt}{12pt}{6pt}
+
+\usepackage{tocloft}
+\setlength{\cftaftertoctitleskip}{6pt}
+\setlength{\cftafterloftitleskip}{6pt}
+\setlength{\cftafterlottitleskip}{6pt}
+\renewcommand{\cfttoctitlefont}{\clearpage \large\bfseries\MakeUppercase}
+\renewcommand{\cftloftitlefont}{\clearpage \large\bfseries\MakeUppercase}
+\renewcommand{\cftlottitlefont}{\clearpage \large\bfseries\MakeUppercase}
+\renewcommand{\contentsname}{Table of Contents}
+\renewcommand{\cftdotsep}{0.0}
+\setlength{\cftparskip}{6pt}
+\setlength{\cftbeforechapskip}{0pt}
+\renewcommand{\cftchapfont}{}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdot}}
+\renewcommand{\cftchappagefont}{}
+\renewcommand{\cftchappresnum}{\chaptertitlename}
+\renewcommand{\cftchapaftersnum}{.}
+\renewcommand{\cftsecaftersnum}{.}
+\renewcommand{\cftsubsecaftersnum}{.}
+\renewcommand{\cftfigaftersnum}{.}
+\renewcommand{\cfttabaftersnum}{.}
+\setlength{\cftfigindent}{0pt}
+\setlength{\cfttabindent}{0pt}
+
+\usepackage[titletoc]{appendix}
+
+\usepackage[numbers, square]{natbib}
+\setlength{\bibsep}{6pt}
+\renewcommand\bibname{BIBLIOGRAPHY}
+\renewcommand\bibsection{\onehalfspacing\chapter*{\bibname}\markboth{\MakeUppercase{\bibname}}{\MakeUppercase{\bibname}}\singlespacing}
+
+\usepackage{chngcntr}
+\counterwithout*{footnote}{chapter}
+\renewcommand{\footnotesize}{\small}
+
+\usepackage{floatrow}
+\DeclareFloatVCode{skip6pt}{\vspace{6pt}}
+\DeclareFloatVCode{skip12pt}{\vspace{12pt}}
+\floatsetup[table]{style=plaintop, font=small, captionskip=0pt, precode=skip6pt, postcode=skip12pt}
+\floatsetup[figure]{captionskip=6pt, precode=skip12pt, postcode=skip12pt}
+\setlength{\floatsep}{0pt}
+\setlength{\intextsep}{0pt}
+\setlength{\textfloatsep}{0pt}
+
+\usepackage[labelsep=period, font=small]{caption}
+\captionsetup[table]{labelfont={bf}, font+=onehalfspacing, singlelinecheck=false}
+\captionsetup[figure]{font+=singlespacing, justification=centerlast, name=Fig.}
+
+\usepackage{tabularx}

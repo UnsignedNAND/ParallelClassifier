@@ -1,0 +1,41 @@
+\chapter{Introduction}
+\label{int}
+
+This chapter introduces the dissertation titled \textit{"Text documents classification in parallel environment"} by presenting its context, motivation, project’s objectives, hypothesis and an outline on sections \ref{con}, \ref{mot}, \ref{obj}, \ref{hyp}, \ref{conclusions}f{out} respectively.
+
+\section{Context}
+\label{con}
+
+
+\section{Motivation}
+\label{mot}
+The motivation for this work is to provide a framework for text document categorization in parallel environment.
+
+\section{Objectives}
+\label{obj}
+In this project a tool for fast and scalable text document categorization will be developed and implemented. It will consist of two parts described shortly below.
+	\subsection{Advisor}
+	The first part of work is to prepare implementation of advisor for text document categorization. Advisor will be responsible for generating decision on class of given text document in relevance to known set of documents. It will be based on a tiered model with layers specified as follows:
+	\begin{enumerate}
+		\item First layer will be responsible for general decision that restricts the set of potential classes. It will be implemented using simple minimal distance kNN classifier.
+		\item second layer will return more precise decision and will be implemented using more complex Support Vector Machine approach.
+	\end{enumerate}
+	
+	\subsection{Parallen environment framework}
+	The second part of work consist of designing and implementing generic framework, which would allow users to run different advisors in parallel environment, speeding up total time needed for text document categorization. This includes designing of systems 
+
+\section{Hypothesis}
+\label{hypo}
+
+\section{Outline}
+\label{outline}
+
+The rest of the document is structured as follows:
+\begin{enumerate}
+	\item \textbf{Chapter \ref{state_of_art}} - Analysis of the state of knowledge in the field of: parsing text documents, counting theirs statistics, finding distance and relevance between them, methods of distributing data across cluster and running scalable tasks on it, comparing and evaluating effectiveness of these methods.
+	\item \textbf{Chapter \ref{methodology}} - Methodology, choice of algorithms for automatic analysis of facial expressions and analysis of the possibilities of their realization in HTML5 WebRTC technology. 
+	\item \textbf{Chapter \ref{system_design}} - Design of the system, aim of the project, potential users, system requirements.
+	\item \textbf{Chapter \ref{implementation}} - Description and implementation of the system.
+	\item \textbf{Chapter \ref{tests}} - Development of the test scenarios, performing the tests and conducting the experiments in different measuring conditions. Description of the achieved results.
+	\item \textbf{Chapter\ref{conclusions}} - Drawing conclusions from the results of work and possibilities of the future work.
+\end{enumerate}
