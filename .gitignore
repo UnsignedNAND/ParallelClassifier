@@ -58,3 +58,13 @@ target/
 
 # PyCharm
 .idea/
+
+# LaTeX
+*.aux
+*.log
+*..out
+*.lof
+*.lot
+*.synctex.gz
+*.toc
+
