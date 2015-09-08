@@ -8,31 +8,34 @@ This chapter introduces the dissertation titled \textit{"Text documents classifi
 The problem of text categorization is widely known in commercial world. Use cases include, for example, spam filtering, grouping articles and data organization in general. Thanks to text categorization it is possible to gain faster access to information because of usage of cataloged collections of documents \cite{aut_wiki_cat_8}. Despite the fact that there have already been introduced numerous tools providing the possibility of document categorization, the problem of performance and efficiency still exists.
 
 Taking it into consideration, the motivation for this work is to provide a framework for text document categorization in parallel environment. This innovative approach will allow to significantly reduce total time needed to parse a collection of documents and find relations between them. Using standard procedures this operation on a set of Wikipedia articles (4.9M of articles and growing \cite{wiki_art_num} \footnote{Number of articles in English Wikipedia, https://en.wikipedia.org/wiki/Wikipedia:Size\_of\_Wikipedia, access on 09.07.2015}) consumed weeks or even months. During this research I will try to prove that introducing parallelism will allow to shorten required time, thus creating applications more responsive to the end user.
+
 \section{Objectives}
 \label{obj}
-In this project a tool for fast and scalable text document categorization will be developed and implemented. It will consist of two parts described shortly below.
-	\subsection{Advisor}
-	The first part of work is to prepare implementation of advisor for text document categorization. Advisor will be responsible for generating decision on class of given text document in relevance to known set of documents. It will be based on a tiered model with layers specified as follows:
-	\begin{enumerate}
-		\item First layer will be responsible for general decision that restricts the set of potential classes. It will be implemented using simple minimal distance kNN classifier.
-		\item second layer will return more precise decision and will be implemented using more complex Support Vector Machine approach.
-	\end{enumerate}
+Project has two main objectives. First, is to design and implement multi-tier advisor for text document categorization, which will allow to test final solution application. Second, is to propose and implement framework that will make it possible to run different advisor's implementations in a parallel environment with data spanned across cluster of servers. Each of objectives is split into parts and described below.
+
+\subsection{Advisor}
+The first part of work is to prepare implementation of advisor for text document categorization. Advisor will be responsible for generating decision on class of given text document in relevance to known set of documents. It will be based on a tiered model with layers specified as follows:
+\begin{enumerate}
+\item First layer will be responsible for general decision that restricts the set of potential classes. It will be implemented using simple minimal distance kNN classifier.
+\item second layer will return more precise decision and will be implemented using more complex Support Vector Machine approach.
+\end{enumerate}
 	
-	\subsection{Parallen environment framework}
-	The second part of work consist of designing and implementing generic framework, which would allow users to run different advisors in parallel environment, speeding up total time needed for text document categorization. This includes designing of systems 
+\subsection{Parallel environment framework}
+The second part of work consist of designing and implementing generic framework, which would allow users to run different advisors in parallel environment, speeding up total time needed for text document categorization. This includes designing of systems 
 
 \section{Hypothesis}
 \label{hypo}
+As already mentioned, the aim of the project is to introduce framework that will allow to find relations between documents using combination of newest methods and trends of data distribution, parallel computation and machine learning algorithms. Such approach should demonstrate both efficiency and accuracy.
+\textit{TODO co jest mozliwe i co chce udowodnic}
 
 \section{Outline}
 \label{outline}
-
-The rest of the document is structured as follows:
+Document was divided into chapters and is structured as follows:
 \begin{enumerate}
-	\item \textbf{Chapter \ref{state_of_art}} - Analysis of the state of knowledge in the field of: parsing text documents, counting theirs statistics, finding distance and relevance between them, methods of distributing data across cluster and running scalable tasks on it, comparing and evaluating effectiveness of these methods.
-	\item \textbf{Chapter \ref{methodology}} - Methodology, choice of algorithms for automatic analysis of facial expressions and analysis of the possibilities of their realization in HTML5 WebRTC technology. 
-	\item \textbf{Chapter \ref{system_design}} - Design of the system, aim of the project, potential users, system requirements.
+	\item \textbf{Chapter \ref{state_of_art}} - Analysis of the state of knowledge in the field of: parsing text documents, methods of finding distance and relevance between them, machine learning algorithms that can be used to improve advisor's output decision, methods of distributing data across cluster and running scalable tasks on it, comparing and evaluating effectiveness of these methods.
+	\item \textbf{Chapter \ref{methodology}} - Methodology, choice of technologies, methods and algorithms for document categorization and distribution across cluster of nodes, analysis of possibilities of their realization in context of the project.
+	\item \textbf{Chapter \ref{design}} - Design of the system, aim of the project, potential users, system requirements.
 	\item \textbf{Chapter \ref{implementation}} - Description and implementation of the system.
-	\item \textbf{Chapter \ref{tests}} - Development of the test scenarios, performing the tests and conducting the experiments in different measuring conditions. Description of the achieved results.
+	\item \textbf{Chapter \ref{tests}} - Development of the test scenarios, performing the tests and conducting experiments. Description of the achieved results.
 	\item \textbf{Chapter\ref{conclusions}} - Drawing conclusions from the results of work and possibilities of the future work.
 \end{enumerate}
