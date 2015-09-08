@@ -62,7 +62,7 @@ target/
 # LaTeX
 *.aux
 *.log
-*..out
+*.out
 *.lof
 *.lot
 *.synctex.gz
