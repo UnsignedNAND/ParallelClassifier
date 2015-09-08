@@ -1,16 +1,13 @@
 \chapter{Introduction}
 \label{int}
 
-This chapter introduces the dissertation titled \textit{"Text documents classification in parallel environment"} by presenting its context, motivation, project’s objectives, hypothesis and an outline on sections \ref{con}, \ref{mot}, \ref{obj}, \ref{hyp}, \ref{conclusions}f{out} respectively.
+This chapter introduces the dissertation titled \textit{"Text documents classification in parallel environment"} by presenting its context and motivation, project’s objectives, hypothesis and an outline on sections \ref{con_mon}, \ref{obj}, \ref{hypo}, \ref{outline} respectively.
 
-\section{Context}
-\label{con}
+\section{Context and motivation}
+\label{con_mon}
+The problem of text categorization is widely known in commercial world. Use cases include, for example, spam filtering, grouping articles and data organization in general. Thanks to text categorization it is possible to gain faster access to information because of usage of cataloged collections of documents \cite{aut_wiki_cat_8}. Despite the fact that there have already been introduced numerous tools providing the possibility of document categorization, the problem of performance and efficiency still exists.
 
-
-\section{Motivation}
-\label{mot}
-The motivation for this work is to provide a framework for text document categorization in parallel environment.
-
+Taking it into consideration, the motivation for this work is to provide a framework for text document categorization in parallel environment. This innovative approach will allow to significantly reduce total time needed to parse a collection of documents and find relations between them. Using standard procedures this operation on a set of Wikipedia articles (4.9M of articles and growing \cite{wiki_art_num} \footnote{Number of articles in English Wikipedia, https://en.wikipedia.org/wiki/Wikipedia:Size\_of\_Wikipedia, access on 09.07.2015}) consumed weeks or even months. During this research I will try to prove that introducing parallelism will allow to shorten required time, thus creating applications more responsive to the end user.
 \section{Objectives}
 \label{obj}
 In this project a tool for fast and scalable text document categorization will be developed and implemented. It will consist of two parts described shortly below.
