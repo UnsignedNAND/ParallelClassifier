@@ -20,6 +20,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{textcomp}
+\usepackage[table]{xcolor}
 \usepackage[OT4]{fontenc}
 
 \usepackage[top=2.5cm, bottom=2.5cm, right=2.5cm, left=3.5cm]{geometry}
@@ -78,7 +79,7 @@
 %
 \newtheorem{twierdzenie}{Twierdzenie}[section]
 \newtheorem{lemat}[twierdzenie]{Lemat}
-\newtheoremstyle{definicja}
+\newtheoremstyle{definition}
 	{\topsep}
 	{\topsep}
 	{}
@@ -87,8 +88,8 @@
 	{.\\}
 	{.5em}
 	{\thmname{\textbf{#1}}\thmnumber{ \textbf{#2.}}\thmnote{ \textit{#3}}}
-\theoremstyle{definicja}
-\newtheorem{definicja}{Definicja}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
 \newtheorem{przyklad}{Przykład}
 
 \renewenvironment{proof}[1][\proofname]{\noindent {\textit{#1}:} }{}
