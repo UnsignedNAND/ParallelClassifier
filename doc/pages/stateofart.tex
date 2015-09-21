@@ -24,11 +24,7 @@ The process of Knowledge Discovery in Databases can be divided into following st
 		\end{itemize}
 	\item \textbf{Results validation} - the final step of Knowledge Discovery process is to verify whether discovered patterns can be applied to a wider dataset. It may turned out to be impossible to use some of the patters and reproduce results on a new sample. The process of using the model that is excessively complex and includes too many parameters in statistics and machine learning is known as over-fitting. A model that has been overfit may have poor predictive performance, as it  exaggerates even small fluctuations of information.  The accuracy of the model can then be measured from how many of new samples are correctly classify based on patterns learned from the training set. The binary classificator can also be evaluated by some statistical methods, for example the receiver operating characteristic, ROC.
 	
-	
-	
 \end{enumerate} 
-
-
 
 
 \section{Knowledge Discovery in Databases}
@@ -525,8 +521,39 @@ Then, the trade-off between the measures can be presented using TPR and FPR by p
 In order to evaluate multiclass classificators, the ROC curve may also be used. As in several multi-class problems, the idea is to perform pairwise comparison (one against one, one agaist all) \cite{multiclass-roc}. 
 
 \section{Parallel processing and scalability}
-	\subsection{Horizontal scaling}
-	\subsection{Vertical scaling}
+	Although classification is well-studied data mining problem, there are still some issues that limits its usability 
+	There are two main approaches to scaling:
+	\begin{enumerate}
+		\item \textbf{Horizontal scaling}
+		Horizontal scaling, also referred to as scale out, is the ability to increase computation performance by adding more machines into pool of resources. In database context horizontal scaling refers to partitioning data across nodes, so each node contains part of it.
+		
+		\begin{figure}[H]
+			\begin{center}
+				\includegraphics[width=0.3\linewidth]{images/scaleout.png}
+				\caption{Scale out method, source \cite{scale_out_up} }
+				\label{svm-plot2}
+			\end{center}
+		\end{figure}
+		
+		Horizontal scaling is the easiest way to achieve performance improvements in large scale. It often allows to add more machines to the cluster without affecting existing nodes, resulting in minimal downtime.
+		
+		With horizontal scaling comes also important feature from cloud computing - high availability. Cluster configured to work in high availability mode multiplies services and data so they meet replication level requirement. With this approach, if one node fails, responsibility for serving lost data and failed services is handed over to another node, allowing to keep downtime even more minimal.
+		
+		Finally, with scaling out there is possibility to scatter clusters across different data centers or geographical locations. It allows to handle unforeseen natural catastrophes without compromising your application.
+		
+		\item \textbf{Vertical scaling}
+		Vertical scaling is the ability to increase computation performance by adding more CPUs/cores or memory to existing machine.
+		
+		\begin{figure}[H]
+			\begin{center}
+				\includegraphics[width=0.2\linewidth]{images/scaleup.png}
+				\caption{Scale up method, source \cite{scale_out_up} }
+				\label{svm-plot2}
+			\end{center}
+		\end{figure}
+		
+		Vertical scaling is the easiest way to achieve significant performance improvements in small scale, scaling usually involves downtime and comes with an upper limit.
+	\end{enumerate}
 
 \section{Existing solutions}
 	With development of new technologies different means of using artificial intelligence to deal with real world problems became more and more common, creating a niche for providing such services. Despite the fact that those solution are often not free to use, they might sometimes turn out to be beneficial than creating own solution from scratch. Designing own classification system and developing it might be very time consuming, rendering product planning decisions more crucial.
