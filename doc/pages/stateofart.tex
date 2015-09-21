@@ -375,7 +375,7 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 
 \subsection{Data mining - Documents classification}
 	\subsubsection{Support Vector Machine model}
-	The Support Vector Machine algorithm is a discriminative classifier which uses hyperplane to separate new examples. The main goal of the algorithm is to find the optimal hyperplane, yet the question is which parameters define it. After analysing a plot illustrated in the figure \ref{svm-plot}, it becomes obvious that a line that passes too close to points may make classification be noise sensitive.  Taking it into consideration we can intuitively define a criterion of the best hyperplane: it should pass as far as possible from all points.
+	The Support Vector Machine algorithm is a discriminative classifier which uses hyperplane to separate new examples. The main goal of the algorithm is to find the optimal hyperplane, yet the question is which parameters define it. After analysing a plot illustrated in the figure \ref{svm-plot}, it becomes obvious that a line that passes too close to points may make classification be noise sensitive.  Taking it into consideration we can intuitively define a criterion of the best hyperplane: it should pass as far as possible from all points and then, samples that are closest to the hyperplane are called support vectors.
 		\begin{figure}[H]
 	\begin{center}
 	\includegraphics[width=0.4\linewidth]{images/svm-plot.png}
@@ -391,6 +391,20 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 	\label{svm-plot2}
 	\end{center}
 	\end{figure}
+	Formally, a hyperplane may be defined as:
+	\[f(x)=\beta_0+\beta^Tx\]
+where:
+ \[\beta - \text{weight vector}\]  
+ \[\beta_0 - \text{bias}\]  
+ Therefore the optimal plane may be formulated as:
+ \[\left | \beta_0+\beta^Tx \right | = 1\]
+
+	Multi-class SVM algorithm (MCSVM) can be implemented by combining binary SVM processes \cite{multi-svm}. We can distinguish two strategies for MCSVM algorithm \cite{mcsvm}:
+	\begin{enumerate}
+	\item One Against One - approach which focuses on creating one SVM for each pair of classes and train it to distinguish samples of one class from the others. Usually, classification   of  a new pattern  is  performed based on maximum voting, where each SVM votes for one class \cite{mcsvm}.
+	\item One Against All - approach which focuses on creating one SVM for each class and train it to distinguish samples of one class from the others. Usually, classification   of  a new pattern  is  performed based on the  maximum output of all SVM. \cite{mcsvm}
+	\end{enumerate} 
+	Taking into account some assumptions made by autors of \cite{mcsvm}  the   “one   against all”   strategy   seems to be   more  accurate   than   the   “one   against   one”. On the other hand although the  training  time  of an SVM  increases  rapidly with  the  number  of training samples, for a small number of training samples, it is easier to train SVMs in OAO algorithm.
 	\subsubsection{Naive Bayes}
 	Naive Bayes is a fast statistical classifier which is frequently used in spam detection systems.
 	\subsubsection{Maximum Entropy}
