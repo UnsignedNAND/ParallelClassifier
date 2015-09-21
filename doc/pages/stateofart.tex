@@ -375,6 +375,22 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 
 \subsection{Data mining - Documents classification}
 	\subsubsection{Support Vector Machine model}
+	The Support Vector Machine algorithm is a discriminative classifier which uses hyperplane to separate new examples. The main goal of the algorithm is to find the optimal hyperplane, yet the question is which parameters define it. After analysing a plot illustrated in the figure \ref{svm-plot}, it becomes obvious that a line that passes too close to points may make classification be noise sensitive.  Taking it into consideration we can intuitively define a criterion of the best hyperplane: it should pass as far as possible from all points.
+		\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.4\linewidth]{images/svm-plot.png}
+	\caption{SVM algorithm - multiple lines which separate two classes - Cartesian plane instead of hyperplanes to simplificate the problem, source \cite{svm-plot} }
+	\label{svm-plot}
+	\end{center}
+	\end{figure}
+	In SVM theory the distance between the optimal hyperplane and nearest points of both classes is known as margin. Therefore the optimal hyperplane leads to maximization of this margin (fig. \ref{svm-plot2}).
+	\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.4\linewidth]{images/svm-plot2.png}
+	\caption{SVM algorithm - maximum margin, source \cite{svm-plot} }
+	\label{svm-plot2}
+	\end{center}
+	\end{figure}
 	\subsubsection{Naive Bayes}
 	Naive Bayes is a fast statistical classifier which is frequently used in spam detection systems.
 	\subsubsection{Maximum Entropy}
