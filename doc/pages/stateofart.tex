@@ -200,7 +200,7 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 	\item After reading first transaction 
 	\begin{figure}[H]
 		\begin{center}
-			\includegraphics[width=0.4\linewidth]{images/fp1.png}
+			\includegraphics[width=0.3\linewidth]{images/fp1.png}
 			\caption{FP-growth example, after reading first transaction}
 			\label{fp_1}
 		\end{center}
@@ -208,7 +208,7 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 	\item After reading second transaction 
 		\begin{figure}[H]
 			\begin{center}
-				\includegraphics[width=0.4\linewidth]{images/fp2.png}
+				\includegraphics[width=0.3\linewidth]{images/fp2.png}
 				\caption{FP-growth example, after reading second transaction}
 				\label{fp_2}
 			\end{center}
@@ -252,7 +252,7 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 	\begin{figure}[H]
 	\begin{center}
 	\includegraphics[width=0.8\linewidth]{images/kmeans1.png}
-	\caption{K-means algorithm, step 1.}
+	\caption{K-means algorithm, step 1}
 	\label{kmeans_s1}
 	\end{center}
 	\end{figure}
@@ -261,7 +261,7 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 	\begin{figure}[H]
 	\begin{center}
 	\includegraphics[width=0.8\linewidth]{images/kmeans2.png}
-	\caption{K-means algorithm, step 2.}
+	\caption{K-means algorithm, step 2}
 	\label{kmeans_s2}
 	\end{center}
 	\end{figure}
@@ -272,7 +272,7 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 	\begin{figure}[H]
 	\begin{center}
 	\includegraphics[width=0.8\linewidth]{images/kmeans4.png}
-	\caption{K-means algorithm, step 3 \& 4.}
+	\caption{K-means algorithm, step 3 \& 4}
 	\label{kmeans_s4}
 	\end{center}
 	\end{figure}
@@ -283,7 +283,7 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 	\begin{figure}[H]
 	\begin{center}
 	\includegraphics[width=0.8\linewidth]{images/kmeans5.png}
-	\caption{K-means algorithm, step 5.}
+	\caption{K-means algorithm, step 5}
 	\label{kmeans_s5}
 	\end{center}
 	\end{figure}
@@ -306,7 +306,7 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 
 	\begin{enumerate}
 		\item Let \textbf{A} be a point, which we want to label.
-		\item Find a point \textbf{B}, that is closest to \textbf{A} taking into account the geometrical distance.
+		\item Find a point \textbf{B}, that is closest to \textbf{A} taking into account the distance between \textbf{A} and \textbf{B}.
 		\item Assign label of \textbf{B} to \textbf{A}
 		
 	\end{enumerate}
@@ -314,10 +314,37 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 		\item \textbf{Case 2, k=k}
 		\begin{enumerate}
 			\item We want to find \textit{k} Nearest Neighbors and perform the majority voting.
-			\item Let assume that we have \textit{n} instances of class 1 \textbf{C1} and \textit{n+1} instances of class 2 \textbf{C2}, such as \textit{k=2n+1}
+			\item Let assume that we have \textit{k} nearest neighbors of the point \textbf{A}, such as \textit{k=2n+1} and \textit{n} instances belong to class 1 - \textbf{C1} and \textit{n+1} instances belong to class 2 - \textbf{C2}.
 			\item We want to label \textbf{A} sample.
-			\item The sample \textbf{A} will be labeled as \textbf{C2}, as it forms majority.
+			\item The sample \textbf{A} will be labeled as \textbf{C2}, as instances from this group form majority.
 		\end{enumerate}
+		All of the described steps are illustrated using figures \ref{knn1}, \ref{knn2}, \ref{knn3}.
+		We have two labeled groups \textbf{C1} and \textbf{C2}. 
+		 
+		\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.5\linewidth]{images/knn1.png}
+	\caption{K-nearest neighbor algorithm, two labeled groups}
+	\label{knn1}
+	\end{center}
+	\end{figure}
+	We want to label a new sample \textbf{A}, so we find \textit{k} nearest neighbors (let \textit{k} equals 3).
+	\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.5\linewidth]{images/knn2.png}
+	\caption{K-nearest neighbor algorithm, finding nearest neighbors}
+	\label{knn2}
+	\end{center}
+	\end{figure}
+	As can be seen instances from group \textbf{C2} forms majority of nearest neighbors, so the sample \textbf{A} is labeled as \textbf{C2}.
+	\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.5\linewidth]{images/knn3.png}
+	\caption{K-nearest neighbor algorithm, labelling sample}
+	\label{knn3}
+	\end{center}
+	\end{figure}
+		
 			\item \textbf{Case 3, weightened kNN} - in this case each point has a weight which is  calculated using the distance to the sample, instead of giving all points weight equals 1. 
 		\end{itemize}
 		
@@ -329,13 +356,6 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 			\item \textit{c} - number of classes
 			\item \textit{P} - Nearest Neighbor error rate
 		\end{itemize}
-	
-	
-	
-	TODO https://www.youtube.com/watch?v=UqYde-LULfs figures
-	\begin{enumerate}
-	\item Given N training vectors, kNN	algorithm identifies the \textit{k} nearest neighbors of 'c', regardless of labels
-	\end{enumerate}
 	
 	\subsubsection{Hierarchical algorithm}
 	Hierarchical clustering is a method which aims to build a hierarchy of clusters. It is often presented as the one that offers better quality, but its use is limited due to quadratic time complexity \cite{k_means}. Hierarchical clustering goal is to produce a tree with single all-inclusive cluster as the root, that than divides into smaller, nested partitions with a single clusters at the bottom. Each of mid-points can be described as a combination of two clusters from lower level or as a part that was produced from splitting higher level. The output of such method can be visualized as a tree that is called dendogram (see Fig. \ref{hierarchical_dendogram}). This clustering offers two approaches, that share mentioned principles:
