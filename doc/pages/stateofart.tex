@@ -31,7 +31,6 @@ The process of Knowledge Discovery in Databases can be divided into following st
 
 
 
-
 \section{Knowledge Discovery in Databases}
 \subsection{Pre-processing}
 When designing a classifier for text documents, the feature extraction step is one of the most crucial to the final outcome. It should be build regarding the context that it is going to be used in, or it might render final solution to be inaccurate.
@@ -48,7 +47,7 @@ Some ways of cleaning and generalizing existing information are described below.
 
 \item	\textbf{Stemming}
 	
-	Stemming is a process of getting word steam from its inflected and derived forms. The main algorithm criteria is the fact that the steam has to be identical to the morphological root. There are several types of stemming algorithms. Each of them differs in respect to accuracy and achieved performance.
+	Stemming is a process of getting word stem from its inflected and derived forms. The main algorithm criteria is the fact that the stem has to be identical to the morphological root. There are several types of stemming algorithms. Each of them differs in respect to accuracy and achieved performance.
 	
 	\begin{enumerate}
 		\item \textbf{Lookup algorithms} - In this approach each of the inflected form together with related stem is collected in the structured form  \cite{lookup-stem}, a lookup table (def. \ref{lookup-table}). If a proper table is prepared, the algorithm is very efficient and fast. However the process of creating the table may be quite long and the table itself can be very large. Moreover for every new word it has to be updated. 
@@ -71,7 +70,7 @@ Some ways of cleaning and generalizing existing information are described below.
 	
 \item	 \textbf{Lemmatisation}
 	 
-	 The lemmatisation algorithm by using vocabulary and morphological analysis of words, reduces  inflectional forms of a word to a base/root form (or dictionary form known as \textit{lemma}). This process is similar, but not identical to stemming \cite{lemma}. 
+	 The lemmatisation algorithm reduces inflectional forms of a word to a base/root form (or dictionary form known as \textit{lemma}) by using vocabulary and morphological analysis of words. This process is similar, but not identical to stemming \cite{lemma}. 
 	 At first the part of speech of a word is determined, and then different normalization rules for each part of speech are applied. The algorithm is limited by the possibility to obtain the correct lexical category.
 	 
 \item	\textbf{Stochastic algorithms} 
@@ -90,6 +89,157 @@ This is a numerical statistic which specifies how important a word is to a docum
 \end{enumerate}
 	
 	
+\subsection{Data mining - Dependency modeling}
+Dependency modeling focuses on finding association rules using various measures of interestingness \cite{association-rules}. Association rule learning is a popular method for discovering interesting relations between variables. Generally the association rule is a rule that determines a data set that could be found in the database if the other data set exists in this database. In order to select interesting rules, some constraints have to be defined:
+ \begin{definition}[Support]
+ 	\label{support}
+ 	Support value of X is the proportion of transactions that contain a certain data set \textbf{X}
+ 	
+ \end{definition}
+  \begin{definition}[Confidence]
+  	\label{confidence}
+  	Confidence value of an association rule \[\left \{ X \right \} \Rightarrow \left \{ Y\right \}\] is the proportion of transactions that contain a certain data set \textbf{X} and also the other data set \textbf{Y}
+  	
+  \end{definition}
+
+\subsubsection{Apriori algorithm}
+The Apriori algorithm helps to find which variables can depend on others. 
+For example, the rule can look as follows \[\left \{ bread, cheese \right \} \Rightarrow \left \{ butter \right \}\] 
+It means that if someone buys bread and cheese, he buys also butter. Such information can
+be used as the basis for decisions about marketing activities.
+The steps of the Apriori algorithm will be described using following example:
+\begin{enumerate}
+	\item Consider following transactions gathered in a database presented in the table \ref{apriori-1}
+	\begin{table}[H]
+		\centering
+		\caption{Apriori algorithm - example of transactions}
+		\label{apriori-1}
+		\begin{tabular}{|c|c|l}
+			\cline{1-2}
+			Transaction & Items       &  \\ \cline{1-2}
+			1           & \{1,2,3,4\} &  \\ \cline{1-2}
+			2           & \{1,2\}     &  \\ \cline{1-2}
+			3           & \{2,3,4\}   &  \\ \cline{1-2}
+			4           & \{1,2,3\}   &  \\ \cline{1-2}
+			5           & \{2,3\}     &  \\ \cline{1-2}
+		\end{tabular}
+	\end{table}
+	\item  The Apriori algorithm will be used to determine the frequent item sets of this database. We will assume that an item set is frequent if it appears in at least N transactions. This value (N) is the support threshold.
+	\item At first we will count the support of each item separately.
+	\begin{table}[H]
+		\centering
+		\caption{Apriori algorithm - support of each item}
+		\label{apriori-2}
+		\begin{tabular}{|c|c|l}
+			\cline{1-2}
+			Item  & Support      &  \\ \cline{1-2}
+			\{1\} & 3			 &  \\ \cline{1-2}
+			\{2\} & 5            &  \\ \cline{1-2}
+			\{3\} & 4            &  \\ \cline{1-2}
+			\{4\} & 2            &  \\ \cline{1-2}
+		\end{tabular}
+	\end{table}
+	\item Let the support threshold equals 3 (N=3). As a result all of the items, except item \{4\} are frequent. 
+	\item In the next step we generate a list of pairs of frequent items.
+	\begin{table}[H]
+		\centering
+		\caption{Apriori algorithm - support of each pair}
+		\label{apriori-3}
+		\begin{tabular}{|c|c|l}
+			\cline{1-2}
+			Item    & Support &  \\ \cline{1-2}
+			\{1,2\} & 3       &  \\ \cline{1-2}
+			\{1,3\} & 5       &  \\ \cline{1-2}
+			\{2,3\} & 4       &  \\ \cline{1-2}
+		\end{tabular}
+	\end{table}
+	\item All of the pairs meet or exceed the minimum support, so they are frequent. Now we can count support of triples. 
+	\begin{table}[H]
+		\centering
+		\caption{Apriori algorithm - support of each triple}
+		\label{apriori-4}
+		\begin{tabular}{|c|c|l}
+			\cline{1-2}
+			Item      & Support &  \\ \cline{1-2}
+			\{1,2,3\} & 2       &  \\ \cline{1-2}
+		\end{tabular}
+	\end{table}
+	\item Taking into consideration a result collected in the table \ref{apriori-4}, there are no frequent triples in the considered example.
+\end{enumerate}
+\subsubsection{FP-growth algorithm}
+The algorithm for finding frequent patterns is quite simple and includes two passes over the dataset \cite{fp-growth}.
+\begin{itemize}
+	\item Pass 1
+	\begin{enumerate}
+		\item support of each item is first counted and stored to 'header table' 
+		\item infrequent items are discarded
+		\item the FP-tree structure is created by inserting instances into it, items in each instance are sorted by descending order of their frequency
+	\end{enumerate}
+	\item Pass 2
+	\begin{enumerate}
+		\item read transactions and map them to a path in the tree
+	\end{enumerate}
+\end{itemize}
+The construction of the FP-tree will be described using following example.
+Consider the same database ref{fp-alg} as presented in the Apriori algorithm example.
+\begin{table}[H]
+	\centering
+	\caption{FP-growth algorithm - example of transactions}
+	\label{apriori-1}
+	\begin{tabular}{|c|c|l}
+		\cline{1-2}
+		Transaction & Items       &  \\ \cline{1-2}
+		1           & \{1,2,3,4\} &  \\ \cline{1-2}
+		2           & \{1,2\}     &  \\ \cline{1-2}
+		3           & \{2,3,4\}   &  \\ \cline{1-2}
+		4           & \{1,2,3\}   &  \\ \cline{1-2}
+		5           & \{2,3\}     &  \\ \cline{1-2}
+	\end{tabular}
+\end{table}
+\begin{enumerate}
+	\item After reading first transaction 
+	\begin{figure}[H]
+		\begin{center}
+			\includegraphics[width=0.4\linewidth]{images/fp1.png}
+			\caption{FP-growth example, after reading first transaction}
+			\label{fp_1}
+		\end{center}
+	\end{figure}
+	\item After reading second transaction 
+		\begin{figure}[H]
+			\begin{center}
+				\includegraphics[width=0.4\linewidth]{images/fp2.png}
+				\caption{FP-growth example, after reading second transaction}
+				\label{fp_2}
+			\end{center}
+		\end{figure}
+			\item After reading third transaction 
+			\begin{figure}[H]
+				\begin{center}
+					\includegraphics[width=0.4\linewidth]{images/fp3.png}
+					\caption{FP-growth example, after reading third transaction}
+					\label{fp_3}
+				\end{center}
+			\end{figure}
+				\item After reading fourth transaction 
+				\begin{figure}[H]
+					\begin{center}
+						\includegraphics[width=0.4\linewidth]{images/fp4.png}
+						\caption{FP-growth example, after reading fourth transaction}
+						\label{fp_4}
+					\end{center}
+				\end{figure}
+					\item After reading fifth transaction
+					\begin{figure}[H]
+						\begin{center}
+							\includegraphics[width=0.4\linewidth]{images/fp5.png}
+							\caption{FP-growth example, after reading fifth transaction}
+							\label{fp_5}
+						\end{center}
+					\end{figure}
+	
+\end{enumerate}
+
 
 \subsection{Data mining - Documents clusterization}
 	\subsubsection{K-means algorithm}
@@ -141,7 +291,46 @@ This is a numerical statistic which specifies how important a word is to a docum
 	\end{enumerate}
 	
 	\subsubsection{K-Nearest Neighbors algorithm}
-	This section focuses on important classification algorithm called K-Nearest Neighbors (kNN). It is simple and efficient to use, as it does not require any labeling for data processing \cite{knn}.
+	This section focuses on important classification algorithm called K-Nearest Neighbors (kNN). It is simple and efficient to use, as it does not require any labeling for data processing \cite{knn}. KNN is an non parametric lazy learning algorithm, because it doesn't make any assumptions on distribution of information and it doesn't contain any training phase or this phase is very minimal \cite{knn2}.  
+	
+	In KNN algorithm some assumptions are made:
+	\begin{enumerate}
+		\item Each training dataset consists of vectors labeled by a class differentiator. 
+		\item Data is in feature/metric space, so it is a scalar or multidimensional vector. This assumption is necessary to be able to use a notion of distance \cite{knn2}.
+		\item It is necessary to specify a kn number which determines number of neighbors that have influence on classification. 
+	\end{enumerate}
+	
+	The algorithm of labeling a sample using kNN algorithm involves following steps:
+	\begin{itemize}
+		\item \textbf{Case 1, k=1}
+
+	\begin{enumerate}
+		\item Let \textbf{A} be a point, which we want to label.
+		\item Find a point \textbf{B}, that is closest to \textbf{A} taking into account the geometrical distance.
+		\item Assign label of \textbf{B} to \textbf{A}
+		
+	\end{enumerate}
+	
+		\item \textbf{Case 2, k=k}
+		\begin{enumerate}
+			\item We want to find \textit{k} Nearest Neighbors and perform the majority voting.
+			\item Let assume that we have \textit{n} instances of class 1 \textbf{C1} and \textit{n+1} instances of class 2 \textbf{C2}, such as \textit{k=2n+1}
+			\item We want to label \textbf{A} sample.
+			\item The sample \textbf{A} will be labeled as \textbf{C2}, as it forms majority.
+		\end{enumerate}
+			\item \textbf{Case 3, weightened kNN} - in this case each point has a weight which is  calculated using the distance to the sample, instead of giving all points weight equals 1. 
+		\end{itemize}
+		
+		Obviously this algorithm may result an error. However this statement holds only when a dataset is not big and the error turns out to be quite small, less than twice the Bayes error rate as described in \cite{duda-hart-classification}. One of the authors statements is to obtain a tight error bound to the Nearest Neighbor Rule:
+		\[P*\leqslant P\leqslant P*(2-\frac{c}{c-1}P*)\]
+		where:
+		\begin{itemize}
+			\item \textit{P*} - Bayes error rate
+			\item \textit{c} - number of classes
+			\item \textit{P} - Nearest Neighbor error rate
+		\end{itemize}
+	
+	
 	
 	TODO https://www.youtube.com/watch?v=UqYde-LULfs figures
 	\begin{enumerate}
@@ -266,14 +455,29 @@ Then, the trade-off between the measures can be presented using TPR and FPR by p
 	\end{center}
 \end{figure}
 \subsubsection{Evaluation of multiclass classificators}
+
+
 http://stats.stackexchange.com/questions/2151/how-to-plot-roc-curves-in-multiclass-classification
+
+
 http://stats.stackexchange.com/questions/44261/how-to-determine-the-quality-of-a-multiclass-classifier
 \section{Parallel processing and scalability}
 \section{Existing solutions}
 	\subsection{Data mining}
+	\textbf{Business}
+		
+	\textbf{Science}
+	
+	\textbf{Medicine}
+	
+	\textbf{Spatial}
+	
+		
+	
+	
 	Other use cases cover such aspects as filtering unsolicited bulk e-mail \cite{naive-bayesian}. 
 	\subsection{Machine learning}
 		\subsubsection{Microsoft Azure Machine Learning}
-		\subsubsection{Amazon AWS Machine Learning}
+
 \section{Conclusion}
 This chapter reviewed a number of issues and concerns that might have risen through out the discussion about performing scalable text document classification. Different methods of classification and clusterization were discussed, including kNN and SVM.
