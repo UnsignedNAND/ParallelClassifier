@@ -417,14 +417,9 @@ For any pixel we have to calculate \textit{aposterior probability} and choose a 
 \[{P(X|\omega_1)P(\omega_1)} > {P(X|\omega_2)P(\omega_2)}\]
 
 	\subsubsection{Naive Bayes}
-	Naive Bayes is a fast statistical classifier which is frequently used in spam detection systems \cite{naive-bayesian}.  
-The algorithm can be easily presented using message classification process. Let assume that a message is represented by a vector of values 
-\[x_1, ..., x_n\]
-of atributes
-\[X_1, ..., X_n\]
-If a characteristic is present in the message we set its value \textit{1} to it, otherwise value \textit{0} is assigned. Then, to classify each candidate we compute \textit{mutual information - MI} of each candidate attribute with category-denoting variable \cite{neive-bayesian}:
-\[MI(X,C)=\sum_{x\in {0,1};c\in{C_1,C_2}}P(X=x,C=c)log\frac{P(X=x,C=c)}{P(X=x)P(C=c)}\]
-Then, we select attribute with the highest value of \textit{mutual information}. Probabilities are estimated from the training dataset.
+	Naive Bayes is a fast statistical classifier which is frequently used in spam detection systems.
+	\subsubsection{Maximum Entropy}
+	\subsubsection{Winnow}
 	\subsubsection{Neural Network}
 	Neural networks are computional methods which allow to solve nonlinear classifications, because of their nonlinear nature. Being inspired by biological neural structures, they are composed of neurons connected through weights. First step focuses on training the network with given samples \cite{fe_signal_processing} in order to specify best weights. Once they are defined, the network may be used for classification.
 
@@ -522,8 +517,12 @@ Then, the trade-off between the measures can be presented using TPR and FPR by p
 	\end{center}
 \end{figure}
 \subsubsection{Evaluation of multiclass classificators}
-In order to evaluate multiclass classificators, the ROC curve may also be used. As in several multi-class problems, the idea is to perform pairwise comparison (one against one, one agaist all) \cite{multiclass-roc}. 
 
+
+http://stats.stackexchange.com/questions/2151/how-to-plot-roc-curves-in-multiclass-classification
+
+
+http://stats.stackexchange.com/questions/44261/how-to-determine-the-quality-of-a-multiclass-classifier
 \section{Parallel processing and scalability}
 	\subsection{Horizontal scaling}
 	\subsection{Vertical scaling}
