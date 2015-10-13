@@ -24,7 +24,11 @@ The process of Knowledge Discovery in Databases can be divided into following st
 		\end{itemize}
 	\item \textbf{Results validation} - the final step of Knowledge Discovery process is to verify whether discovered patterns can be applied to a wider dataset. It may turned out to be impossible to use some of the patters and reproduce results on a new sample. The process of using the model that is excessively complex and includes too many parameters in statistics and machine learning is known as over-fitting. A model that has been overfit may have poor predictive performance, as it  exaggerates even small fluctuations of information.  The accuracy of the model can then be measured from how many of new samples are correctly classify based on patterns learned from the training set. The binary classificator can also be evaluated by some statistical methods, for example the receiver operating characteristic, ROC.
 	
+	
+	
 \end{enumerate} 
+
+
 
 
 \section{Knowledge Discovery in Databases}
@@ -413,14 +417,9 @@ For any pixel we have to calculate \textit{aposterior probability} and choose a 
 \[{P(X|\omega_1)P(\omega_1)} > {P(X|\omega_2)P(\omega_2)}\]
 
 	\subsubsection{Naive Bayes}
-	Naive Bayes is a fast statistical classifier which is frequently used in spam detection systems \cite{naive-bayesian}.  
-The algorithm can be easily presented using message classification process. Let assume that a message is represented by a vector of values 
-\[x_1, ..., x_n\]
-of atributes
-\[X_1, ..., X_n\]
-If a characteristic is present in the message we set its value \textit{1} to it, otherwise value \textit{0} is assigned. Then, to classify each candidate we compute \textit{mutual information - MI} of each candidate attribute with category-denoting variable \cite{neive-bayesian}:
-\[MI(X,C)=\sum_{x\in {0,1};c\in{C_1,C_2}}P(X=x,C=c)log\frac{P(X=x,C=c)}{P(X=x)P(C=c)}\]
-Then, we select attribute with the highest value of \textit{mutual information}. Probabilities are estimated from the training dataset.
+	Naive Bayes is a fast statistical classifier which is frequently used in spam detection systems.
+	\subsubsection{Maximum Entropy}
+	\subsubsection{Winnow}
 	\subsubsection{Neural Network}
 	Neural networks are computional methods which allow to solve nonlinear classifications, because of their nonlinear nature. Being inspired by biological neural structures, they are composed of neurons connected through weights. First step focuses on training the network with given samples \cite{fe_signal_processing} in order to specify best weights. Once they are defined, the network may be used for classification.
 
@@ -518,49 +517,20 @@ Then, the trade-off between the measures can be presented using TPR and FPR by p
 	\end{center}
 \end{figure}
 \subsubsection{Evaluation of multiclass classificators}
-In order to evaluate multiclass classificators, the ROC curve may also be used. As in several multi-class problems, the idea is to perform pairwise comparison (one against one, one agaist all) \cite{multiclass-roc}. 
 
+
+http://stats.stackexchange.com/questions/2151/how-to-plot-roc-curves-in-multiclass-classification
+
+
+http://stats.stackexchange.com/questions/44261/how-to-determine-the-quality-of-a-multiclass-classifier
 \section{Parallel processing and scalability}
-	Although classification is well-studied data mining problem, there are still some issues that limits its usability 
-	There are two main approaches to scaling:
-	\begin{enumerate}
-		\item \textbf{Horizontal scaling}
-		Horizontal scaling, also referred to as scale out, is the ability to increase computation performance by adding more machines into pool of resources. In database context horizontal scaling refers to partitioning data across nodes, so each node contains part of it.
-		
-		\begin{figure}[H]
-			\begin{center}
-				\includegraphics[width=0.3\linewidth]{images/scaleout.png}
-				\caption{Scale out method, source \cite{scale_out_up} }
-				\label{svm-plot2}
-			\end{center}
-		\end{figure}
-		
-		Horizontal scaling is the easiest way to achieve performance improvements in large scale. It often allows to add more machines to the cluster without affecting existing nodes, resulting in minimal downtime.
-		
-		With horizontal scaling comes also important feature from cloud computing - high availability. Cluster configured to work in high availability mode multiplies services and data so they meet replication level requirement. With this approach, if one node fails, responsibility for serving lost data and failed services is handed over to another node, allowing to keep downtime even more minimal.
-		
-		Finally, with scaling out there is possibility to scatter clusters across different data centers or geographical locations. It allows to handle unforeseen natural catastrophes without compromising your application.
-		
-		\item \textbf{Vertical scaling}
-		Vertical scaling is the ability to increase computation performance by adding more CPUs/cores or memory to existing machine.
-		
-		\begin{figure}[H]
-			\begin{center}
-				\includegraphics[width=0.2\linewidth]{images/scaleup.png}
-				\caption{Scale up method, source \cite{scale_out_up} }
-				\label{svm-plot2}
-			\end{center}
-		\end{figure}
-		
-		Vertical scaling is the easiest way to achieve significant performance improvements in small scale, scaling usually involves downtime and comes with an upper limit.
-	\end{enumerate}
+	\subsection{Horizontal scaling}
+	\subsection{Vertical scaling}
 
 \section{Existing solutions}
 	With development of new technologies different means of using artificial intelligence to deal with real world problems became more and more common, creating a niche for providing such services. Despite the fact that those solution are often not free to use, they might sometimes turn out to be beneficial than creating own solution from scratch. Designing own classification system and developing it might be very time consuming, rendering product planning decisions more crucial.
 	\subsection{Machine learning}
-		
-		\subsubsection{Amazon AWS Machine Learning}
-		Amazon is said to be the biggest cloud services provider on the market. It has overwhelming market share leadership, with over 10 times more infrastructure available on demand than the aggregate total of the other 14 providers \cite{amazon_leader}. Recently tools for applying machine learning were added to their portfolio, allowing end-users to take advantage of scalable environment which in combination with machine learning design system with high-level of abstraction allows to efficiently design and deploy application. 
+		\subsubsection{Microsoft Azure Machine Learning}
 		
 \section{Use cases}
 	Development was always driven by arising needs, and so classification development has few different fields which are the forces that push it ahead. This section illustrates the most note-worthy areas and briefly discusses source of those needs and most common use cases.
@@ -578,10 +548,12 @@ In order to evaluate multiclass classificators, the ROC curve may also be used. 
 			One of most important examples is the study of human genetics. Sequence mining helps to understand the relation between single DNA sequences with probability of developing common diseases like cancer. It helps to diagnose such cases, allowing to start treatment as soon as possible, and sometimes even to prevent it completely \cite{data_mining_cancer}.
 			
 			Another worth mentioning example is the area of power engineering, where data mining methods have been widely adapted for condition monitoring of high voltage electrical equipment. Condition monitoring itself supplies information, while data clustering techniques, such as self-organizing map, allow to detect abnormal conditions and denominate possible nature of the abnormalities \cite{data_mining_electrical_abnormalities}.
-
+						
+			\item \textbf{Spatial}
+			
+			
 		\end{enumerate}
-
 		Other use cases cover such aspects as filtering unsolicited bulk e-mail \cite{naive-bayesian}. 
 
 \section{Conclusion}
-This chapter reviewed a number of issues and concerns that might have risen through out the discussion about performing scalable text document classification. Different methods of classification and clusterization were discussed, including kNN and SVM. The state of the art presented in this section provides a complete source of knowledge required to implement application of this kind. Moreover, restrictions mentioned previously should be taken into account. The state of the art presented in this chapter was prepared in reference to the hypothesis of the project.
+This chapter reviewed a number of issues and concerns that might have risen through out the discussion about performing scalable text document classification. Different methods of classification and clusterization were discussed, including kNN and SVM.

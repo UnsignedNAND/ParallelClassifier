@@ -40,18 +40,6 @@
 	\tableofcontents
 	\newpage
 	
-	% List of figures
-	\cleardoublepage
-	\phantomsection
-	\addcontentsline{toc}{chapter}{List of figures}
-	\listoffigures
-	
-	% List of tables
-	\cleardoublepage
-	\phantomsection
-	\addcontentsline{toc}{chapter}{List of tables}
-	\listoftables
-	
 	% Chapters
 	\input{pages/intro.tex}
 	\input{pages/stateofart.tex}
@@ -60,6 +48,19 @@
 	\input{pages/implementation.tex}
 	\input{pages/tests.tex}
 	\input{pages/conclusion.tex}
+	
+	
+	% List of figures
+	\cleardoublepage
+	\phantomsection
+	\addcontentsline{toc}{chapter}{List of figures}
+	\listoffigures
+		
+	% List of tables
+	\cleardoublepage
+	\phantomsection
+	\addcontentsline{toc}{chapter}{List of tables}
+	\listoftables
 	
 	\input{pages/bibliography.tex}
 	\input{pages/appendix.tex}
