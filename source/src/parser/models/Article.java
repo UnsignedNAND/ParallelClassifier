@@ -5,30 +5,32 @@ import parser.PrepareText;
 import parser.stemmers.Porter;
 
 public class Article {
+
     private String title;
     private String text;
     private Map<String, Integer> bagOfWords;
-    
+
     private final Porter stemmer;
 
     public Map<String, Integer> getBagOfWords() {
         return bagOfWords;
     }
     private String categoryWiki;
-    
-    public Article(){
+
+    public Article() {
         this.stemmer = new Porter();
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return "Title: " + this.title + "\nText:\n" + this.text + "\n********************";
     }
-    
-    public void PrintBag(){
-        for(String key : this.bagOfWords.keySet()){
+
+    public void PrintBag() {
+        for (String key : this.bagOfWords.keySet()) {
             System.out.println(key + " : " + this.bagOfWords.get(key));
         }
+        System.out.println("Len: " + this.bagOfWords.size());
     }
 
     public String getTitle() {
@@ -49,11 +51,12 @@ public class Article {
         text = PrepareText.TrimWhiteSpaces(text);
         this.text = text;
         String text2 = "";
-        for(String word : text.split(" ")){
+        for (String word : text.split(" ")) {
             this.stemmer.add(word.toCharArray(), word.length());
             this.stemmer.stem();
             text2 += this.stemmer.toString() + " ";
         }
+        text = text2;
         this.bagOfWords = PrepareText.bagOfWords(text);
     }
 
