@@ -98,3 +98,35 @@
 \captionsetup[figure]{font+=singlespacing, justification=centerlast, name=Fig.}
 
 \usepackage{tabularx}
+\usepackage{amsthm}
+\usepackage{amssymb, amsfonts, amsmath, amsthm}
+\usepackage{mathtools, relsize}
+\usepackage{listings}
+\usepackage{wrapfig}
+\usepackage{longtable}
+\usepackage{textcomp}
+\usepackage{multirow}
+\usepackage[OT4]{fontenc}
+
+\widowpenalty=2000
+\clubpenalty=2000
+%
+% Style twierdzeń, definicji i dowodów
+%
+\newtheorem{twierdzenie}{Twierdzenie}[section]
+\newtheorem{lemat}[twierdzenie]{Lemat}
+\newtheoremstyle{definition}
+	{\topsep}
+	{\topsep}
+	{}
+	{}
+	{}
+	{.\\}
+	{.5em}
+	{\thmname{\textbf{#1}}\thmnumber{ \textbf{#2.}}\thmnote{ \textit{#3}}}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{przyklad}{Przykład}
+
+\renewenvironment{proof}[1][\proofname]{\noindent {\textit{#1}:} }{}
+%========================
