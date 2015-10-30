@@ -37,8 +37,9 @@ public class WikiParser {
     
     public void PrintList(){
         for(Article article : this.articles){
-            System.out.println(article);
-            article.PrintBag();
+//            System.out.println(article);
+//            article.PrintBag();
+            TextTools.WordsHistogram(article.getBagOfWords());
         }
     }
 

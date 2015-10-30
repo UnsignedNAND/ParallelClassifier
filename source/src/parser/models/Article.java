@@ -1,7 +1,7 @@
 package parser.models;
 
 import java.util.Map;
-import parser.PrepareText;
+import parser.TextTools;
 import parser.stemmers.Porter;
 
 public class Article {
@@ -46,18 +46,8 @@ public class Article {
     }
 
     public void setText(String text) {
-        text = PrepareText.LowerString(text);
-        text = PrepareText.RemoveSpecialChars(text);
-        text = PrepareText.TrimWhiteSpaces(text);
-        this.text = text;
-        String text2 = "";
-        for (String word : text.split(" ")) {
-            this.stemmer.add(word.toCharArray(), word.length());
-            this.stemmer.stem();
-            text2 += this.stemmer.toString() + " ";
-        }
-        text = text2;
-        this.bagOfWords = PrepareText.bagOfWords(text);
+        this.text = TextTools.Simplify(text);
+        this.bagOfWords = TextTools.bagOfWords(this.text);
     }
 
     public String getCategoryWiki() {
