@@ -1,6 +1,6 @@
 package parser.models;
 
-import java.util.Map;
+import java.util.HashMap;
 import parser.TextTools;
 import parser.stemmers.Porter;
 
@@ -8,29 +8,22 @@ public class Article {
 
     private String title;
     private String text;
-    private Map<String, Integer> bagOfWords;
+    private HashMap<String, Integer> bagOfWords;
 
     private final Porter stemmer;
-
-    public Map<String, Integer> getBagOfWords() {
-        return bagOfWords;
-    }
-    private String categoryWiki;
 
     public Article() {
         this.stemmer = new Porter();
     }
+    
+    public HashMap<String, Integer> getBagOfWords() {
+        return bagOfWords;
+    }
+    private String categoryWiki;
 
     @Override
     public String toString() {
         return "Title: " + this.title + "\nText:\n" + this.text + "\n********************";
-    }
-
-    public void PrintBag() {
-        for (String key : this.bagOfWords.keySet()) {
-            System.out.println(key + " : " + this.bagOfWords.get(key));
-        }
-        System.out.println("Len: " + this.bagOfWords.size());
     }
 
     public String getTitle() {

@@ -1,6 +1,7 @@
 package msc;
 
 import java.util.concurrent.TimeUnit;
+import parser.TextTools;
 import parser.WikiParser;
 
 public class Msc {
@@ -15,7 +16,7 @@ public class Msc {
         parseTimeStop = System.nanoTime();
         parseTimeDelta = parseTimeStop - parseTimeStart;
 
-        wp.PrintList();
+        TextTools.PrintArticles(wp.getArticles());
 
         System.out.println("Elapsed: " + TimeUnit.NANOSECONDS.toMillis(parseTimeDelta) + " ms");
     }

@@ -19,6 +19,7 @@ public class WikiParser {
 
 
     List<Article> articles;
+
     Article currentArticle;
     String tagContent = "";
 
@@ -33,14 +34,6 @@ public class WikiParser {
             Logger.getLogger(WikiParser.class.getName()).log(Level.SEVERE, ex.toString());
         }
         this.articles = new ArrayList<>();
-    }
-    
-    public void PrintList(){
-        for(Article article : this.articles){
-//            System.out.println(article);
-//            article.PrintBag();
-            TextTools.WordsHistogram(article.getBagOfWords());
-        }
     }
 
     public void Parse() {
@@ -81,12 +74,16 @@ public class WikiParser {
                         this.articles = new ArrayList<>();
                         break;
                 }
-                if(articlesParsed >= 1){
+                if(articlesParsed >= 5){
                         break;
                     }
             }
         } catch (XMLStreamException ex) {
             Logger.getLogger(WikiParser.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public List<Article> getArticles() {
+        return articles;
     }
 }
