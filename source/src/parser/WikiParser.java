@@ -16,7 +16,7 @@ import parser.models.Article;
 public class WikiParser {
 
     String path = "../data/simplewiki-20150314-pages-articles.xml";
-
+    int articlesToParse = 30;
 
     List<Article> articles;
 
@@ -74,7 +74,7 @@ public class WikiParser {
                         this.articles = new ArrayList<>();
                         break;
                 }
-                if(articlesParsed >= 5){
+                if(articlesParsed >= this.articlesToParse){
                         break;
                     }
             }

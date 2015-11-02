@@ -47,11 +47,24 @@ public class TextTools {
     }
 
     public static void PrintArticles(List<Article> articles) {
+        double distance = 0.0;
+        HashMap<String, Integer> document1 = null;
+        HashMap<String, Integer> document2 = null;
         for (Article article : articles) {
-            TextTools.PrintSortedBag(TextTools.cutInsignificantWords(article.getBagOfWords()));
+            document1 = TextTools.CutInsignificantWords(article.getBagOfWords());
+            document2 = null;
+            
+            for (Article articleToCompare : articles) {
+//                if(!articleToCompare.getTitle().equals(article.getTitle())){
+                    document2 = TextTools.CutInsignificantWords(articleToCompare.getBagOfWords());
+                    distance = TextTools.ComputeDistance(document1, document2);
+                    System.out.println(article.getTitle() + " x " + articleToCompare.getTitle() + " = " + distance);
+//                }
+            }
+            System.out.println("*******************************");
 //            TextTools.WordsHistogram(article.getBagOfWords());
-            System.out.println("Size cut: " + TextTools.cutInsignificantWords(article.getBagOfWords()).size());
-            System.out.println("Size bow: " + article.getBagOfWords().size());
+//            System.out.println("Size cut: " + TextTools.CutInsignificantWords(article.getBagOfWords()).size());
+//            System.out.println("Size bow: " + article.getBagOfWords().size());
         }
     }
 
@@ -95,7 +108,7 @@ public class TextTools {
         return bow;
     }
 
-    public static int wordsInBagOfWords(HashMap<String, Integer> bow) {
+    public static int WordsInBagOfWords(HashMap<String, Integer> bow) {
         int num = 0;
         for (String key : bow.keySet()) {
             num += bow.get(key);
@@ -103,8 +116,8 @@ public class TextTools {
         return num;
     }
 
-    public static HashMap<String, Integer> cutInsignificantWords(HashMap<String, Integer> bow) {
-        int numTotalWords = TextTools.wordsInBagOfWords(bow),
+    public static HashMap<String, Integer> CutInsignificantWords(HashMap<String, Integer> bow) {
+        int numTotalWords = TextTools.WordsInBagOfWords(bow),
                 value;
         HashMap<String, Integer> filtered = new HashMap<>();
 
@@ -141,5 +154,23 @@ public class TextTools {
 
     private static String LowerString(String str) {
         return str.toLowerCase(TextTools.locale);
+    }
+
+    public static int InnerProduct(HashMap<String, Integer> document1, HashMap<String, Integer> document2) {
+        int sum = 0;
+
+        for (String word : document1.keySet()) {
+            if (document2.containsKey(word)) {
+                sum += document1.get(word) * document2.get(word);
+            }
+        }
+        return sum;
+    }
+
+    public static double ComputeDistance(HashMap<String, Integer> document1, HashMap<String, Integer> document2) {
+        int numerator = TextTools.InnerProduct(document1, document2);
+        double denominator = Math.sqrt(TextTools.InnerProduct(document1, document1) * TextTools.InnerProduct(document2, document2));
+
+        return Math.acos(numerator / denominator);
     }
 }
