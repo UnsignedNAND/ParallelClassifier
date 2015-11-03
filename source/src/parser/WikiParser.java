@@ -16,7 +16,7 @@ import parser.models.Article;
 public class WikiParser {
 
     String path = "../data/simplewiki-20150314-pages-articles.xml";
-    int articlesToParse = 30;
+    int articlesToParse = 500;
 
     List<Article> articles;
 
@@ -45,8 +45,7 @@ public class WikiParser {
                     case XMLStreamConstants.START_ELEMENT:
                         if ("page".equals(reader.getLocalName())) {
                             currentArticle = new Article();
-                        }
-                        else if ("text".equals(reader.getLocalName()) || "title".equals(reader.getLocalName())) {
+                        } else if ("text".equals(reader.getLocalName()) || "title".equals(reader.getLocalName())) {
                             tagContent = "";
                         }
                         break;
@@ -69,20 +68,20 @@ public class WikiParser {
                                 break;
                         }
                         break;
-                        
+
                     case XMLStreamConstants.START_DOCUMENT:
                         this.articles = new ArrayList<>();
                         break;
                 }
-                if(articlesParsed >= this.articlesToParse){
-                        break;
-                    }
+                if (this.articlesToParse != 0 && articlesParsed >= this.articlesToParse) {
+                    break;
+                }
             }
         } catch (XMLStreamException ex) {
             Logger.getLogger(WikiParser.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public List<Article> getArticles() {
         return articles;
     }

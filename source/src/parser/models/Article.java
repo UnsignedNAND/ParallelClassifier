@@ -6,11 +6,11 @@ import parser.stemmers.Porter;
 
 public class Article {
 
-    private String title;
-    private String text;
-    private HashMap<String, Integer> bagOfWords;
-
-    private final Porter stemmer;
+    protected String title;
+    protected String text;
+    protected HashMap<String, Integer> bagOfWords;
+    protected String categoryWiki;
+    protected final Porter stemmer;
 
     public Article() {
         this.stemmer = new Porter();
@@ -19,7 +19,6 @@ public class Article {
     public HashMap<String, Integer> getBagOfWords() {
         return bagOfWords;
     }
-    private String categoryWiki;
 
     @Override
     public String toString() {
