@@ -13,6 +13,11 @@ import java.util.HashMap;
  */
 public class Article extends parser.models.Article{
     public HashMap<Article, Double> distances;
+    private Double distanceToCurrentCenter = 0.0;
+
+    public Double getDistanceToCurrentCenter() {
+        return distanceToCurrentCenter;
+    }
     
     public Article(){
         
@@ -34,6 +39,7 @@ public class Article extends parser.models.Article{
                 closestCenter = article;
             }
         }
+        this.distanceToCurrentCenter = closestDistance;
         return closestCenter;
     }
     

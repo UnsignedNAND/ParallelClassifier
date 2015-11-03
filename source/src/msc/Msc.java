@@ -19,6 +19,7 @@ public class Msc {
         km = new KMeans(wp.getArticles());
         km.InitializeGroupCenters();
         km.CalculateDistances();
+        km.CalculateNewCenters();
         parseTimeStop = System.nanoTime();
         parseTimeDelta = parseTimeStop - parseTimeStart;
 
