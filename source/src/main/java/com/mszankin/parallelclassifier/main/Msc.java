@@ -23,9 +23,7 @@ public class Msc {
         List<Article> articles = XMLArticleReader.read(path, 10);
         
         for(Article a : articles){
-            System.out.println(a.getTitle());
-            System.out.println(a.getText());
-            System.out.println("==============================================");
+            a.print();
         }
     }
 }
