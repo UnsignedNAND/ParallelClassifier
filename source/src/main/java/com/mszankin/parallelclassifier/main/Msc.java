@@ -23,7 +23,7 @@ public class Msc {
         List<Article> articles = XMLArticleReader.read(path, 10);
         
         for(Article a : articles){
-            a.print();
+            System.out.println(a);
         }
     }
 }

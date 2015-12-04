@@ -19,54 +19,20 @@ import java.util.TreeMap;
 public class Article {
     private String title;
     private String text;
-    private HashMap<String, Integer> textBag;
-    private Locale locale = Locale.ENGLISH;
-    private int minimalWordLength;
+    private BagOfWords textBag;
+    private final Locale locale;
     
     public Article(String title, String text){
+        this.locale = Locale.ENGLISH;
         this.title = title;
         this.text = title;
     }
     
     public Article(){
+        this.locale = Locale.ENGLISH;
         this.title = null;
         this.text = null;
         this.textBag = null;
-        this.minimalWordLength = 3;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = this.simplify(title);
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = this.simplify(text);
-        this.textBag = this.bagOfWords(this.text);
-    }
-    
-    private HashMap<String, Integer> bagOfWords(String text){
-        HashMap<String, Integer> bow = new HashMap<>();
-        Porter stemmer = new Porter();
-        for (String word : text.split(" ")) {
-            if (word.length() <= this.minimalWordLength) {
-                continue;
-            }
-            stemmer.add(word.toCharArray(), word.length());
-            stemmer.stem();
-            word = stemmer.toString();
-
-            Integer count = bow.get(word);
-            bow.put(word, (count == null) ? 1 : count + 1);
-        }
-        return bow;
     }
     
     //region Tokenization
@@ -78,12 +44,7 @@ public class Article {
     }
     
     private String removeSpecialChars(String str) {
-        String specialCharsStr = ". , : ; ( ) [ ] < > ? / \\ \" * $ = + - _ { } ! @ # % ^ & \n ! ' |";
-
-        for (String c : specialCharsStr.split(" ")) {
-            str = str.replace(c, " ");
-        }
-        return str;
+        return str.replaceAll("[^A-Za-z0-9 ]", " ");
     }
 
     private String trimWhiteSpaces(String str) {
@@ -97,29 +58,30 @@ public class Article {
     
     //endregion
     
-    //region Printing
-    public void print(){
-        class ValueComparator implements Comparator<String> {
+    //region Getters and setters
+        public String getTitle() {
+        return title;
+    }
 
-            Map<String, Integer> map;
+    public void setTitle(String title) {
+        this.title = this.simplify(title);
+    }
 
-            public ValueComparator(Map<String, Integer> base) {
-                this.map = base;
-            }
+    public String getText() {
+        return text;
+    }
 
-            public int compare(String a, String b) {
-                if (map.get(a) >= map.get(b)) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            }
-        }
-        ValueComparator vc = new ValueComparator(this.textBag);
-        TreeMap<String, Integer> sortedMap = new TreeMap<>(vc);
-        sortedMap.putAll(this.textBag);
-        System.out.println(("Title: " + this.title ));
-        System.out.println("BoW: " + sortedMap);
+    public void setText(String text) {
+        this.text = this.simplify(text);
+        this.textBag = new BagOfWords(this.text);
+    }
+    //endregion
+    
+    //region Overrides
+    @Override
+    public String toString(){
+        String r = this.title + " : " + this.textBag + "\n";
+        return r;
     }
     //endregion
 }
