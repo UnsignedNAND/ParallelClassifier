@@ -8,7 +8,6 @@ package com.mszankin.parallelclassifier.models;
 import com.mszankin.parallelclassifier.stemmer.Porter;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 

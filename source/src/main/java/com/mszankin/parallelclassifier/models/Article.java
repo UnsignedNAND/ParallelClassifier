@@ -5,12 +5,7 @@
  */
 package com.mszankin.parallelclassifier.models;
 
-import com.mszankin.parallelclassifier.stemmer.Porter;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  *
