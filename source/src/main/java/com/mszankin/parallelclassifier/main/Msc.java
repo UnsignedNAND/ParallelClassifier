@@ -1,5 +1,6 @@
 package com.mszankin.parallelclassifier.main;
 
+import com.mszankin.parallelclassifier.clustering.KMeans;
 import com.mszankin.parallelclassifier.models.Article;
 import com.mszankin.parallelclassifier.tools.XMLArticleReader;
 import java.util.List;
@@ -21,6 +22,8 @@ public class Msc {
     private static void execute(){
         String path = "../data/simplewiki-20150314-pages-articles.xml";
         List<Article> articles = XMLArticleReader.read(path, 10);
+        
+        KMeans kmeans = new KMeans(articles);
         
         for(Article a : articles){
             System.out.println(a);

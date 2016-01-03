@@ -6,6 +6,7 @@
 package com.mszankin.parallelclassifier.clustering;
 
 import com.mszankin.parallelclassifier.models.Article;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,4 +15,18 @@ import java.util.List;
  */
 public class KMeans {
     private List<Article> articles;
+    
+    public KMeans(){
+        this.articles = new ArrayList<>();
+    }
+    
+    public KMeans(List<Article> articles){
+        this.articles = articles;
+    }
+
+    //region Getters and setters
+    public void setArticles(List<Article> articles) {
+        this.articles = articles;
+    }
+    //endregion
 }
