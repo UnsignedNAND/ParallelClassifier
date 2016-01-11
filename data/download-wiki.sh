@@ -4,7 +4,7 @@
 # NOTE: files can be multiple gigabytes in size.
 
 online_dumps=(
-    "https://dumps.wikimedia.org/simplewiki/20150314/simplewiki-20150314-pages-articles.xml.bz2"
+    "https://dumps.wikimedia.org/simplewiki/20151226/simplewiki-20151226-pages-articles.xml.bz2"
     "https://dumps.wikimedia.org/enwiki/20150304/enwiki-20150304-pages-articles.xml.bz2"
 )
 
