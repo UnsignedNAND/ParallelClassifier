@@ -3,14 +3,8 @@
 
 VAGRANTFILE_API_VERSION = "2"
 
-$git_use_https= <<USEHTTPS
-apt-get install -y git
-/usr/bin/git config --system url."https://github.com/".insteadOf git@github.com:
-/usr/bin/git config --system url."https://".insteadOf git://
-USEHTTPS
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.define "msc_master" do |master|
+  config.vm.define "msc-master" do |master|
     master.vm.box = "ubuntu/trusty64"
     master.vm.provider :virtualbox do |vb|
       vb.customize ["modifyvm", :id, "--memory", "2048"]
@@ -18,10 +12,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     master.vm.network "private_network", ip: "192.168.0.2"
-    master.vm.hostname = "msc_master"
 
-    master.vm.provision :shell do |shell|
-      shell.path = "bootstrap.sh"
-    end
+    # forward rabbit management to 8080 port
+    master.vm.network "forwarded_port", guest: 8080, host: 8080
+
+    master.vm.hostname = "msc-master"
+
+    master.vm.provision "shell", path: "bootstrap_common.sh"
+    master.vm.provision "shell", path: "bootstrap_master.sh"
   end
 end

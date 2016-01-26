@@ -17,6 +17,8 @@ apt-get -y install \
                 tmux \
                 vim
 
+pip install pika
+
 # install docker & dependencies
 apt-get -y install linux-image-extra-$(uname -r)
 apt-get -y install docker-engine
