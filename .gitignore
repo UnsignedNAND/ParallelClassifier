@@ -68,3 +68,6 @@ target/
 *.synctex.gz
 *.toc
 
+# Vagrant
+.vagrant/
+
