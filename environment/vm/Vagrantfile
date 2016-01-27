@@ -13,12 +13,29 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     master.vm.network "private_network", ip: "192.168.0.2"
 
-    # forward rabbit management to 8080 port
+    # forward rabbit management to 8080 port...
     master.vm.network "forwarded_port", guest: 8080, host: 8080
+    # ... end expose rabbit queue port
+    master.vm.network "forwarded_port", guest: 5672, host: 5672
 
     master.vm.hostname = "msc-master"
 
     master.vm.provision "shell", path: "bootstrap_common.sh"
     master.vm.provision "shell", path: "bootstrap_master.sh"
+  end
+
+  config.vm.define "msc-compute-1" do |comp1|
+    comp1.vm.box = "ubuntu/trusty64"
+    comp1.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "2048"]
+      vb.customize ["modifyvm", :id, "--cpus", "2"]
+    end
+
+    comp1.vm.network "private_network", ip: "192.168.0.3"
+
+    comp1.vm.hostname = "msc-compute-1"
+
+    comp1.vm.provision "shell", path: "bootstrap_common.sh"
+    comp1.vm.provision "shell", path: "bootstrap_compute.sh"
   end
 end
