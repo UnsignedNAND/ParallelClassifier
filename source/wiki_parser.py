@@ -6,22 +6,24 @@ import logging
 from db.db import Page, Base, engine
 from sqlalchemy.orm import sessionmaker
 
-logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-rootLogger = logging.getLogger()
+log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+logger = logging.getLogger()
 
-fileHandler = logging.FileHandler("{0}/{1}.log".format('.', 'wiki_parser'))
-fileHandler.setFormatter(logFormatter)
-rootLogger.addHandler(fileHandler)
+log_dir = '.'
+log_file = str(__file__).split('.')[0]
+file_handler = logging.FileHandler("{0}/{1}.log".format(log_dir, log_file))
+file_handler.setFormatter(log_formatter)
+logger.addHandler(file_handler)
 
-consoleHandler = logging.StreamHandler()
-consoleHandler.setFormatter(logFormatter)
-rootLogger.addHandler(consoleHandler)
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(log_formatter)
+logger.addHandler(console_handler)
 
-rootLogger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
 
 Base.metadata.bind = engine
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
+db_session = sessionmaker(bind=engine)
+session = db_session()
 
 
 def write_page(title, text, redirect):
@@ -30,7 +32,7 @@ def write_page(title, text, redirect):
     page.text = text
     if redirect:
         page.redirect = redirect
-        rootLogger.debug('Page redirect: ' + title + ' -> ' + redirect)
+        logger.debug('Page redirect: ' + title + ' -> ' + redirect)
 
     session.add(page)
     session.commit()
