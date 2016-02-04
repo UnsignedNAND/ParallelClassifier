@@ -3,6 +3,10 @@
 import xml.sax
 import logging
 
+from db.db import Page, Base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
 rootLogger = logging.getLogger()
 
@@ -16,10 +20,22 @@ rootLogger.addHandler(consoleHandler)
 
 rootLogger.setLevel(logging.INFO)
 
+engine = create_engine('sqlite:///db/sqlalchemy_example.db')
+Base.metadata.bind = engine
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
+
 
 def write_page(title, text, redirect):
+    page = Page()
+    page.title = title
+    page.text = text
     if redirect:
+        page.redirect = redirect
         rootLogger.debug('Page redirect: ' + title + ' -> ' + redirect)
+
+    session.add(page)
+    session.commit()
 
 
 class WikiContentHandler(xml.sax.ContentHandler):
