@@ -11,5 +11,5 @@ class Page(Base):
     redirect = Column(String(250), ForeignKey('page.title'), nullable=True)
     text = Column(UnicodeText, nullable=False)
 
-engine = create_engine('sqlite:///sqlalchemy_example.db')
+engine = create_engine('sqlite:///wiki.db')
 Base.metadata.create_all(engine)

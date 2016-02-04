@@ -3,8 +3,7 @@
 import xml.sax
 import logging
 
-from db.db import Page, Base
-from sqlalchemy import create_engine
+from db.db import Page, Base, engine
 from sqlalchemy.orm import sessionmaker
 
 logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
@@ -20,7 +19,6 @@ rootLogger.addHandler(consoleHandler)
 
 rootLogger.setLevel(logging.INFO)
 
-engine = create_engine('sqlite:///db/sqlalchemy_example.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
