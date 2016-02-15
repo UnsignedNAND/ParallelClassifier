@@ -39,6 +39,10 @@ def write_page(title, text, redirect):
     session.commit()
 
 
+class PageLimitException(Exception):
+    pass
+
+
 class WikiContentHandler(xml.sax.ContentHandler):
     def __init__(self, pages_limit=None):
         self.path = []
@@ -80,8 +84,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
             write_page(self.title, self.text, self.redirect)
             self.pages_saved += 1
             if self.pages_limit and self.pages_saved >= self.pages_limit:
-                logger.info("Parser hit pages limit ({0})".format(self.pages_limit))
-                exit()
+                raise PageLimitException("Parser hit pages limit ({0})".format(self.pages_limit))
 
     def characters(self, content):
         assert content is not None and len(content) > 0
@@ -94,9 +97,13 @@ class WikiContentHandler(xml.sax.ContentHandler):
             assert self.title is not None
             self.text += content
 
-wiki_handler = WikiContentHandler(pages_limit=10)
-sax_parser = xml.sax.make_parser()
-sax_parser.setContentHandler(wiki_handler)
+if __name__ == '__main__':
+    wiki_handler = WikiContentHandler(pages_limit=10)
+    sax_parser = xml.sax.make_parser()
+    sax_parser.setContentHandler(wiki_handler)
 
-data_source = open('../data/wiki_dump.xml')
-sax_parser.parse(data_source)
+    try:
+        data_source = open('../data/wiki_dump.xml')
+        sax_parser.parse(data_source)
+    except PageLimitException as page_limit_exception:
+        logger.info(page_limit_exception.message)
