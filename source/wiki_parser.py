@@ -2,15 +2,13 @@
 
 import xml.sax
 import logging
-import os
 
 from db.db import Page, Base, engine
 from sqlalchemy.orm import sessionmaker
 
 
 log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-log_dir = '.'
-log_file = "{1}.log".format(log_dir, str(__file__).split('.')[0])
+log_file = "{0}.log".format(str(__file__).split('.')[0])
 
 logger = logging.getLogger()
 
@@ -42,11 +40,13 @@ def write_page(title, text, redirect):
 
 
 class WikiContentHandler(xml.sax.ContentHandler):
-    def __init__(self):
+    def __init__(self, pages_limit=None):
         self.path = []
         self.text = None
         self.title = None
         self.redirect = None
+        self.pages_limit = pages_limit
+        self.pages_saved = 0
 
     def startElement(self, name, attributes):
         if name == "page":
@@ -78,6 +78,10 @@ class WikiContentHandler(xml.sax.ContentHandler):
         if name == "text":
             # We have the complete article: write it out
             write_page(self.title, self.text, self.redirect)
+            self.pages_saved += 1
+            if self.pages_limit and self.pages_saved >= self.pages_limit:
+                logger.info("Parser hit pages limit ({0})".format(self.pages_limit))
+                exit()
 
     def characters(self, content):
         assert content is not None and len(content) > 0
@@ -90,7 +94,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
             assert self.title is not None
             self.text += content
 
-wiki_handler = WikiContentHandler()
+wiki_handler = WikiContentHandler(pages_limit=10)
 sax_parser = xml.sax.make_parser()
 sax_parser.setContentHandler(wiki_handler)
 
