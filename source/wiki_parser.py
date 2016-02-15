@@ -2,16 +2,19 @@
 
 import xml.sax
 import logging
+import os
 
 from db.db import Page, Base, engine
 from sqlalchemy.orm import sessionmaker
 
+
 log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+log_dir = '.'
+log_file = "{1}.log".format(log_dir, str(__file__).split('.')[0])
+
 logger = logging.getLogger()
 
-log_dir = '.'
-log_file = str(__file__).split('.')[0]
-file_handler = logging.FileHandler("{0}/{1}.log".format(log_dir, log_file))
+file_handler = logging.FileHandler(log_file)
 file_handler.setFormatter(log_formatter)
 logger.addHandler(file_handler)
 
