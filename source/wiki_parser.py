@@ -6,11 +6,13 @@ import logging
 from db.db import Page, Base, engine
 from sqlalchemy.orm import sessionmaker
 
+from utils.timer import timer
+
 
 log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
 log_file = "{0}.log".format(str(__file__).split('.')[0])
 
-logger = logging.getLogger()
+logger = logging.getLogger('wiki_parser')
 
 file_handler = logging.FileHandler(log_file)
 file_handler.setFormatter(log_formatter)
@@ -97,7 +99,9 @@ class WikiContentHandler(xml.sax.ContentHandler):
             assert self.title is not None
             self.text += content
 
-if __name__ == '__main__':
+
+@timer
+def main():
     wiki_handler = WikiContentHandler(pages_limit=10)
     sax_parser = xml.sax.make_parser()
     sax_parser.setContentHandler(wiki_handler)
@@ -107,3 +111,6 @@ if __name__ == '__main__':
         sax_parser.parse(data_source)
     except PageLimitException as page_limit_exception:
         logger.info(page_limit_exception.message)
+
+if __name__ == '__main__':
+    main()
