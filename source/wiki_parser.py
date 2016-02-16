@@ -102,7 +102,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
 
 @timer
 def main():
-    wiki_handler = WikiContentHandler(pages_limit=10)
+    wiki_handler = WikiContentHandler(pages_limit=None)
     sax_parser = xml.sax.make_parser()
     sax_parser.setContentHandler(wiki_handler)
 
