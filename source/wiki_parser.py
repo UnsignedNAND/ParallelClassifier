@@ -3,8 +3,9 @@
 import xml.sax
 import logging
 
-from db.db import Page, Base, engine
+from db.db import Page, Redirect, Base, engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 
 from utils.timer import timer
 
@@ -29,16 +30,32 @@ db_session = sessionmaker(bind=engine)
 session = db_session()
 
 
-def write_page(title, text, redirect):
+def write_page(title, text):
     page = Page()
     page.title = title
     page.text = text
-    if redirect:
-        page.redirect = redirect
-        logger.debug('Page redirect: ' + title + ' -> ' + redirect)
 
     session.add(page)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError as integrity_error:
+        logger.error(integrity_error)
+        logger.error('Database integrity error (duplicate primary key?) : {0}'.format(page.title))
+        exit()
+
+
+def write_redirect(title, target):
+    redirect = Redirect()
+    redirect.target = target
+    redirect.title = title
+
+    session.add(redirect)
+    try:
+        session.commit()
+    except IntegrityError as integrity_error:
+        logger.error(integrity_error)
+        logger.error('Database integrity error (duplicate primary key?) : {0}'.format(redirect.title))
+        exit()
 
 
 class PageLimitException(Exception):
@@ -82,8 +99,12 @@ class WikiContentHandler(xml.sax.ContentHandler):
         if len(self.path) > 0 and name == self.path[-1]:
             del self.path[-1]
         if name == "text":
-            # We have the complete article: write it out
-            write_page(self.title, self.text, self.redirect)
+            # We have the complete article: write it to db
+            if not self.redirect:
+                write_page(self.title, self.text)
+            else:
+                write_redirect(title=self.title, target=self.redirect)
+
             self.pages_saved += 1
             if self.pages_limit and self.pages_saved >= self.pages_limit:
                 raise PageLimitException("Parser hit pages limit ({0})".format(self.pages_limit))
