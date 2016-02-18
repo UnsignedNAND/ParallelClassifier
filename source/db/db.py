@@ -26,7 +26,7 @@ class Redirect(Base):
     title = Column(UnicodeText(250),
                    nullable=False)
 
-engine = create_engine('mysql://root:r00tme@localhost/wiki_dump')
+engine = create_engine('mysql://root:r00tme@localhost/wiki')
 Base.metadata.create_all(engine)
 
 

@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 
 from utils.timer import timer
+from utils.exceptions import PageLimitException
 
 
 log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
@@ -56,10 +57,6 @@ def write_redirect(title, target):
         logger.error(integrity_error)
         logger.error('Database integrity error (duplicate primary key?) : {0}'.format(redirect.title))
         exit()
-
-
-class PageLimitException(Exception):
-    pass
 
 
 class WikiContentHandler(xml.sax.ContentHandler):
