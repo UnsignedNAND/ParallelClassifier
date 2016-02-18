@@ -119,7 +119,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
 
 
 @timer
-def main():
+def parse():
     wiki_handler = WikiContentHandler(pages_limit=None)
     sax_parser = xml.sax.make_parser()
     sax_parser.setContentHandler(wiki_handler)
@@ -131,4 +131,4 @@ def main():
         logger.info(page_limit_exception.message)
 
 if __name__ == '__main__':
-    main()
+    parse()
