@@ -15,6 +15,8 @@ class Page(Base):
                       nullable=True)
     text = Column(UnicodeText,
                   nullable=False)
+    parsed_text = Column(UnicodeText,
+                         nullable=True)
 
 
 class Redirect(Base):
