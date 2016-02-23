@@ -1,0 +1,3 @@
+python-dev
+mysql-server
+libmysqlclient-dev
