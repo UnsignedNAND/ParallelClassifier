@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import xml.sax
 import logging
 
