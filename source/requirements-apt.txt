@@ -2,3 +2,4 @@ python-pip
 python-dev
 mysql-server
 libmysqlclient-dev
+rabbitmq-server
