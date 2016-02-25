@@ -46,12 +46,12 @@ def write_redirect(title, target):
 
 
 class WikiContentHandler(xml.sax.ContentHandler):
-    def __init__(self, pages_limit=None):
+    def __init__(self):
         self.path = []
         self.text = None
         self.title = None
         self.redirect = None
-        self.pages_limit = pages_limit
+        self.pages_limit = int(conf['dev']['page_limit'])
         self.pages_saved = 0
 
     def startElement(self, name, attributes):
@@ -107,7 +107,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
 @timer
 def parse():
     logger.info("Started loading to database")
-    wiki_handler = WikiContentHandler(pages_limit=None)
+    wiki_handler = WikiContentHandler()
     sax_parser = xml.sax.make_parser()
     sax_parser.setContentHandler(wiki_handler)
 
