@@ -1,17 +1,22 @@
 import ConfigParser
 
+CONF = None
+
 
 def get_conf():
-    parser = ConfigParser.ConfigParser()
-    parser.readfp(open('../wiki.conf'))
+    global CONF
 
-    config = {}
-    for section in parser.sections():
-        config[section] = {}
-        for key, value in parser.items(section):
-            if value.startswith('[') and value.endswith(']'):
-                value = value.replace('[', '').replace(']', '').split(',')
-            config[section][key] = value
+    if not CONF:
+        parser = ConfigParser.ConfigParser()
+        parser.readfp(open('wiki.conf'))
+        CONF = {}
+        for section in parser.sections():
+            CONF[section] = {}
+            for key, value in parser.items(section):
+                if value.startswith('[') and value.endswith(']'):
+                    value = value.replace('[', '').replace(']', '').split(',')
+                CONF[section][key] = value
+    return CONF
 
 if __name__ == '__main__':
     get_conf()

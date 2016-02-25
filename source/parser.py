@@ -1,5 +1,4 @@
 import xml.sax
-import logging
 
 from db.db import Page, Redirect, Base, engine
 from sqlalchemy.orm import sessionmaker
@@ -7,22 +6,11 @@ from sqlalchemy.exc import IntegrityError
 
 from utils.timer import timer
 from utils.exceptions import PageLimitException
+from utils.config_manager import get_conf
+from utils.logger import get_logger
 
-
-log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-log_file = "{0}.log".format(str(__file__).split('.')[0])
-
-logger = logging.getLogger('wiki_parser')
-
-file_handler = logging.FileHandler(log_file)
-file_handler.setFormatter(log_formatter)
-logger.addHandler(file_handler)
-
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(log_formatter)
-logger.addHandler(console_handler)
-
-logger.setLevel(logging.INFO)
+conf = get_conf()
+logger = get_logger()
 
 Base.metadata.bind = engine
 db_session = sessionmaker(bind=engine)
