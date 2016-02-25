@@ -2,7 +2,9 @@ from sqlalchemy import Column, Integer, UnicodeText
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy.orm import sessionmaker
+from utils.config_manager import get_conf
 
+conf = get_conf()
 Base = declarative_base()
 
 
@@ -40,7 +42,7 @@ class Redirect(Base):
     title = Column(UnicodeText(250),
                    nullable=False)
 
-engine = create_engine('mysql://root:r00tme@localhost/wiki')
+engine = create_engine(conf['db']['connection'])
 Base.metadata.create_all(engine)
 
 
