@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, UnicodeText
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
@@ -10,13 +10,25 @@ class Page(Base):
     __tablename__ = 'page'
     id = Column(Integer,
                 primary_key=True)
-    title = Column(UnicodeText(250))
+    title = Column(UnicodeText(250),
+                   nullable=False)
     redirect = Column(UnicodeText(250),
                       nullable=True)
     text = Column(UnicodeText,
                   nullable=False)
+
+
+class ProcessedPage(Base):
+    __tablename__ = 'processed_page'
+    id = Column(Integer,
+                primary_key=True)
+    page_id = Column(Integer,
+                     ForeignKey("page.id"),
+                     nullable=False)
+    parsed_title = Column(UnicodeText(250),
+                          nullable=False)
     parsed_text = Column(UnicodeText,
-                         nullable=True)
+                         nullable=False)
 
 
 class Redirect(Base):
