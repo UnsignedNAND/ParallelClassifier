@@ -89,6 +89,8 @@ class WikiContentHandler(xml.sax.ContentHandler):
                 write_redirect(title=self.title, target=self.redirect)
 
             self.pages_saved += 1
+            if self.pages_saved % int(self.pages_limit/10) == 0:
+                logger.debug('Parsed {0} / {1} pages'.format(self.pages_saved, self.pages_limit))
             if self.pages_limit and self.pages_saved >= self.pages_limit:
                 raise PageLimitException("Parser hit pages limit ({0})".format(self.pages_limit))
 
