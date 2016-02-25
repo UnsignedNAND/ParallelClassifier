@@ -2,7 +2,7 @@
 
 import argparse
 
-from parser import parse as parse_wiki
+from server.parser import parse as parse_wiki
 
 arg_parser = argparse.ArgumentParser(description='Parallel Wiki Classifier')
 arg_parser.add_argument('--parse', default=False, action='store_true',
