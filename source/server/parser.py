@@ -90,7 +90,8 @@ class WikiContentHandler(xml.sax.ContentHandler):
 
             self.pages_saved += 1
             if self.pages_saved % int(self.pages_limit/10) == 0:
-                logger.debug('Parsed {0} / {1} pages'.format(self.pages_saved, self.pages_limit))
+                logger.debug('[{0:.2f} %] Parsed {1} / {2} pages'.format(self.pages_saved/float(self.pages_limit)*100,
+                                                                         self.pages_saved, self.pages_limit))
             if self.pages_limit and self.pages_saved >= self.pages_limit:
                 raise PageLimitException("Parser hit pages limit ({0})".format(self.pages_limit))
 
