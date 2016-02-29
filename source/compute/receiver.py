@@ -2,7 +2,7 @@
 import pika
 import json
 
-from process import simplify
+from process_text import simplify
 
 from utils.config_manager import get_conf
 from utils.logger import get_logger
