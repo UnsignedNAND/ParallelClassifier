@@ -1,22 +1,22 @@
-#!/usr/bin/env python
-import pika
-from utils.config_manager import get_conf
+#!/usr/bin/python
 
-conf = get_conf()
+import argparse
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(
-        host=conf['hosts']['controller']))
-channel = connection.channel()
-
-channel.queue_declare(queue='hello')
+from compute.receiver import receive
 
 
-def callback(ch, method, properties, body):
-    print(" [x] Received %r" % body)
+arg_parser = argparse.ArgumentParser(description='Parallel Wiki Classifier')
+arg_parser.add_argument('--process', default=False, action='store_true',
+                        help='Process text documents stored in database.')
 
-channel.basic_consume(callback,
-                      queue='hello',
-                      no_ack=True)
+args = arg_parser.parse_args()
 
-print(' [*] Waiting for messages. To exit press CTRL+C')
-channel.start_consuming()
+print args
+
+if not args.process:
+    print 'Supply at least one action.'
+    arg_parser.print_help()
+    exit()
+
+if args.process:
+    receive()
