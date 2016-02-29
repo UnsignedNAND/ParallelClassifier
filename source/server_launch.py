@@ -3,6 +3,7 @@
 import argparse
 
 from server.parser import parse as parse_wiki
+from server.sender import send
 
 arg_parser = argparse.ArgumentParser(description='Parallel Wiki Classifier')
 arg_parser.add_argument('--parse', default=False, action='store_true',
@@ -28,4 +29,4 @@ if args.parse:
     parse_wiki()
 
 if args.process:
-    pass
+    send()
