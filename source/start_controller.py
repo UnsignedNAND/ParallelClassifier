@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import select
 
-from db.db import Base, engine, ProcessedPage, Occurrence
+from db.db import Base, engine, ProcessedPage, OccurrenceCount, OccurrenceDocument
 
 conf = get_conf()
 logger = get_logger()
@@ -69,16 +69,24 @@ if args.process_receive:
             processed_page.parsed_title = json.dumps(body['parsed_title'])
             processed_page.parsed_text = json.dumps(body['parsed_text'])
 
+            # For TF-IDF to work, we need some words statistics
             for word in body['parsed_text'].keys():
-                result = session.query(Occurrence).filter(Occurrence.name == word)
-                if result.count() == 0:
-                    occurrence = Occurrence()
+                result_count = session.query(OccurrenceCount).filter(OccurrenceCount.name == word)
+                if result_count.count() == 0:
+                    occurrence = OccurrenceCount()
                     occurrence.count = body['parsed_text'][word]['count']
                     occurrence.name = word
                 else:
-                    occurrence = result.first()
+                    occurrence = result_count.first()
                     occurrence.count += body['parsed_text'][word]['count']
                 session.add(occurrence)
+
+                session.flush()
+
+                occurrence_document = OccurrenceDocument()
+                occurrence_document.word_id = occurrence.id
+                occurrence_document.document_id = body['page_id']
+                session.add(occurrence_document)
 
             logger.debug(processed_page.parsed_title)
             logger.debug(processed_page.parsed_text)
