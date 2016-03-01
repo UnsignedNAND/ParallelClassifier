@@ -12,7 +12,9 @@ from utils.logger import get_logger
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
-from db.db import Base, engine, ProcessedPage
+from sqlalchemy.sql import select
+
+from db.db import Base, engine, ProcessedPage, Occurrence
 
 conf = get_conf()
 logger = get_logger()
@@ -66,6 +68,17 @@ if args.process_receive:
             processed_page.page_id = body['page_id']
             processed_page.parsed_title = json.dumps(body['parsed_title'])
             processed_page.parsed_text = json.dumps(body['parsed_text'])
+
+            for word in body['parsed_text'].keys():
+                result = session.query(Occurrence).filter(Occurrence.name == word)
+                if result.count() == 0:
+                    occurrence = Occurrence()
+                    occurrence.count = body['parsed_text'][word]['count']
+                    occurrence.name = word
+                else:
+                    occurrence = result.first()
+                    occurrence.count += body['parsed_text'][word]['count']
+                session.add(occurrence)
 
             logger.debug(processed_page.parsed_title)
             logger.debug(processed_page.parsed_text)

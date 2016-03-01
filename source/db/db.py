@@ -42,6 +42,17 @@ class Redirect(Base):
     title = Column(UnicodeText(250),
                    nullable=False)
 
+
+class Occurrence(Base):
+    __tablename__ = 'occurrence'
+    id = Column(Integer,
+                primary_key=True)
+    name = Column(UnicodeText(48),
+                  nullable=False)
+    count = Column(Integer,
+                   nullable=False)
+
+
 engine = create_engine(conf['db']['connection'])
 Base.metadata.create_all(engine)
 
