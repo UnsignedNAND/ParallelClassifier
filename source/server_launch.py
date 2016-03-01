@@ -10,6 +10,10 @@ from server.sender import send
 from utils.config_manager import get_conf
 from utils.logger import get_logger
 
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
+from db.db import Base, engine, ProcessedPage
+
 conf = get_conf()
 logger = get_logger()
 
@@ -42,6 +46,10 @@ if args.process:
     send()
 
 if args.process_receive:
+    Base.metadata.bind = engine
+    db_session = sessionmaker(bind=engine)
+    session = db_session()
+
     def receive():
         connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=conf['hosts']['controller']))
@@ -53,6 +61,19 @@ if args.process_receive:
         def callback(ch, method, properties, body):
             body = json.loads(body)
             logger.info("Received %d : %r" % (body['page_id'], body['parsed_title']))
+            processed_page = ProcessedPage()
+            processed_page.page_id = body['page_id']
+            processed_page.parsed_title = body['parsed_title']
+            processed_page.parsed_text = body['parsed_text']
+
+            session.add(processed_page)
+            try:
+                session.commit()
+            except IntegrityError as integrity_error:
+                logger.error(integrity_error)
+                logger.error('Database integrity error (duplicate primary key?) : {0}'.
+                             format(processed_page.parsed_title))
+                exit()
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
