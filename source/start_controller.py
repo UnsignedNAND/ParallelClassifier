@@ -88,8 +88,8 @@ if args.process_receive:
                 occurrence_document.document_id = body['page_id']
                 session.add(occurrence_document)
 
-            logger.debug(processed_page.parsed_title)
-            logger.debug(processed_page.parsed_text)
+            # logger.debug(processed_page.parsed_title)
+            # logger.debug(processed_page.parsed_text)
 
             session.add(processed_page)
             try:
