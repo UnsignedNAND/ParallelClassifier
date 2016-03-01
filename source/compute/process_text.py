@@ -1,11 +1,12 @@
+import re
+
+
 def _lower_string(text):
     return text.lower()
 
 
 def _remove_special_chars(text):
-    special_chars = ". , : ; ( ) [ ] < > ? / \\ \" * $ = + - _ { } ! @ # % ^ & \n ! ' |"
-    for char in special_chars.split():
-        text = text.replace(char, ' ')
+    text = re.sub(r'\W+', ' ', text)
     return text
 
 
@@ -14,31 +15,38 @@ def _trim_white_spaces(text):
 
 
 def _bag_of_words(text):
-    # TODO test bow vs n-gram
+    # TODO test BoW vs n-gram
     bow = {}
+    length = float(len(text))
     for word in text.split():
         if word in bow.keys():
-            bow[word] += 1
+            bow[word]['count'] += 1
         else:
-            bow[word] = 1
+            bow[word] = {
+                'count': 1
+            }
+
+    # normalizing the dictionary
+    for word in bow.keys():
+        bow[word]['normalized'] = bow[word]['count'] / length
     return bow
 
 
 def _filter(bow):
-    words = len(bow)
     filtered = {}
     for word in bow.keys():
-        if bow.get(word) > 1:
-            filtered[word] = bow[word]
+        if bow.get(word) > 0.001:
+            filtered[word] = bow[word]['normalized']
     return filtered
 
 
-def simplify(text):
+def simplify(text, filtering=True):
     text = _lower_string(text)
     text = _remove_special_chars(text)
     text = _trim_white_spaces(text)
     text = _bag_of_words(text)
-    text = _filter(text)
+    if filtering:
+        text = _filter(text)
     return text
 
 if __name__ == '__main__':

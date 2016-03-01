@@ -13,8 +13,8 @@ logger = get_logger()
 
 
 @timer
-def parse(text):
-    return simplify(text)
+def parse(text, filtering=True):
+    return simplify(text, filtering=filtering)
 
 
 def receive():
@@ -31,7 +31,7 @@ def receive():
 
         parsed_page = {
             'page_id': body['id'],
-            'parsed_title': parse(body['title']),
+            'parsed_title': parse(body['title'], filtering=False),
             'parsed_text': parse(body['text']),
         }
 

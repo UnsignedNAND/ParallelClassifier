@@ -67,6 +67,9 @@ if args.process_receive:
             processed_page.parsed_title = json.dumps(body['parsed_title'])
             processed_page.parsed_text = json.dumps(body['parsed_text'])
 
+            logger.debug(processed_page.parsed_title)
+            logger.debug(processed_page.parsed_text)
+
             session.add(processed_page)
             try:
                 session.commit()
