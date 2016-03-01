@@ -1,5 +1,7 @@
 import xml.sax
 
+from math import ceil
+
 from db.db import Page, Redirect, Base, engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
@@ -89,7 +91,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
                 write_redirect(title=self.title, target=self.redirect)
 
             self.pages_saved += 1
-            if self.pages_saved % int(self.pages_limit/10) == 0:
+            if self.pages_saved % (int(ceil(self.pages_limit/10)) if int(ceil(self.pages_limit/10)) > 0 else 1) == 0:
                 logger.debug('[{0:.2f} %] Parsed {1} / {2} pages'.format(self.pages_saved/float(self.pages_limit)*100,
                                                                          self.pages_saved, self.pages_limit))
             if self.pages_limit and self.pages_saved >= self.pages_limit:
