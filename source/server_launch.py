@@ -61,10 +61,11 @@ if args.process_receive:
         def callback(ch, method, properties, body):
             body = json.loads(body)
             logger.info("Received %d : %r" % (body['page_id'], body['parsed_title']))
+
             processed_page = ProcessedPage()
             processed_page.page_id = body['page_id']
-            processed_page.parsed_title = body['parsed_title']
-            processed_page.parsed_text = body['parsed_text']
+            processed_page.parsed_title = json.dumps(body['parsed_title'])
+            processed_page.parsed_text = json.dumps(body['parsed_text'])
 
             session.add(processed_page)
             try:
