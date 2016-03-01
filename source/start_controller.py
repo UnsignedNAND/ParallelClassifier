@@ -4,8 +4,8 @@ import argparse
 import pika
 import json
 
-from server.parser import parse as parse_wiki
-from server.sender import send
+from controller.parser import parse as parse_wiki
+from controller.sender import send
 
 from utils.config_manager import get_conf
 from utils.logger import get_logger

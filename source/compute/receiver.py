@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-import pika
 import json
 
-from process_text import simplify
+import pika
 
+from compute.preprocessing.process_text import simplify
 from utils.config_manager import get_conf
 from utils.logger import get_logger
 from utils.timer import timer
