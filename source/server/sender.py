@@ -45,5 +45,5 @@ def send():
                               properties=pika.BasicProperties(
                                  delivery_mode=2,  # make message persistent
                               ))
-        logger.info(" [x] Sent %r" % message)
+        logger.info(" [x] Sent  %d : %r" % (data['id'], data['title']))
     connection.close()

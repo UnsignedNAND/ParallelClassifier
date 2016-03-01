@@ -14,7 +14,7 @@ logger = get_logger()
 
 @timer
 def parse(text):
-    simplify(text)
+    return simplify(text)
 
 
 def receive():
@@ -27,9 +27,21 @@ def receive():
 
     def callback(ch, method, properties, body):
         body = json.loads(body)
-        logger.info(" [x] Received %r" % body['id'])
-        parse(body['text'])
-        logger.info(" [x] Done")
+        logger.info("Received %d : %r" % (body['id'], body['title']))
+
+        parsed_page = {
+            'page_id': body['id'],
+            'parsed_title': parse(body['title']),
+            'parsed_text': parse(body['text']),
+        }
+
+        channel.basic_publish(exchange='',
+                              routing_key='parse_return_queue',
+                              body=json.dumps(parsed_page),
+                              properties=pika.BasicProperties(
+                                 delivery_mode=2,  # make message persistent
+                              ))
+        logger.info("Parsed and responded.")
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     channel.basic_qos(prefetch_count=1)
