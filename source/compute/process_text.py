@@ -5,7 +5,7 @@ def _lower_string(text):
 def _remove_special_chars(text):
     special_chars = ". , : ; ( ) [ ] < > ? / \\ \" * $ = + - _ { } ! @ # % ^ & \n ! ' |"
     for char in special_chars.split():
-        text.replace(char, " ")
+        text = text.replace(char, ' ')
     return text
 
 
@@ -28,3 +28,9 @@ def simplify(text):
     text = _remove_special_chars(text)
     text = _trim_white_spaces(text)
     return text
+
+if __name__ == '__main__':
+    test = 'Hello world [!]   @test \n new line test'
+    print test
+    print 20*'-'
+    print simplify(test)
