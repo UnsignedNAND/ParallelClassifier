@@ -17,7 +17,6 @@ def _trim_white_spaces(text):
 def _bag_of_words(text):
     # TODO test BoW vs n-gram
     bow = {}
-    length = float(len(text))
     for word in text.split():
         if word in bow.keys():
             bow[word]['count'] += 1
@@ -27,6 +26,7 @@ def _bag_of_words(text):
             }
 
     # normalizing the dictionary
+    length = float(len(bow))
     for word in bow.keys():
         bow[word]['normalized'] = bow[word]['count'] / length
     return bow
@@ -35,8 +35,8 @@ def _bag_of_words(text):
 def _filter(bow):
     filtered = {}
     for word in bow.keys():
-        if bow.get(word) > 0.001:
-            filtered[word] = bow[word]['normalized']
+        if bow[word]['normalized'] > 0.01:
+            filtered[word] = bow[word]
     return filtered
 
 
