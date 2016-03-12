@@ -70,9 +70,20 @@ class OccurrenceDocument(Base):
                          nullable=False)
 
 
+def delete(session):
+    try:
+        session.query(OccurrenceDocument).delete()
+        session.query(OccurrenceCount).delete()
+        session.query(Redirect).delete()
+        session.query(ProcessedPage).delete()
+        session.query(Page).delete()
+        session.commit()
+    except:
+        session.rollback()
+        raise
+
 engine = create_engine(conf['db']['connection'])
 Base.metadata.create_all(engine)
-
 
 if __name__ == '__main__':
     Base.metadata.bind = engine

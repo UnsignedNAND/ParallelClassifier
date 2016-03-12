@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import select
 
-from db.db import Base, engine, ProcessedPage, OccurrenceCount, OccurrenceDocument
+from db.db import Base, engine, ProcessedPage, OccurrenceCount, OccurrenceDocument, delete
 
 conf = get_conf()
 logger = get_logger()
@@ -32,7 +32,7 @@ arg_parser.add_argument('--delete', default=False, action='store_true',
 args = arg_parser.parse_args()
 
 
-if not(args.parse or args.process):
+if not(args.parse or args.process or args.delete):
     print 'Supply at least one action.'
     arg_parser.print_help()
     exit()
@@ -45,6 +45,12 @@ if args.parse:
 
 if args.process:
     send()
+
+if args.delete:
+    Base.metadata.bind = engine
+    db_session = sessionmaker(bind=engine)
+    session = db_session()
+    delete(session)
 
 if args.process_receive:
     Base.metadata.bind = engine
