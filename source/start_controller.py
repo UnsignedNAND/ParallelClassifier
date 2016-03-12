@@ -31,12 +31,11 @@ arg_parser.add_argument('--delete', default=False, action='store_true',
 
 args = arg_parser.parse_args()
 
-print args
 
-#if not(args.parse or args.process):
-#    print 'Supply at least one action.'
-#    arg_parser.print_help()
-#    exit()
+if not(args.parse or args.process):
+    print 'Supply at least one action.'
+    arg_parser.print_help()
+    exit()
 
 if args.delete:
     pass
