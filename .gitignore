@@ -79,3 +79,7 @@ known_hosts
 # virtual environment
 venv
 
+# wiki downloads
+*.xml
+*.bz2
+
