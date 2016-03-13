@@ -70,16 +70,19 @@ class OccurrenceDocument(Base):
                          nullable=False)
 
 
-def delete(session):
+def delete():
+    Base.metadata.bind = engine
+    db_delete_session = sessionmaker(bind=engine)
+    delete_session = db_delete_session()
     try:
-        session.query(OccurrenceDocument).delete()
-        session.query(OccurrenceCount).delete()
-        session.query(Redirect).delete()
-        session.query(ProcessedPage).delete()
-        session.query(Page).delete()
-        session.commit()
+        delete_session.query(OccurrenceDocument).delete()
+        delete_session.query(OccurrenceCount).delete()
+        delete_session.query(Redirect).delete()
+        delete_session.query(ProcessedPage).delete()
+        delete_session.query(Page).delete()
+        delete_session.commit()
     except:
-        session.rollback()
+        delete_session.rollback()
         raise
 
 engine = create_engine(conf['db']['connection'])

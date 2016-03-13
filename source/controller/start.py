@@ -12,9 +12,9 @@ from utils.logger import get_logger
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.sql import select
 
-from db.db import Base, engine, ProcessedPage, OccurrenceCount, OccurrenceDocument, delete
+from db.db import Base, engine, ProcessedPage, OccurrenceCount, \
+    OccurrenceDocument, delete
 
 conf = get_conf()
 logger = get_logger()
@@ -38,19 +38,13 @@ if not(args.parse or args.process or args.delete):
     exit()
 
 if args.delete:
-    pass
+    delete()
 
 if args.parse:
     parse_wiki()
 
 if args.process:
     send()
-
-if args.delete:
-    Base.metadata.bind = engine
-    db_session = sessionmaker(bind=engine)
-    session = db_session()
-    delete(session)
 
 if args.process_receive:
     Base.metadata.bind = engine
