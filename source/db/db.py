@@ -3,8 +3,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy.orm import sessionmaker
 from utils.config_manager import get_conf
+from utils.logger import get_logger
 
 conf = get_conf()
+logger = get_logger()
 Base = declarative_base()
 
 
@@ -74,12 +76,13 @@ def delete():
     Base.metadata.bind = engine
     db_delete_session = sessionmaker(bind=engine)
     delete_session = db_delete_session()
+    clear_tables = [OccurrenceDocument, OccurrenceCount, Redirect,
+                    ProcessedPage, Page]
     try:
-        delete_session.query(OccurrenceDocument).delete()
-        delete_session.query(OccurrenceCount).delete()
-        delete_session.query(Redirect).delete()
-        delete_session.query(ProcessedPage).delete()
-        delete_session.query(Page).delete()
+        for clear_table in clear_tables:
+            logger.debug("Deleted {0} rows from {1}".format(
+                delete_session.query(
+                clear_table).delete(), str(clear_table.__tablename__)))
         delete_session.commit()
     except:
         delete_session.rollback()
