@@ -61,7 +61,8 @@ if args.process_receive:
 
         def callback(ch, method, properties, body):
             body = json.loads(body)
-            logger.info("Received %d : %r" % (body['page_id'], body['parsed_title']))
+            logger.info("Received %d : %r" % (body['page_id'],
+                                              body['parsed_title']))
 
             processed_page = ProcessedPage()
             processed_page.page_id = body['page_id']

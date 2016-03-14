@@ -1,5 +1,9 @@
 import re
 
+from utils.config_manager import get_conf
+
+conf = get_conf()
+
 
 def _lower_string(text):
     return text.lower()
@@ -35,7 +39,8 @@ def _bag_of_words(text):
 def _filter(bow):
     filtered = {}
     for word in bow.keys():
-        if bow[word]['normalized'] > 0.01:
+        if bow[word]['normalized'] > float(conf['process'][
+                                               'normalize_minimal']):
             filtered[word] = bow[word]
     return filtered
 

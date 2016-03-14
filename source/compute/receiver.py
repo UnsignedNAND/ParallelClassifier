@@ -35,6 +35,11 @@ def receive():
             'parsed_text': parse(body['text']),
         }
 
+        logger.debug("Parsed title: {0}\n"
+                     "Parsed text: {1}".
+                     format(parsed_page['parsed_title'],
+                            parsed_page['parsed_text']))
+
         channel.basic_publish(exchange='',
                               routing_key='parse_return_queue',
                               body=json.dumps(parsed_page),
