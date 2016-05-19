@@ -120,10 +120,10 @@ def parse():
     sax_parser.setContentHandler(wiki_handler)
 
     try:
-        data_source = open('../../data/wiki_dump.xml')
+        data_source = open('../data/wiki_dump.xml')
         sax_parser.parse(data_source)
     except PageLimitException as page_limit_exception:
-        logger.info(page_limit_exception.message)
+        logger.info(page_limit_exception)
 
 if __name__ == '__main__':
     parse()

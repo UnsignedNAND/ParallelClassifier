@@ -77,7 +77,7 @@ id_rsa.pub
 known_hosts
 
 # virtual environment
-venv
+venv*
 
 # wiki downloads
 *.xml
