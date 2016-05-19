@@ -4,7 +4,7 @@ from math import ceil
 
 from db.db import Page, Redirect, Base, engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy.exc import IntegrityError, OperationalError, DataError
 
 from utils.timer import timer
 from utils.exceptions import PageLimitException
@@ -28,7 +28,10 @@ def write_page(title, text):
     try:
         session.commit()
     except OperationalError as operational_error:
-        logger.error(operational_error)
+        logger.error("Operational error at " + page.title)
+        session.rollback()
+    except DataError as data_error:
+        logger.error("Data error at " + page.title)
         session.rollback()
     except IntegrityError as integrity_error:
         logger.error(integrity_error)
@@ -124,6 +127,8 @@ def parse():
         sax_parser.parse(data_source)
     except PageLimitException as page_limit_exception:
         logger.info(page_limit_exception)
+    except KeyboardInterrupt:
+        exit()
 
 if __name__ == '__main__':
     parse()
