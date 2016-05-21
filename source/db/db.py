@@ -11,7 +11,8 @@ Base = declarative_base()
 
 
 class Page(Base):
-    # This table holds all pages read from Wikipedia database that was dumped into XML file.
+    # This table holds all pages read from Wikipedia database that was dumped
+    #  into XML file.
     __tablename__ = 'page'
     id = Column(Integer,
                 primary_key=True)
@@ -49,7 +50,8 @@ class Redirect(Base):
 
 
 class OccurrenceCount(Base):
-    # This table holds information on how many times given word occurred in all documents
+    # This table holds information on how many times given word occurred in
+    # all documents
     __tablename__ = 'occurrence_count'
     id = Column(Integer,
                 primary_key=True)
@@ -60,7 +62,8 @@ class OccurrenceCount(Base):
 
 
 class OccurrenceDocument(Base):
-    # This table holds relation, that tells us if given word occurred in given document
+    # This table holds relation, that tells us if given word occurred in
+    # given document
     __tablename__ = 'occurrence_document'
     id = Column(Integer,
                 primary_key=True)

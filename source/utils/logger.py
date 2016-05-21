@@ -8,7 +8,8 @@ logger = None
 def get_logger():
     global logger
     if not logger:
-        log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+        log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] "
+                                          "[%(levelname)-5.5s]  %(message)s")
         log_file = conf['log']['path']
 
         logger = logging.getLogger('wiki')
