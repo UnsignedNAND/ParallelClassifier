@@ -75,7 +75,7 @@ class OccurrenceDocument(Base):
                          nullable=False)
 
 
-def delete():
+def clean():
     Base.metadata.bind = engine
     db_delete_session = sessionmaker(bind=engine)
     delete_session = db_delete_session()

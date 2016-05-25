@@ -92,9 +92,11 @@ class WikiContentHandler(xml.sax.ContentHandler):
         if name == "text":
             # We have the complete article: write it to db
             if not self.redirect:
-                write_page(self.title, self.text)
+                pass
+                # write_page(self.title, self.text)
             else:
-                write_redirect(title=self.title, target=self.redirect)
+                pass
+                # write_redirect(title=self.title, target=self.redirect)
 
             self.pages_saved += 1
             if self.pages_saved % (int(ceil(self.pages_limit/10)) if int(ceil(self.pages_limit/10)) > 0 else 1) == 0:
