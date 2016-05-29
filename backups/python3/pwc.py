@@ -43,5 +43,5 @@ from utils.logger import get_logger
 from utils.parser import parse
 
 conf = get_conf()
-logger = get_logger()
+_LOG = get_logger()
 parse()

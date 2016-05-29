@@ -9,7 +9,7 @@ from sqlalchemy.sql import select
 from db.db import Page, Base, engine
 
 conf = get_conf()
-logger = get_logger()
+_LOG = get_logger()
 
 
 def send():
@@ -21,7 +21,7 @@ def send():
         channel = connection.channel()
         channel.queue_declare(queue='parse_queue', durable=True)
     except Exception as exception:
-        logger.error(exception)
+        _LOG.error(exception)
         exit()
 
     Base.metadata.bind = engine
@@ -45,5 +45,5 @@ def send():
                               properties=pika.BasicProperties(
                                  delivery_mode=2,  # make message persistent
                               ))
-        logger.info(" [x] Sent  %d : %r" % (data['id'], data['title']))
+        _LOG.info(" [x] Sent  %d : %r" % (data['id'], data['title']))
     connection.close()

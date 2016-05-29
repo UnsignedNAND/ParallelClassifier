@@ -6,7 +6,7 @@ from utils.config_manager import get_conf
 from utils.logger import get_logger
 
 conf = get_conf()
-logger = get_logger()
+_LOG = get_logger()
 Base = declarative_base()
 
 
@@ -80,7 +80,7 @@ def delete():
                     ProcessedPage, Page]
     try:
         for clear_table in clear_tables:
-            logger.debug("Deleted {0} rows from {1}".format(
+            _LOG.debug("Deleted {0} rows from {1}".format(
                 delete_session.query(
                 clear_table).delete(), str(clear_table.__tablename__)))
         delete_session.commit()

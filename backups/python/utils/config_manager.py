@@ -1,10 +1,10 @@
 import ConfigParser
 
-CONF = None
+_CONF = None
 
 
 def get_conf():
-    global CONF
+    global _CONF
 
     if not CONF:
         parser = ConfigParser.ConfigParser()

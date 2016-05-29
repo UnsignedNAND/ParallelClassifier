@@ -12,7 +12,7 @@ from utils.config_manager import get_conf
 from utils.logger import get_logger
 
 conf = get_conf()
-logger = get_logger()
+_LOG = get_logger()
 
 Base.metadata.bind = engine
 db_session = sessionmaker(bind=engine)
@@ -28,11 +28,11 @@ def write_page(title, text):
     try:
         session.commit()
     except OperationalError as operational_error:
-        logger.error(operational_error)
+        _LOG.error(operational_error)
         session.rollback()
     except IntegrityError as integrity_error:
-        logger.error(integrity_error)
-        logger.error('Database integrity error (duplicate primary key?) : {0}'.format(page.title))
+        _LOG.error(integrity_error)
+        _LOG.error('Database integrity error (duplicate primary key?) : {0}'.format(page.title))
         exit()
 
 
@@ -45,8 +45,8 @@ def write_redirect(title, target):
     try:
         session.commit()
     except IntegrityError as integrity_error:
-        logger.error(integrity_error)
-        logger.error('Database integrity error (duplicate primary key?) : {0}'.format(redirect.title))
+        _LOG.error(integrity_error)
+        _LOG.error('Database integrity error (duplicate primary key?) : {0}'.format(redirect.title))
         exit()
 
 
@@ -95,8 +95,8 @@ class WikiContentHandler(xml.sax.ContentHandler):
 
             self.pages_saved += 1
             if self.pages_saved % (int(ceil(self.pages_limit/10)) if int(ceil(self.pages_limit/10)) > 0 else 1) == 0:
-                logger.debug('[{0:.2f} %] Parsed {1} / {2} pages'.format(self.pages_saved/float(self.pages_limit)*100,
-                                                                         self.pages_saved, self.pages_limit))
+                _LOG.debug('[{0:.2f} %] Parsed {1} / {2} pages'.format(self.pages_saved / float(self.pages_limit) * 100,
+                                                                       self.pages_saved, self.pages_limit))
             if self.pages_limit and self.pages_saved >= self.pages_limit:
                 raise PageLimitException("Parser hit pages limit ({0})".format(self.pages_limit))
 
@@ -114,7 +114,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
 
 @timer
 def parse():
-    logger.info("Started loading to database")
+    _LOG.info("Started loading to database")
     wiki_handler = WikiContentHandler()
     sax_parser = xml.sax.make_parser()
     sax_parser.setContentHandler(wiki_handler)
@@ -123,7 +123,7 @@ def parse():
         data_source = open('../../data/wiki_dump.xml')
         sax_parser.parse(data_source)
     except PageLimitException as page_limit_exception:
-        logger.info(page_limit_exception.message)
+        _LOG.info(page_limit_exception.message)
 
 if __name__ == '__main__':
     parse()

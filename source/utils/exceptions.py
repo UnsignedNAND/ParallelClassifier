@@ -1,0 +1,2 @@
+class PageLimitException(Exception):
+    pass

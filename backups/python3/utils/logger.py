@@ -2,11 +2,11 @@ import logging
 from utils.config_manager import get_conf
 
 conf = get_conf()
-logger = None
+_LOG = None
 
 
 def get_logger():
-    global logger
+    global _LOG
     if not logger:
         log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] "
                                           "[%(levelname)-5.5s]  %(message)s")

@@ -1,27 +1,28 @@
 import logging
-from utils.config_manager import get_conf
+from utils.config import get_conf
 
-conf = get_conf()
+_CONF = get_conf()
 _LOG = None
 
 
-def get_logger():
+def get_log():
     global _LOG
-    if not logger:
-        log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-        log_file = conf['log']['path']
+    if not _LOG:
+        log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] "
+                                          "[%(levelname)-5.5s]  %(message)s")
+        log_file = _CONF['log']['path']
 
-        logger = logging.getLogger('wiki')
+        _LOG = logging.getLogger('wiki')
 
         file_handler = logging.FileHandler(log_file)
         file_handler.setFormatter(log_formatter)
-        logger.addHandler(file_handler)
+        _LOG.addHandler(file_handler)
 
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(log_formatter)
-        logger.addHandler(console_handler)
+        _LOG.addHandler(console_handler)
 
-        conf_level = conf['log']['level']
+        conf_level = _CONF['log']['level']
         log_level = logging.DEBUG
 
         if conf_level == 'critical':
@@ -37,5 +38,5 @@ def get_logger():
         elif conf_level == 'notset':
             log_level = logging.NOTSET
 
-        logger.setLevel(log_level)
-    return logger
+        _LOG.setLevel(log_level)
+    return _LOG

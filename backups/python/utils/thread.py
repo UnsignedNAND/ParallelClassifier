@@ -2,7 +2,7 @@ import threading
 import inspect
 from logger import get_logger
 
-logger = get_logger()
+_LOG = get_logger()
 
 
 class Thread(threading.Thread):
@@ -14,16 +14,16 @@ class Thread(threading.Thread):
 
     def run(self):
         if inspect.isfunction(self.obj):
-            logger.info('Starting function thread')
+            _LOG.info('Starting function thread')
             self.obj()
         elif inspect.isclass(self.obj) and hasattr(self.obj, 'start'):
-            logger.info('Starting object thread')
+            _LOG.info('Starting object thread')
             instance = self.obj()
             instance.start()
         elif inspect.isclass(self.obj):
-            logger.error('Object passed to thread should implement "start" method!')
+            _LOG.error('Object passed to thread should implement "start" method!')
         else:
-            logger.error('Thread is empty!')
+            _LOG.error('Thread is empty!')
             raise Exception('Thread is empty!')
 
 if __name__ == '__main__':

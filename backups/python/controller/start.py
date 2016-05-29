@@ -17,7 +17,7 @@ from db.db import Base, engine, ProcessedPage, OccurrenceCount, \
     OccurrenceDocument, delete
 
 conf = get_conf()
-logger = get_logger()
+_LOG = get_logger()
 
 arg_parser = argparse.ArgumentParser(description='Parallel Wiki Classifier')
 arg_parser.add_argument('--parse', default=False, action='store_true',
@@ -57,12 +57,12 @@ if args.process_receive:
         channel = connection.channel()
 
         channel.queue_declare(queue='parse_return_queue', durable=True)
-        logger.info(' [*] Waiting for messages. To exit press CTRL+C')
+        _LOG.info(' [*] Waiting for messages. To exit press CTRL+C')
 
         def callback(ch, method, properties, body):
             body = json.loads(body)
-            logger.info("Received %d : %r" % (body['page_id'],
-                                              body['parsed_title']))
+            _LOG.info("Received %d : %r" % (body['page_id'],
+                                            body['parsed_title']))
 
             processed_page = ProcessedPage()
             processed_page.page_id = body['page_id']
@@ -95,9 +95,9 @@ if args.process_receive:
             try:
                 session.commit()
             except IntegrityError as integrity_error:
-                logger.error(integrity_error)
-                logger.error('Database integrity error (duplicate primary key?) : {0}'.
-                             format(processed_page.parsed_title))
+                _LOG.error(integrity_error)
+                _LOG.error('Database integrity error (duplicate primary key?) : {0}'.
+                           format(processed_page.parsed_title))
                 exit()
 
             ch.basic_ack(delivery_tag=method.delivery_tag)

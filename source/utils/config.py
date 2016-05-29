@@ -6,17 +6,17 @@ _CONF = None
 def get_conf():
     global _CONF
 
-    if not CONF:
+    if not _CONF:
         parser = configparser.ConfigParser()
         parser.read_file(open('wiki.conf'))
-        CONF = {}
+        _CONF = {}
         for section in parser.sections():
-            CONF[section] = {}
+            _CONF[section] = {}
             for key, value in parser.items(section):
                 if value.startswith('[') and value.endswith(']'):
                     value = value.replace('[', '').replace(']', '').split(',')
-                CONF[section][key] = value
-    return CONF
+                _CONF[section][key] = value
+    return _CONF
 
 if __name__ == '__main__':
     get_conf()

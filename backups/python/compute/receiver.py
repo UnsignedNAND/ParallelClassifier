@@ -9,7 +9,7 @@ from utils.logger import get_logger
 from utils.timer import timer
 
 conf = get_conf()
-logger = get_logger()
+_LOG = get_logger()
 
 
 @timer
@@ -23,11 +23,11 @@ def receive():
     channel = connection.channel()
 
     channel.queue_declare(queue='parse_queue', durable=True)
-    logger.info(' [*] Waiting for messages. To exit press CTRL+C')
+    _LOG.info(' [*] Waiting for messages. To exit press CTRL+C')
 
     def callback(ch, method, properties, body):
         body = json.loads(body)
-        logger.info("Received %d : %r" % (body['id'], body['title']))
+        _LOG.info("Received %d : %r" % (body['id'], body['title']))
 
         parsed_page = {
             'page_id': body['id'],
@@ -35,9 +35,9 @@ def receive():
             'parsed_text': parse(body['text']),
         }
 
-        logger.debug("Parsed title: {0}\n"
+        _LOG.debug("Parsed title: {0}\n"
                      "Parsed text: {1}".
-                     format(parsed_page['parsed_title'],
+                   format(parsed_page['parsed_title'],
                             parsed_page['parsed_text']))
 
         channel.basic_publish(exchange='',
@@ -46,7 +46,7 @@ def receive():
                               properties=pika.BasicProperties(
                                  delivery_mode=2,  # make message persistent
                               ))
-        logger.info("Parsed and responded.")
+        _LOG.info("Parsed and responded.")
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     channel.basic_qos(prefetch_count=1)
