@@ -15,6 +15,8 @@ arg_parser = argparse.ArgumentParser(description='Parallel Wiki Classifier')
 
 arg_parser.add_argument('--debug', default=False, action='store_true',
                         help='Forces log level to DEBUG')
+arg_parser.add_argument('--clean', default=False, action='store_true',
+                        help='Wipe out all data stored in database')
 arg_parser.add_argument('--parse', default=False, action='store_true',
                         help='Parse Wikipedia XML dump and load it do '
                              'database.')
@@ -23,6 +25,9 @@ args = arg_parser.parse_args()
 
 if args.debug:
     LOG.setLevel(logging.DEBUG)
+
+if args.clean:
+    pass
 
 if args.parse:
     parse()
