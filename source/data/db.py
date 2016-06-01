@@ -16,19 +16,25 @@ class Models:
         # This table holds all pages read from Wikipedia database that was
         # dumped into XML file.
         __tablename__ = 'page'
+        __table_args__ = {
+            'mysql_engine': 'InnoDB',
+            'mysql_charset': 'utf8mb4',
+            'mysql_collate': 'utf8mb4_unicode_ci'}
         id = Column(Integer,
                     primary_key=True)
         title = Column(UnicodeText(250),
                        nullable=False)
         redirect = Column(UnicodeText(250),
                           nullable=True)
-        text = Column(UnicodeText,
+        # MySQL UnicodeText default length is too short to store certain Wiki
+        # pages, so it has to be defined
+        text = Column(UnicodeText(320000),
                       nullable=False)
 
 
 class Db:
     @staticmethod
-    def connect():
+    def _connect():
         global ENGINE
         global BASE
         ENGINE = create_engine(CONF['db']['connection'])
@@ -52,13 +58,21 @@ class Db:
             delete_session.rollback()
             raise
 
+    @staticmethod
+    def init():
+        Db._connect()
+        BASE.metadata.bind = ENGINE
+
+    @staticmethod
+    def create_session():
+        db_session = sessionmaker(bind=ENGINE)
+        return db_session()
+
 
 if __name__ == '__main__':
-    Db.connect()
+    Db.init()
     Db.clean()
-    BASE.metadata.bind = ENGINE
-    db_session = sessionmaker(bind=ENGINE)
-    session = db_session()
+    session = Db.create_session()
 
     for i in range(0, 5):
         page = Models.Page()

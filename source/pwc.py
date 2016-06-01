@@ -3,12 +3,19 @@
 import argparse
 import logging
 
+from data.db import Db, BASE, ENGINE
 from utils.config import get_conf
 from utils.log import get_log
 from xml_parser import parse
 
 CONF = get_conf()
 LOG = get_log()
+
+try:
+    Db.init()
+except Exception as ex:
+    LOG.error(ex)
+    exit()
 
 
 arg_parser = argparse.ArgumentParser(description='Parallel Wiki Classifier')
@@ -27,7 +34,7 @@ if args.debug:
     LOG.setLevel(logging.DEBUG)
 
 if args.clean:
-    pass
+    Db.clean()
 
 if args.parse:
     parse()

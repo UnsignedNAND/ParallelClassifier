@@ -1,7 +1,8 @@
 import math
 import xml.sax
 
-
+from data.db import Db, Models
+from sqlalchemy.exc import DataError
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
 from utils.log import get_log
@@ -21,6 +22,24 @@ class WikiContentHandler(xml.sax.ContentHandler):
         self.items_saved = 0
         self._pages_saved = 0
         self._redirects_saved = 0
+
+    def _save_element(self, **kwargs):
+        session = Db.create_session()
+        element = None
+
+        if kwargs['type'] is None:
+            LOG.error('Unknown element type: ' + kwargs['type'])
+        if kwargs['type'] == 'page':
+            element = Models.Page()
+            element.title = kwargs['title']
+            element.text = kwargs['text']
+
+        try:
+            session.add(element)
+            session.commit()
+        except DataError:
+            LOG.critical('Data too long to store: ' + str(len(element.text)))
+            exit()
 
     def startElement(self, name, attributes):
         if name == "page":
@@ -53,7 +72,8 @@ class WikiContentHandler(xml.sax.ContentHandler):
             # We have the complete article: write it to db
             if not self._redirect:
                 self._pages_saved += 1
-                # write_page(self.title, self.text)
+                self._save_element(type='page', title=self._title,
+                                   text=self._text)
             else:
                 self._redirects_saved += 1
                 # write_redirect(title=self.title, target=self.redirect)
