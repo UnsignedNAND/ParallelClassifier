@@ -4,9 +4,9 @@ import argparse
 import logging
 
 from data.db import Db
+from parsing.xml_parser import xml_parser
 from utils.config import get_conf
 from utils.log import get_log
-from xml_parser import xml_parser
 
 CONF = get_conf()
 LOG = get_log()
