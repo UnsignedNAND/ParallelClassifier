@@ -2,7 +2,6 @@ import math
 import xml.sax
 
 from data.db import Db, Models
-from sqlalchemy.exc import DataError
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
 from utils.log import get_log
@@ -10,6 +9,7 @@ from utils.timer import timer
 
 CONF = get_conf()
 LOG = get_log()
+session = None
 
 
 class WikiContentHandler(xml.sax.ContentHandler):
@@ -24,7 +24,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
         self._redirects_saved = 0
 
     def _save_element(self, **kwargs):
-        session = Db.create_session()
+        global session
         element = None
 
         if kwargs['type'] is None:
@@ -34,12 +34,9 @@ class WikiContentHandler(xml.sax.ContentHandler):
             element.title = kwargs['title']
             element.text = kwargs['text']
 
-        try:
-            session.add(element)
+        session.add(element)
+        if self.items_saved % 5:
             session.commit()
-        except DataError:
-            LOG.critical('Data too long to store: ' + str(len(element.text)))
-            exit()
 
     def startElement(self, name, attributes):
         if name == "page":
@@ -109,7 +106,9 @@ class WikiContentHandler(xml.sax.ContentHandler):
 
 
 @timer
-def parse():
+def xml_parser():
+    global session
+    session = Db.create_session()
     LOG.info("Started loading to database")
     wiki_handler = WikiContentHandler()
     sax_parser = xml.sax.make_parser()
@@ -125,4 +124,4 @@ def parse():
         exit()
 
 if __name__ == '__main__':
-    parse()
+    xml_parser()

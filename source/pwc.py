@@ -3,10 +3,10 @@
 import argparse
 import logging
 
-from data.db import Db, BASE, ENGINE
+from data.db import Db
 from utils.config import get_conf
 from utils.log import get_log
-from xml_parser import parse
+from xml_parser import xml_parser
 
 CONF = get_conf()
 LOG = get_log()
@@ -20,13 +20,30 @@ except Exception as ex:
 
 arg_parser = argparse.ArgumentParser(description='Parallel Wiki Classifier')
 
-arg_parser.add_argument('--debug', default=False, action='store_true',
-                        help='Forces log level to DEBUG')
-arg_parser.add_argument('--clean', default=False, action='store_true',
-                        help='Wipe out all data stored in database')
-arg_parser.add_argument('--parse', default=False, action='store_true',
-                        help='Parse Wikipedia XML dump and load it do '
-                             'database.')
+arg_parser.add_argument(
+    '--debug',
+    default=False,
+    action='store_true',
+    help='Forces log level to DEBUG'
+)
+arg_parser.add_argument(
+    '--clean',
+    default=False,
+    action='store_true',
+    help='Wipe out all data stored in database'
+)
+arg_parser.add_argument(
+    '--parse',
+    default=False,
+    action='store_true',
+    help='Parse Wikipedia XML dump and load it do database.'
+)
+arg_parser.add_argument(
+    '--features',
+    default=False,
+    action='store_true',
+    help='Extract features from articles'
+)
 
 args = arg_parser.parse_args()
 
@@ -37,4 +54,7 @@ if args.clean:
     Db.clean()
 
 if args.parse:
-    parse()
+    xml_parser()
+
+if args.features:
+    pass
