@@ -1,6 +1,5 @@
-from sqlalchemy import Column, Integer, UnicodeText, String
+from sqlalchemy import Column, Integer, UnicodeText, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy.orm import sessionmaker
 from utils.config import get_conf
 from utils.log import get_log
