@@ -96,13 +96,6 @@ if __name__ == '__main__':
                 parse(d.text)
                 print(pid, ': parsed:', d.title)
 
-
-        def process_monitor(qin, qout):
-            time.sleep(1)
-            print('QIN :', qin.qsize())
-            print('QOUT :', qout.qsize())
-            print('-'*10)
-
         ps = []
         for i in range(0, 1):
             ps.append(Process(target=process_parsing, args=(i, qin, qout)))
@@ -113,9 +106,4 @@ if __name__ == '__main__':
         for p in ps:
             p.join()
 
-        # process_monitor = Process(target=process_monitor, args=(qin, qout))
-        # process_monitor.start()
-        # process_monitor.join()
     test()
-    print('ok')
-
