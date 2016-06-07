@@ -12,17 +12,11 @@ from nltk.stem.snowball import SnowballStemmer
 
 class Synopses:
     @staticmethod
-    def _remove_stopwords(tokens):
-        filtered_tokens = []
-        stopwords = nltk.corpus.stopwords.words('english')
-        for token in tokens:
-            if token not in stopwords:
-                filtered_tokens.append(token)
-        return filtered_tokens
-
-
-    @staticmethod
     def _remove_special_chars(text):
+        """
+        Method removes special characters from input. Returned string is
+        alfa-numeric.
+        """
         text = re.sub(r'\W+', ' ', text).lower()
         return text
 
@@ -31,37 +25,63 @@ class Synopses:
         return " ".join(text.split())
 
     @staticmethod
-    def _tokenize(text):
-        tokens = [word for sent in nltk.sent_tokenize(text) for word in
-                  nltk.word_tokenize(sent)]
-        return tokens
+    def _stemm(tokens):
+        # run stemmer and remove stop words
+        stopwords = nltk.corpus.stopwords.words('english')
+        stemmer = SnowballStemmer("english")
+        tokens_total = 0
+        counted_stems = {}
+        for token in tokens:
+            if token in stopwords:
+                continue
+            stemmed_token = stemmer.stem(token)
+            tokens_total += 1
+            if stemmed_token in counted_stems.keys():
+                counted_stems[stemmed_token]['count'] += 1
+            else:
+                counted_stems[stemmed_token] = {
+                    'count': 1
+                }
+
+        counted_stems['_meta'] = {
+            'tokens_in_document': tokens_total
+        }
+        return counted_stems
 
     @staticmethod
-    def _stemm(tokens):
-        stemmer = SnowballStemmer("english")
-        stems = [stemmer.stem(t) for t in tokens]
-        return stems
+    def _tf(tokens):
+        """
+        TF: Term Frequency, which measures how frequently a term occurs in a
+        document. Since every document is different in length, it is possible
+        that a term would appear much more times in long documents than shorter
+        ones. Thus, the term frequency is often divided by the document length
+        (aka. the total number of terms in the document) as a way of
+        normalization:
+        TF(t) = (Number of times term t appears in a document) / (Total
+        number of terms in the document).
+        """
+        tokens_in_document = tokens['_meta']['tokens_in_document']
+        for token in tokens.keys():
+            if token == '_meta':
+                continue
+            tokens[token]['tf'] = tokens[token]['count'] / tokens_in_document
+            print(tokens[token])
+            # tokens[token]['tf'] = tokens[token]['tf']['count'] / \
+            #                       tokens_in_document
+        return tokens
 
     @staticmethod
     def make(text):
         text = Synopses._remove_special_chars(text)
-        print('({0})_remove_special_chars:\t\t{1}'.format(len(text.split()),
-                                                          text))
-
         text = Synopses._trim_white_spaces(text)
-        print('({0})_trim_white_spaces:\t\t\t{1}'.format(len(text.split()),
-                                                         text))
 
-        text = Synopses._tokenize(text)
-        print('({0}) _tokenize_:\t\t{1}'.format(len(text), text))
+        tokens = text.split()
+        tokens = Synopses._stemm(tokens)
+        tokens = Synopses._tf(tokens)
 
-        text = Synopses._remove_stopwords(text)
-        print('({0}) _remove_stopwords:\t\t{1}'.format(len(text), text))
+        from pprint import pprint
+        pprint(tokens, indent=4)
 
-        text = Synopses._stemm(text)
-        print('({0}) _stemm:\t\t{1}'.format(len(text), text))
-
-        print(Synopses._stemm(['network', 'networking']))
         return text
 
 if __name__ == '__main__':
@@ -70,19 +90,5 @@ if __name__ == '__main__':
     pages = pages
     pages = sorted(pages, key=lambda page: len(page.text))[:1]
 
-    # for p in pages:
-    #     print('{0} : {1}'.format(p.title, len(p.text)))
     for page in pages:
         Synopses.make(page.text)
-
-    # ts = Synopses.make(text[:500])
-    #
-    # tfidf_vectorizer = TfidfVectorizer(max_df=0.8, max_features=200000,
-    #                                    min_df=0.2, stop_words='english',
-    #                                    use_idf=True,
-    #                                    tokenizer=Synopses.make,
-    #                                    ngram_range=(1, 3))
-    #
-    # # tfidf_matrix = tfidf_vectorizer.fit_transform(synopses)
-    #
-    # # print(tfidf_matrix.shape)
