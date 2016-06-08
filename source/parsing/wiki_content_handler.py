@@ -2,6 +2,8 @@ import math
 import xml.sax
 
 from data.db import Db, Models
+from multiprocessing import Queue
+from parsing.text_parser import parse as text_parse
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
 from utils.log import get_log
@@ -18,25 +20,10 @@ class WikiContentHandler(xml.sax.ContentHandler):
         self._text = None
         self._title = None
         self._redirect = None
-        self._pages_limit = int(CONF['dev']['item_limit'])
+        self._items_limit = int(CONF['dev']['item_limit'])
         self.items_saved = 0
-        self._pages_saved = 0
+        self._documents_saved = 0
         self._redirects_saved = 0
-
-    def _save_element(self, **kwargs):
-        global session
-        element = None
-
-        if kwargs['type'] is None:
-            LOG.error('Unknown element type: ' + kwargs['type'])
-        if kwargs['type'] == 'page':
-            element = Models.Page()
-            element.title = kwargs['title']
-            element.text = kwargs['text']
-
-        session.add(element)
-        if self.items_saved % 5:
-            session.commit()
 
     def startElement(self, name, attributes):
         if name == "page":
@@ -68,27 +55,31 @@ class WikiContentHandler(xml.sax.ContentHandler):
         if name == "text":
             # We have the complete article: write it to db
             if not self._redirect:
-                self._pages_saved += 1
-                self._save_element(type='page', title=self._title,
-                                   text=self._text)
+                self._documents_saved += 1
+                # self.unparsed_documents.put(
+                #     {
+                #         'title': self._title,
+                #         'text': self._text
+                #     }
+                # )
             else:
                 self._redirects_saved += 1
                 # write_redirect(title=self.title, target=self.redirect)
 
             self.items_saved += 1
-            if self.items_saved % (int(math.ceil(self._pages_limit/10))
-                                    if int(math.ceil(self._pages_limit/10)) > 0
+            if self.items_saved % (int(math.ceil(self._items_limit/10))
+                                    if int(math.ceil(self._items_limit/10)) > 0
                                     else 1) == 0:
                 LOG.debug('[{0:6.2f} %] Parsed {1} / {2} items'.format(
-                    self.items_saved / float(self._pages_limit) * 100,
-                    self.items_saved, self._pages_limit),
+                    self.items_saved / float(self._items_limit) * 100,
+                    self.items_saved, self._items_limit),
                 )
-            if self._pages_limit and self.items_saved >= self._pages_limit:
+            if self._items_limit and self.items_saved >= self._items_limit:
                 raise PageLimitException('Parser hit items limit ({0}), '
                                          'Parsed pages: {1}, '
                                          'Parsed redirects {2}'.format(
-                                             self._pages_limit,
-                                             self._pages_saved,
+                                             self._items_limit,
+                                             self._documents_saved,
                                              self._redirects_saved
                                              )
                                          )

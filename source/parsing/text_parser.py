@@ -81,7 +81,6 @@ def parse(text):
 if __name__ == '__main__':
     from multiprocessing import Process, Queue
     from parsing.example_set import pages
-    import time
     qin = Queue()
     qout = Queue()
 
@@ -97,7 +96,7 @@ if __name__ == '__main__':
                 print(pid, ': parsed:', d.title)
 
         ps = []
-        for i in range(0, 1):
+        for i in range(0, 4):
             ps.append(Process(target=process_parsing, args=(i, qin, qout)))
 
         for p in ps:
