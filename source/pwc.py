@@ -4,7 +4,7 @@ import argparse
 import logging
 
 from data.db import Db
-from parsing.wiki_content_handler import xml_parser
+from parsing.wiki_parser import parse
 from utils.config import get_conf
 from utils.log import get_log
 
@@ -54,7 +54,7 @@ if args.clean:
     Db.clean()
 
 if args.parse:
-    xml_parser()
+    parse()
 
 if args.features:
     pass

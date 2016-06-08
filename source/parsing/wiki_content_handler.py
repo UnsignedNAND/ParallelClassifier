@@ -1,13 +1,9 @@
 import math
 import xml.sax
 
-from data.db import Db, Models
-from multiprocessing import Queue
-from parsing.text_parser import parse as text_parse
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
 from utils.log import get_log
-from utils.timer import timer
 
 CONF = get_conf()
 LOG = get_log()
@@ -15,7 +11,7 @@ session = None
 
 
 class WikiContentHandler(xml.sax.ContentHandler):
-    def __init__(self):
+    def __init__(self, q_unparsed_documents):
         self._path = []
         self._text = None
         self._title = None
@@ -24,6 +20,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
         self.items_saved = 0
         self._documents_saved = 0
         self._redirects_saved = 0
+        self._q_unparsed_documents = q_unparsed_documents
 
     def startElement(self, name, attributes):
         if name == "page":
@@ -55,7 +52,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
         if name == "text":
             # We have the complete article: write it to db
             if not self._redirect:
-                self._documents_saved += 1
+                self._q_unparsed_documents.put(self._title)
                 # self.unparsed_documents.put(
                 #     {
                 #         'title': self._title,
@@ -63,26 +60,32 @@ class WikiContentHandler(xml.sax.ContentHandler):
                 #     }
                 # )
             else:
-                self._redirects_saved += 1
+                pass
                 # write_redirect(title=self.title, target=self.redirect)
+            self._monitor_progress()
 
-            self.items_saved += 1
-            if self.items_saved % (int(math.ceil(self._items_limit/10))
-                                    if int(math.ceil(self._items_limit/10)) > 0
-                                    else 1) == 0:
-                LOG.debug('[{0:6.2f} %] Parsed {1} / {2} items'.format(
-                    self.items_saved / float(self._items_limit) * 100,
-                    self.items_saved, self._items_limit),
-                )
-            if self._items_limit and self.items_saved >= self._items_limit:
-                raise PageLimitException('Parser hit items limit ({0}), '
-                                         'Parsed pages: {1}, '
-                                         'Parsed redirects {2}'.format(
-                                             self._items_limit,
-                                             self._documents_saved,
-                                             self._redirects_saved
-                                             )
+    def _monitor_progress(self):
+        self.items_saved += 1
+        if not self._redirect:
+            self._documents_saved += 1
+        else:
+            self._redirects_saved += 1
+
+        if self.items_saved % (int(math.ceil(self._items_limit/10)) if int(
+                math.ceil(self._items_limit/10)) > 0 else 1) == 0:
+            LOG.debug('[{0:6.2f} %] Parsed {1} / {2} items'.format(
+                self.items_saved / float(self._items_limit) * 100,
+                self.items_saved, self._items_limit),
+            )
+        if self._items_limit and self.items_saved >= self._items_limit:
+            raise PageLimitException('Parser hit items limit ({0}), '
+                                     'Parsed pages: {1}, '
+                                     'Parsed redirects {2}'.format(
+                                         self._items_limit,
+                                         self._documents_saved,
+                                         self._redirects_saved
                                          )
+                                     )
 
     def characters(self, content):
         assert content is not None and len(content) > 0
@@ -94,25 +97,3 @@ class WikiContentHandler(xml.sax.ContentHandler):
         elif self._path[-1] == "text":
             assert self._title is not None
             self._text += content
-
-
-@timer
-def xml_parser():
-    global session
-    session = Db.create_session()
-    LOG.info("Started loading to database")
-    wiki_handler = WikiContentHandler()
-    sax_parser = xml.sax.make_parser()
-    sax_parser.setContentHandler(wiki_handler)
-
-    try:
-        data_source = open('../data/wiki_dump.xml')
-        sax_parser.parse(data_source)
-        LOG.info('Parsed {0} items'.format(wiki_handler.items_saved))
-    except PageLimitException as page_limit_exception:
-        LOG.info(page_limit_exception)
-    except KeyboardInterrupt:
-        exit()
-
-if __name__ == '__main__':
-    xml_parser()
