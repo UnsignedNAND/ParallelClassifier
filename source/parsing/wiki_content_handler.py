@@ -52,13 +52,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
         if name == "text":
             # We have the complete article: write it to db
             if not self._redirect:
-                self._q_unparsed_documents.put(self._title)
-                # self.unparsed_documents.put(
-                #     {
-                #         'title': self._title,
-                #         'text': self._text
-                #     }
-                # )
+                self._q_unparsed_documents.put(self._text)
             else:
                 pass
                 # write_redirect(title=self.title, target=self.redirect)

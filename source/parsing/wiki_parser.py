@@ -1,8 +1,7 @@
 import xml.sax
 
-from data.db import Db
 import multiprocessing
-import time
+from parsing.text_parser import parse as text_parse
 from parsing.wiki_content_handler import WikiContentHandler
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
@@ -31,6 +30,9 @@ class ProcessReader(multiprocessing.Process):
             LOG.info(page_limit_exception)
         except KeyboardInterrupt:
             exit()
+        finally:
+            # A pill for other threads
+            self._q_unparsed_documents.put(None)
 
 
 class ProcessParser(multiprocessing.Process):
@@ -41,17 +43,25 @@ class ProcessParser(multiprocessing.Process):
     def run(self):
         c = 0
         while True:
-            # print(self._q_unparsed_documents.get())
-            self._q_unparsed_documents.get()
+            text = self._q_unparsed_documents.get()
+            if text is None:
+                # Just to be sure that other threads can also take a pill
+                self._q_unparsed_documents.put(None)
+                print(multiprocessing.current_process().pid, c)
+                return
+            text_parse(text)
+            if c % 100 == 0:
+                print('progress', multiprocessing.current_process().pid, c)
             c += 1
-            if self._q_unparsed_documents.empty():
-                print(c)
-                time.sleep(1)
 
 
-class ProcessWriter(multiprocessing.Process):
-    pass
-
+def create_process_parser(**kwargs):
+    processes = []
+    for i in range(0, kwargs['num_of_processes']):
+        process = ProcessParser(kwargs['q_unparsed_documents'])
+        process.start()
+        processes.append(process)
+    return processes
 
 @timer
 def parse():
@@ -61,11 +71,18 @@ def parse():
 
     q_unparsed_documents = multiprocessing.Queue()
     p_reader = ProcessReader(q_unparsed_documents)
-    p_parser = ProcessParser(q_unparsed_documents)
     p_reader.start()
-    p_parser.start()
+
+    LOG.debug('Spawning {0} parser processes'.format(int(CONF['general'][
+                                                         'processes'])))
+    ps_parser = create_process_parser(
+        num_of_processes=int(CONF['general']['processes']),
+        q_unparsed_documents=q_unparsed_documents
+    )
+
     p_reader.join()
-    p_parser.join()
+    for p_parser in ps_parser:
+        p_parser.join()
 
 
 if __name__ == '__main__':
