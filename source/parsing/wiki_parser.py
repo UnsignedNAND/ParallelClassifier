@@ -1,7 +1,6 @@
 import xml.sax
 
 import multiprocessing
-from parsing.text_parser import parse as text_parse
 from parsing.wiki_content_handler import WikiContentHandler
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
@@ -43,13 +42,16 @@ class ProcessParser(multiprocessing.Process):
     def run(self):
         c = 0
         while True:
-            text = self._q_unparsed_documents.get()
-            if text is None:
+            page = self._q_unparsed_documents.get()
+            if page is None:
                 # Just to be sure that other threads can also take a pill
                 self._q_unparsed_documents.put(None)
                 print(multiprocessing.current_process().pid, c)
                 return
-            text_parse(text)
+            # parse_page(page)
+            page.create_tokens()
+            print(page)
+            page.content_clean()
             if c % 100 == 0:
                 print('progress', multiprocessing.current_process().pid, c)
             c += 1
@@ -62,6 +64,7 @@ def create_process_parser(**kwargs):
         process.start()
         processes.append(process)
     return processes
+
 
 @timer
 def parse():

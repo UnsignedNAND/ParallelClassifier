@@ -1,6 +1,7 @@
 import math
 import xml.sax
 
+from models.page import Page
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
 from utils.log import get_log
@@ -52,7 +53,12 @@ class WikiContentHandler(xml.sax.ContentHandler):
         if name == "text":
             # We have the complete article: write it to db
             if not self._redirect:
-                self._q_unparsed_documents.put(self._text)
+                # Page
+                page = Page()
+                page.id = self.items_saved
+                page.content = self._text
+                page.title = self._title
+                self._q_unparsed_documents.put(page)
             else:
                 pass
                 # write_redirect(title=self.title, target=self.redirect)
