@@ -6,6 +6,7 @@ from models.token import Token
 STOPWORDS = nltk.corpus.stopwords.words('english')
 STEMMER = nltk.stem.snowball.SnowballStemmer("english")
 
+
 class Page(object):
     id = None
     title = None
@@ -20,6 +21,7 @@ class Page(object):
         del self.content
 
     def create_tokens(self):
+        self.tokens = []
         self.word_count = 0
         # remote special characters
         self.content = re.sub(r'\W+', ' ', self.content).lower()
