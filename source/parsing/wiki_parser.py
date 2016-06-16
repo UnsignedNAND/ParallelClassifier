@@ -48,9 +48,7 @@ class ProcessParser(multiprocessing.Process):
                 self._q_unparsed_documents.put(None)
                 print(multiprocessing.current_process().pid, c)
                 return
-            # parse_page(page)
             page.create_tokens()
-            print(page)
             page.content_clean()
             if c % 100 == 0:
                 print('progress', multiprocessing.current_process().pid, c)

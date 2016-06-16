@@ -59,6 +59,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
                 page.content = self._text
                 page.title = self._title
                 self._q_unparsed_documents.put(page)
+                del page
             else:
                 pass
                 # write_redirect(title=self.title, target=self.redirect)
