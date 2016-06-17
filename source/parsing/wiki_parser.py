@@ -82,6 +82,8 @@ class Process(object):
                 else:
                     self.tokens[msg] = 1
 
+            self.event.set()
+
             for token in self.tokens:
                 # IDF(token) = 1 + log_e(Total Number Of Documents / Number Of
                 # Documents with token in it)
@@ -89,7 +91,6 @@ class Process(object):
                 token_idf = 1 + math.log(self.num_docs / self.tokens[token],
                                          math.e)
                 self.tokens[token] = token_idf
-            self.event.set()
 
     @staticmethod
     def create_parsers(**kwargs):
