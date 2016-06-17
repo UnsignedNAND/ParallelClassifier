@@ -35,31 +35,38 @@ class Process(object):
                 self._q_unparsed_documents.put(None)
 
     class Parser(multiprocessing.Process):
-        def __init__(self, q_unparsed_documents, p_idf_child):
+        def __init__(self, q_unparsed_documents, p_idf_child, event):
             self._q_unparsed_documents = q_unparsed_documents
             self.p_idf_child = p_idf_child
+            self.event = event
             super(self.__class__, self).__init__()
 
         def run(self):
-            c = 0
+            parsed_docs = 0
             while True:
                 page = self._q_unparsed_documents.get()
                 if page is None:
                     # Just to be sure that other threads can also take a pill
                     self._q_unparsed_documents.put(None)
                     self.p_idf_child.send(None)
-                    return
+                    print('Process {0} finished after parsing {1} '
+                          'docs'.format(self.pid, parsed_docs))
+                    break
                 page.create_tokens()
                 for token in page.tokens:
                     self.p_idf_child.send(token.stem)
                 page.content_clean()
-                if c % 100 == 0:
-                    print('progress', multiprocessing.current_process().pid, c)
-                c += 1
+                parsed_docs += 1
+            print('Process {0} waiting on IDF to finish...'.format(self.pid))
+            self.event.wait()
+            print('Process {0} finished waiting on IDF...'.format(
+                self.pid))
 
     class IDF(multiprocessing.Process):
-        def __init__(self, p_idf_parent):
-            self.p_idf_parent = p_idf_parent
+        def __init__(self, p_idf_parent, num_docs, event):
+            self.p_idf_parent = p_idf_parent  # parent pipe for IDF
+            self.num_docs = num_docs  # total number of documents
+            self.event = event
             self.tokens = {}
             super(self.__class__, self).__init__()
 
@@ -75,13 +82,23 @@ class Process(object):
                 else:
                     self.tokens[msg] = 1
 
+            for token in self.tokens:
+                # IDF(token) = 1 + log_e(Total Number Of Documents / Number Of
+                # Documents with token in it)
+                import math
+                token_idf = 1 + math.log(self.num_docs / self.tokens[token],
+                                         math.e)
+                self.tokens[token] = token_idf
+            self.event.set()
+
     @staticmethod
     def create_parsers(**kwargs):
         processes = []
         for i in range(0, kwargs['num_of_processes']):
             process = Process.Parser(
                 q_unparsed_documents=kwargs['q_unparsed_documents'],
-                p_idf_child=kwargs['p_idf_child']
+                p_idf_child=kwargs['p_idf_child'],
+                event=kwargs['event']
             )
             processes.append(process)
         return processes
@@ -93,14 +110,21 @@ def parse():
 
     q_unparsed_documents = multiprocessing.Queue()
     p_idf_parent, p_idf_child = multiprocessing.Pipe()
+    event = multiprocessing.Event()
+    event.clear()
 
     ps_reader = Process.Reader(q_unparsed_documents=q_unparsed_documents)
     ps_parsers = Process.create_parsers(
         num_of_processes=int(CONF['general']['processes']),
         q_unparsed_documents=q_unparsed_documents,
-        p_idf_child=p_idf_child
+        p_idf_child=p_idf_child,
+        event=event
     )
-    ps_idf = Process.IDF(p_idf_parent=p_idf_parent)
+    ps_idf = Process.IDF(
+        p_idf_parent=p_idf_parent,
+        num_docs=int(CONF['general']['processes']),
+        event=event
+    )
 
     ps_reader.start()
 
