@@ -9,8 +9,8 @@ class Process1(multiprocessing.Process):
 
     def run(self):
         print('Process1 start')
-        for i in range(0, 10):
-            for pipe in pipes:
+        for i in range(10):
+            for pipe in self.pipes:
                 pipe.send(i)
             print('Process1 send', i)
             time.sleep(1)
@@ -45,9 +45,9 @@ if __name__ == '__main__':
 
     p1.start()
     for p in ps:
-        p.stat()
+        p.start()
 
     p1.join()
-    p1.start()
+    p1.join()
     for p in ps:
         p.join()
