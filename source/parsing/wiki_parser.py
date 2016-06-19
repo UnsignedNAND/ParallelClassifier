@@ -45,7 +45,8 @@ class Process(object):
             super(self.__class__, self).__init__()
 
         def run(self):
-            parsed_docs = 0
+            parsed_pages_num = 0
+            parsed_pages = []
             while True:
                 page = self._queue_unparsed_documents.get()
                 if page is None:
@@ -53,18 +54,28 @@ class Process(object):
                     self._queue_unparsed_documents.put(None)
                     self._pipe_tokens_to_idf_child.send(None)
                     print('Process {0} finished after parsing {1} '
-                          'docs'.format(self.pid, parsed_docs))
+                          'docs'.format(self.pid, parsed_pages_num))
                     break
                 page.create_tokens()
                 for token in page.tokens:
                     self._pipe_tokens_to_idf_child.send(token.stem)
                 page.content_clean()
-                parsed_docs += 1
+                parsed_pages_num += 1
+                parsed_pages.append(page)
+
             print('Process {0} waiting on IDF to finish...'.format(self.pid))
             self._event.wait()
-            tokens = self._pipe_tokens_to_processes_child.recv()
+            recv_tokens = self._pipe_tokens_to_processes_child.recv()
             print('Process {0} received {1} tokens from IDF'.format(
-                self.pid, len(tokens)))
+                self.pid, len(recv_tokens)))
+            for page in parsed_pages:
+                for token in page.tokens:
+                    try:
+                        token.idf = recv_tokens[token.stem]
+                        token.calc_tf_idf()
+                    except KeyError as ke:
+                        print('error', token)
+                print(page)
 
     class IDF(multiprocessing.Process):
         def __init__(self, pipe_tokens_to_idf_parent, docs_num, event,

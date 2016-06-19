@@ -45,8 +45,8 @@ class Page(object):
             token = Token()
             token.stem = stem
             token.count = temp_words[stem]
-            token.freq = int((token.count / self.word_count * 100000)) / \
-                         100000.0
+            token.tf = int((token.count / self.word_count * 100000)) / \
+                       100000.0
             self.tokens.append(token)
 
     def __str__(self):
