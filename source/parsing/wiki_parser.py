@@ -110,29 +110,31 @@ class Process(object):
 @timer
 def parse():
     LOG.info("Started loading to database")
+    processes = int(CONF['general']['processes'])
 
     queue_unparsed_documents = multiprocessing.Queue()
     pipe_tokens_to_idf_parent, pipe_tokens_to_idf_child = multiprocessing.Pipe()
+    pipes_tokens_to_processes_parent = []
+    pipes_tokens_to_processes_childs = []
     event = multiprocessing.Event()
     event.clear()
 
     ps_reader = Process.Reader(q_unparsed_documents=queue_unparsed_documents)
     ps_parsers = Process.create_parsers(
-        process_num=int(CONF['general']['processes']),
+        process_num=processes,
         queue_unparsed_documents=queue_unparsed_documents,
         pipe_tokens_to_idf_child=pipe_tokens_to_idf_child,
         event=event
     )
     ps_idf = Process.IDF(
         pipe_tokens_to_idf_parent=pipe_tokens_to_idf_parent,
-        docs_num=int(CONF['general']['processes']),
+        docs_num=int(CONF['dev']['item_limit']),
         event=event
     )
 
     ps_reader.start()
 
-    LOG.debug('Spawning {0} parser processes'.format(int(CONF['general'][
-                                                         'processes'])))
+    LOG.debug('Spawning {0} parser processes'.format(processes))
     for ps_parser in ps_parsers:
         ps_parser.start()
     ps_idf.start()
