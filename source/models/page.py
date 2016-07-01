@@ -57,7 +57,9 @@ class Page(object):
             self.word_count, len(self.tokens))
         return text
 
-
-
-
-
+    def top_tokens(self, num=5):
+        return list(sorted(
+            self.tokens,
+            reverse=True,
+            key=lambda token: token.tf_idf
+        ))[:num]

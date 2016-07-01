@@ -144,7 +144,6 @@ def _receive_parsed_docs(process_num, queue_parsed_docs):
             if processes_returned == process_num:
                 break
         else:
-            print(doc.title)
             docs.append(doc)
     LOG.debug('Received {0} parsed docs.'.format(len(docs)))
     return docs

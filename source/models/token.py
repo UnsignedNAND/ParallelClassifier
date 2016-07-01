@@ -8,7 +8,7 @@ class Token(object):
     tf_idf = 0.0
 
     def __str__(self):
-        return '{0:14} {1:4} {2:7} {3:7} {4:7}'.format(
+        return '{0:14} {1:4} {2:7} * {3:7} = {4:7}'.format(
             self.stem, self.count, self.tf, self.idf, self.tf_idf
         )
 
