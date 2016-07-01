@@ -78,8 +78,12 @@ known_hosts
 
 # virtual environment
 venv*
+.venv
 
 # wiki downloads
 *.xml
 *.bz2
+
+# docs
+*.pdf
 
