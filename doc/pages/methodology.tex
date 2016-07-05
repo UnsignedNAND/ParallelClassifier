@@ -70,28 +70,82 @@ Lemmatization is based on different dictionaries to find root of a word. The mos
 \subsubsection{Term Frequency and Inverse Document Index}
 In order to define document's topic it is essential to find relevant keywords. To achieve this, TF-IDF term weighting algorithm can be utilized. It is a numerical statistic method which reflects how important is a given word to a document in corpus. Value calculated by this method increases proportionally to the number of times a given word appears in a document, but is reduced by the frequency of the word in corpus. This approach allows words that are important for one document and appear frequently in it but rarely in corpus to score higher than ones that appear frequently in whole corpus.
 
-Consider following sentences as an examples for further presentation of TD-IDF:
+Consider following sentences and matrix of tokens as an examples for further presentation of TD-IDF:
 
 \begin{table}[ht]
 	\centering
-	\caption{Sample documents for TF-IDF presentation}
-	\label{my-label}
-	\begin{tabular}{ll}
-		Document 1. & I wasted time, and now doth time waste me. \\
-		Document 2. & There's a time for all things.             \\
-		Document 3. & Time heals all wounds.                     \\
-		Document 4. & He in peace is wounded, not in war.       
+	\caption{TF-IDF - Example documents}
+	\label{tf_idf_example_sentences}
+	\begin{tabular}{@{}ll@{}}
+		Document 1. & A species is a kind of organism. \\
+		Document 2. & An organism is a living thing.   \\
+		Document 3. & Bacteria is a living organism.   \\
+		Document 4. & A is the letter.                
 	\end{tabular}
 \end{table}
 
 \begin{itemize}
-	\item \textbf{TF - Term Frequency} - is a measure of frequency with which given word occurs in document. Words that occur more often in a document have higher value than those that do not. Returned value is normalized.
-	\[TF\textsubscript{word}=\frac{word\ occurence\ count}{total\ words\ in\ document}\]
+	\item \textbf{TF - Term Frequency} - is a measure of frequency with which given word occurs in document. Because every document is different in length and thus longer documents will contain words with higher occurence count, value returned by TF is usually normalized. Words that occur more often in a document have higher value than those that do not.
+	
+	As can be observed in \ref{tf_idf_tf_freq}, matrix created in a process tends to contain many empty cells (word does not occur in a document). It might be worth to consider using sparse matrix implementation in order to preserve memory.
+	\[TF\textsubscript{word}=\frac{word\ occurence\ count}{total\ words\ in\ document}\]	
+\begin{table}[ht]
+	\centering
+	\caption{TF - Words frequencies}
+	\label{tf_idf_tf_freq}
+	\begin{tabular}{@{}lccccccccccc|c|@{}}
+		\toprule
+		& \multicolumn{1}{l}{a} & \multicolumn{1}{l}{species} & \multicolumn{1}{l}{is} & \multicolumn{1}{l}{kind} & \multicolumn{1}{l}{of} & \multicolumn{1}{l}{organism} & \multicolumn{1}{l}{living} & \multicolumn{1}{l}{thing} & \multicolumn{1}{l}{bacteria} & \multicolumn{1}{l}{the} & \multicolumn{1}{l|}{letter} & \multicolumn{1}{l|}{Total} \\ \midrule
+		D1 & 2                     & 1                           & 1                      & 1                        & 1                      & 1                            &                            &                           &                              &                         &                             & 7                          \\ \cmidrule(l){13-13} 
+		D2 & 2                     &                             & 1                      &                          &                        & 1                            & 1                          & 1                         &                              &                         &                             & 6                          \\ \cmidrule(l){13-13} 
+		D3 & 1                     &                             & 1                      &                          &                        & 1                            & 1                          &                           & 1                            &                         &                             & 5                          \\ \cmidrule(l){13-13} 
+		D4 & 1                     &                             & 1                      &                          &                        &                              &                            &                           &                              & 1                       & 1                           & 4                          \\ \bottomrule
+	\end{tabular}
+\end{table}
+\begin{table}[]
+	\centering
+	\caption{TF - Normalized words frequencies}
+	\label{tf_idf_tf_norm_freq}
+	\begin{tabular}{@{}lccccccccccc@{}}
+		\toprule
+		& \multicolumn{1}{l}{a} & \multicolumn{1}{l}{species} & \multicolumn{1}{l}{is} & \multicolumn{1}{l}{kind} & \multicolumn{1}{l}{of} & \multicolumn{1}{l}{organism} & \multicolumn{1}{l}{living} & \multicolumn{1}{l}{thing} & \multicolumn{1}{l}{bacteria} & \multicolumn{1}{l}{the} & \multicolumn{1}{l}{letter} \\ \midrule
+		D1 & 0.29                  & 0.14                        & 0.14                   & 0.14                     & 0.14                   & 0.14                         &                            &                           &                              &                         &                            \\
+		D2 & 0.33                  &                             & 0.16                   &                          &                        & 0.16                         & 0.16                       & 0.16                      &                              &                         &                            \\
+		D3 & 0.20                  &                             & 0.20                   &                          &                        & 0.20                         & 0.20                       &                           & 0.20                         &                         &                            \\
+		D4 & 0.25                  &                             & 0.25                   &                          &                        &                              &                            &                           &                              & 0.25                    & 0.25                       \\ \bottomrule
+	\end{tabular}
+\end{table}
+	
 	\item \textbf{IDF - Inverse Document Frequency} - it can be observed that certain words that do not carry much information appear very frequently across all documents written in English. Example of these words are: 'a', 'an', 'the' and many others. But because not only articles and stopwords can turn out to be redundant, IDF was introduced to counter the emphasis that these words carry with them. IIDF diminishes the weight of words that occur frequently and increases the weight of words that occur rarely across all documents in corpus.
 	\[IDF\textsubscript{word}=1+log_e \frac{total\ number\ of\ documents\ in\ corpus}{number\ of\ documents\ with\ word\ in\ it}\]
+	
+	\begin{table}[ht]
+		\centering
+		\caption{My caption}
+		\label{my-label}
+		\begin{tabular}{@{}ll@{}}
+			\toprule
+			Term     & IDF  \\ \midrule
+			is       & 1.00 \\
+			species  & 2.37 \\
+			a        & 1.00 \\
+			organism & 1.29 \\
+			the      & 2.39 \\
+			thing    & 2.39 \\
+			letter   & 2.39 \\
+			of       & 2.39 \\
+			kind     & 2.39 \\
+			bacteria & 2.39 \\
+			living   & 1.69 \\ \bottomrule
+		\end{tabular}
+	\end{table}
+	
 	\item \textbf{TF-IDF - Term Frequency-Inverse Document Frequency}
+	Final result for TF-IDF is achieved by multiplying TF and IDF values.
 	\[TFIDF\textsubscript{word}=TF\textsubscript{word} * IDF\textsubscript{word}\]
 \end{itemize}
+
+\subsubsection{Cosine similarity}
 
 \subsection{Clusterization}
 \subsection{Classification}

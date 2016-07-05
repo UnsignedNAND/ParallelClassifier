@@ -144,6 +144,7 @@ def _receive_parsed_docs(process_num, queue_parsed_docs):
             if processes_returned == process_num:
                 break
         else:
+            print(doc.title, [(token.stem, token.tf_idf) for token in doc.top_tokens()])
             docs.append(doc)
     LOG.debug('Received {0} parsed docs.'.format(len(docs)))
     return docs

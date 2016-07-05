@@ -5,6 +5,7 @@ from models.token import Token
 
 STOPWORDS = nltk.corpus.stopwords.words('english')
 STEMMER = nltk.stem.snowball.SnowballStemmer("english")
+LEMMATIZER = nltk.stem.wordnet.WordNetLemmatizer()
 
 
 class Page(object):
@@ -35,7 +36,8 @@ class Page(object):
                 continue
             # to make sure we only count really relative words
             self.word_count += 1
-            stem = STEMMER.stem(word)
+            # stem = STEMMER.stem(word)
+            stem = LEMMATIZER.lemmatize(word)
             if stem in temp_words.keys():
                 temp_words[stem] += 1
             else:
@@ -45,8 +47,7 @@ class Page(object):
             token = Token()
             token.stem = stem
             token.count = temp_words[stem]
-            token.tf = int((token.count / self.word_count * 100000)) / \
-                       100000.0
+            token.tf = int((token.count / self.word_count * 100000)) / 100000.0
             self.tokens.append(token)
 
     def __str__(self):
