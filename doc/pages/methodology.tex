@@ -2,10 +2,10 @@
 \label{methodology}
 
 \section{Introduction}
-In the first section of this chapter the significance of the project is briefly explained. Then, according to it, the work plan is presented in the second section.  In next sections designed algorithms are described taking into consideration the possibility to provide a framework for text document categorization in parallel environment. 
+In the first section of this chapter the significance of a project is briefly explained. Then, according to it, the work plan is presented in the second section.  In next sections designed algorithms are described taking into consideration the possibility to provide a framework for text document categorization in parallel environment. 
 
 \section{Significance}
-Data mining algorithms play an essential role not only in business and science applications but also in medicine as second-opinion diagnostic tools. On the other hand, nowadays text documents become more and more accessible, because of digitalization of information. Taking it into consideration there is a strong need to find a tool which allows to speed up information lookup by classifying given document with certain confidence of accuracy in relevance to the set of other documents. This solution based on using data mining algorithms in parallel environment can doubtless have a wide range of applications. The motivation for this work is to provide algorithms for documents features extraction, documents clasterization and classification. Next step is to scale this solution into application based on parallel processing. This combination may lead to previously undiscovered system that allows to accelerate   document classification significantly. Many new aspects analyzed and defined in this paper may turned out to be important in the future researches and significant for development in many areas, for example:
+Data mining algorithms play an essential role not only in business and science applications but also in medicine as second-opinion diagnostic tools. On the other hand, nowadays text documents become more and more accessible, because of information digitalization. Taking it into consideration there is a strong need to find a tool which allows to speed up information lookup by classifying given document with certain confidence of accuracy in relevance to the set of other documents. This solution based on using data mining algorithms in parallel environment can doubtless have a wide range of applications. The motivation for this work is to provide algorithms for documents features extraction, documents clasterization and classification. Next step is to scale this solution into application based on parallel processing. This combination may lead to previously undiscovered system that allows to accelerate document classification significantly. Many new aspects analyzed and defined in this paper may turned out to be important in the future researches and significant for development in many areas, for example:
 \begin{enumerate}
 
 \item spam filtering
@@ -44,26 +44,59 @@ For human beings, documents are an essential mean of both preserving and exchang
 This section summarizes methods that has been used or considered to be used for the best feature extraction that could possibly lead to more accurate clusterization and classification.
 
 \subsubsection{Tokenization}
-First step in feature extraction process is to tokenize document. Tokenization means that ordered sentences are turned into a collection of unordered words. During this step it is possible to reduce the overall weight of corpus by deleting stop words, all special signs and converting all characters to lower case - they do not carry any information that would be considered important during clusterization and classification.
+First step in feature extraction process is to tokenize document. Tokenization means that ordered sentences are turned into a collection of unordered words. During this step it is possible to reduce the overall weight of corpus by deleting stop words (def. \ref{stop_words}), all special signs and converting all characters to lower case - they do not carry any information that would be considered important during clusterization and classification.
 
-During tokenization there is possibility of losing too much information, though. Some set of words are not supposed to be divided into seperate, unordered pieces. Consider following sentance as an example:
+ \begin{definition}[Stop words]
+ 	\label{stop_words}
+ 	In documents analysis, stop words are words which are filtered out before or after processing of natural language text. They usually refer to the most common words in a specific language, so creating universal list of stop words is quite challenging.
+ \end{definition}
 
-\textquotedblleft A popular tourist destination, San Francisco is known for its cool summers\textquotedblright
 
-Tokenizing above sentence results in:
+During tokenization there is possibility of losing too much information, though. Some set of words are not supposed to be divided into seperate, unordered pieces. Consider following sentance as an example:\\
 
-['a', 'popular', 'tourist', 'destination,', 'san', 'francisco', 'is', 'known', 'for', 'its', 'cool', 'summers'].
+\textquotedblleft \textit{A popular tourist destination, San Francisco is known for its cool summers.}\textquotedblright\\
 
-As can be seen, 'San Francisco' has beed divided into two parts - 'san' and 'francisco'. In this particular case tokenization caused additional loss of information, as 'san' and 'francisco', when presented seperatly, might have another meaing. To bypass this issue, n-grams can be used.
+Tokenizing above sentence results in:\\
 
-n-grams posses some advatnages over tokens. Tokens hold information about single word, while n-grams are a sequence of N>=1 consecutive words that appear in text. Example presented above turned into n-grams with N=3 will result in:
+\textit{['a', 'popular', 'tourist', 'destination,', 'san', 'francisco', 'is', 'known', 'for', 'its', 'cool', 'summers'].}\\
 
-[['A', 'popular', 'tourist'], ['popular', 'tourist', 'destination,'], ['tourist', 'destination,', 'San'], ['destination,', 'San', 'Francisco'], ['San', 'Francisco', 'is'], ['Francisco', 'is', 'known'], ['is', 'known', 'for'], ['known', 'for', 'its'], ['for', 'its', 'cool'], ['its', 'cool', 'summers']]
+As can be seen, \textit{'San Francisco'} has beed divided into two parts - \textit{'san'} and \textit{'francisco'}. In this particular case tokenization caused additional loss of information, as 'san' and 'francisco', when presented seperatly, might have another meaing. To bypass this issue, n-grams can be used.\\
+
+\textbf{n-grams}
+
+n-grams posses some advatnages over tokens. Tokens hold information about single word, while n-grams are a sequence of N $>$=1 consecutive words that appear in text. An n-gram of size 1 is referred to as a unigram, size 2 is a bigram (or a digram), size 3 is a trigram. Example presented above turned into n-grams with N=3 will result in:\\
+
+\textit{[['A', 'popular', 'tourist'], ['popular', 'tourist', 'destination,'], ['tourist', 'destination,', 'San'], ['destination,', 'San', 'Francisco'], ['San', 'Francisco', 'is'], ['Francisco', 'is', 'known'], ['is', 'known', 'for'], ['known', 'for', 'its'], ['for', 'its', 'cool'], ['its', 'cool', 'summers']]}\\
+
+As can be seen, resulted trigram is a contiguous sequence of 3 items. An n-gram model is a type of probabilistic language model for predicting the next item in text sequence. These models have recently gained a lot of popularity for using them in probability, communication theory, computational linguistics and data compression.
 
 \subsubsection{Stemming and lemmatization}
-Important step in feature extraction process is word stemming and lemmatization. They both allow for derived words that might be in inflectional forms and sometimes derivationally related forms of a word to be brought to a common root. 
+Important step in feature extraction process is word stemming and lemmatization. They both allow for derived words that might be in inflectional forms (def. \ref{inflectional}) and sometimes derivationally related forms of a word to be brought to a common root (def. \ref{root}). 
 
-Stemming is an approach based on different algorithms for calculating root of a given word. It consist of methods like lookup tables, suffix and postfix stripping algorithms. While this method is efficent, it's accuracy suffers. Root might not always be a lexically correct form, but it still enables both counting occurences of all forms of given word across the document and helps to reduce the overall weight of corpus.
+ \begin{definition}[Inflectional form]
+ 	\label{inflectional}
+In grammar, inflection or inflexion is the modification of a word using a prefix, suffix or infix, or another internal modification such as a vowel change. The aim is to express various grammatical categories for example tense, case, voice, aspect, person, number, gender, and mood. 
+\end{definition}
+
+ \begin{definition}[Root word]
+ 	\label{root}
+A root word is a word that does not have a prefix (before the word) or a suffix (after a word). The root word is the primary lexical unit of a word. It defines a word family. A root is often called base word, which carries the most significant aspects of semantic content and cannot be reduced into smaller constituents. 
+Some common root words, their meanings and words that are formed from this blocks are presented below:
+\begin{itemize}
+	\item Act  - move or do - action, activity, transaction
+	\item Ambul -  move or walk - amble, ambulant
+	\item Auto -  self or same -  automate, automatic
+	\item Cardio -  heart - cardiology
+	\item Cede -  go -  exceed, accessible
+	\item Counter -  against or opposite - counteract, counterpoint 
+	\item Demo -  people - democracy, demographic
+	\item Derma -  skin - dermatology, epidermis
+	\item Equi -  equal - equity
+	\item Semi -  half - semicircle 
+\end{itemize}
+\end{definition}
+
+Stemming is an approach based on different algorithms for calculating root of a given word. It consist of methods like lookup tables, suffix and postfix stripping algorithms. While this method is efficent, its accuracy suffers. Root might not always be a lexically correct form, but it still enables both counting occurences of all forms of given word across the document and helps to reduce the overall weight of corpus.
 
 Lemmatization is based on different dictionaries to find root of a word. The most common dictionary used in lemmatization process is WordNet.
 
@@ -89,7 +122,7 @@ Consider following sentences and matrix of tokens as an examples for further pre
 	
 	As can be observed in \ref{tf_idf_tf_freq}, matrix created in a process tends to contain many empty cells (word does not occur in a document). It might be worth to consider using sparse matrix implementation in order to preserve memory.
 	\[TF\textsubscript{word}=\frac{word\ occurence\ count}{total\ words\ in\ document}\]	
-\begin{table}[ht]
+\begin{table}[H]
 	\centering
 	\caption{TF - Words frequencies}
 	\label{tf_idf_tf_freq}
@@ -102,7 +135,7 @@ Consider following sentences and matrix of tokens as an examples for further pre
 		D4 & 1                     &                             & 1                      &                          &                        &                              &                            &                           &                              & 1                       & 1                           & 4                          \\ \bottomrule
 	\end{tabular}
 \end{table}
-\begin{table}[]
+\begin{table}[H]
 	\centering
 	\caption{TF - Normalized words frequencies}
 	\label{tf_idf_tf_norm_freq}
@@ -117,9 +150,9 @@ Consider following sentences and matrix of tokens as an examples for further pre
 \end{table}
 	
 	\item \textbf{IDF - Inverse Document Frequency} - it can be observed that certain words that do not carry much information appear very frequently across all documents written in English. Example of these words are: 'a', 'an', 'the' and many others. But because not only articles and stopwords can turn out to be redundant, IDF was introduced to counter the emphasis that these words carry with them. IIDF diminishes the weight of words that occur frequently and increases the weight of words that occur rarely across all documents in corpus.
-	\[IDF\textsubscript{word}=1+log_e \frac{total\ number\ of\ documents\ in\ corpus}{number\ of\ documents\ with\ word\ in\ it}\]
+
 	
-	\begin{table}[ht]
+	\begin{table}[H]
 		\centering
 		\caption{My caption}
 		\label{my-label}
@@ -140,6 +173,8 @@ Consider following sentences and matrix of tokens as an examples for further pre
 		\end{tabular}
 	\end{table}
 	
+		\[IDF\textsubscript{word}=1+log_e \frac{total\ number\ of\ documents\ in\ corpus}{number\ of\ documents\ with\ word\ in\ it}\]
+
 	\item \textbf{TF-IDF - Term Frequency-Inverse Document Frequency}
 	Final result for TF-IDF is achieved by multiplying TF and IDF values.
 	\[TFIDF\textsubscript{word}=TF\textsubscript{word} * IDF\textsubscript{word}\]
@@ -149,3 +184,5 @@ Consider following sentences and matrix of tokens as an examples for further pre
 
 \subsection{Clusterization}
 \subsection{Classification}
+\section{Conclusion}
+This chapter includes a complete description of the methodology used to prepare analysis of the requirements for created system. Parallelization of documents classification is the main scientific part of proposed solution. Providing algorithms for documents features extraction, clasterization and classification in the application based on parallel processing may lead to previously undiscovered system that allows to accelerate document classification significantly. 
