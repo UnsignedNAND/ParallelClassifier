@@ -96,7 +96,7 @@ Some common root words, their meanings and words that are formed from this block
 \end{itemize}
 \end{definition}
 
-Stemming is an approach based on different algorithms for calculating root of a given word. It consist of methods like lookup tables (def. \ref{lookup_table}), suffix (def. \ref{suffix}) and postfix (analogically) stripping algorithms. While this method is efficent, its accuracy suffers. Root might not always be a lexically correct form, but it still enables both counting occurences of all forms of given word across the document and helps to reduce the overall weight of corpus.
+Stemming is an approach based on different algorithms for calculating root of a given word. It consist of methods like lookup tables (def. \ref{lookup_table}), suffix (def. \ref{suffix}) and postfix (analogically) stripping algorithms. While this method is efficient, its accuracy suffers. Root might not always be a lexically correct form, but it still enables both counting occurrences of all forms of given word across the document and helps to reduce the overall weight of corpus.
 
  \begin{definition}[Lookup table]
  	\label{lookup_table}
@@ -115,7 +115,7 @@ Suffix stripping algorithms rely on a smaller list of "rules" than a lookup tabl
  \end{definition}
 
  On the other hand, stripping algorithms have been shown to have a poor performance when dealing with exceptional relations (for example 'ran' and 'run'). The results given by suffix stripping algorithms are limited to those which have well defined suffixes. This is a problem, as not all words have a well formulated set of rules. Lemmatisation (def. \ref{lemmatization}) attempts to improve upon this challenge.
-It is based on different dictionaries to find a root of a word. The difference betweet lemmatization and steeming is that a stemmer operates on a single word without any context and without knowledge about part of a speech. On the other hand, stemmers are easier to implement and this algorithm is usually faster.
+It is based on different dictionaries to find a root of a word. The difference between lemmatization and stemming is that a stemmer operates on a single word without any context and without knowledge about part of a speech. On the other hand, stemmers are easier to implement and this algorithm is usually faster.
 
 For example:
 \begin{itemize}
@@ -133,7 +133,7 @@ In linguistics, a lemmatization is the process of grouping together the various 
  
   \begin{definition}[Lemma]
   	\label{lemma}
-  A lemma is the canonical form, dictionary form, or citation form of a word. For example the verb 'to walk' may be presented as walk, walked, walks, walking. The base form walk, which might be looked up in a dictionary, is called the lemma. The combination of the base form with the part of speech is  called the lexeme. Another example include run, runs, ran and running are forms of the same lexeme, with run as the lemma. 
+  A lemma is the canonical form, dictionary form, or citation form of a word. For example the verb 'to walk' may be presented as walk, walked, walks, walking. The base form walk, which might be looked up in a dictionary, is called the lemma. The combination of the base form with the part of speech is called the lexeme. Another example include run, runs, ran and running are forms of the same lexeme, with run as the lemma. 
   \end{definition}
  
 \subsubsection{Term Frequency and Inverse Document Index}
@@ -185,7 +185,7 @@ Consider following sentences and matrix of tokens as an examples for further pre
 	\end{tabular}
 \end{table}
 	
-	\item \textbf{IDF - Inverse Document Frequency} - it can be observed that certain words that do not carry much information appear very frequently across all documents written in English. Example of these words are: 'a', 'an', 'the' and many others. But because not only articles and stop words can turn out to be redundant, IDF was introduced to counter the emphasis that these words carry with them. IIDF diminishes the weight of words that occur frequently and increases the weight of words that occur rarely across all documents in corpus.
+	\item \textbf{IDF - Inverse Document Frequency} - it can be observed that certain words that do not carry much information appear very frequently across all documents written in English. Example of these words are: 'a', 'an', 'the' and many others. But because not only articles and stop words can turn out to be redundant, IDF was introduced to counter the emphasis that these words carry with them. IDF diminishes the weight of words that occur frequently and increases the weight of words that occur rarely across all documents in corpus.
 
 	
 	\begin{table}[H]
@@ -219,7 +219,7 @@ Consider following sentences and matrix of tokens as an examples for further pre
 \subsubsection{Cosine similarity}
  The documents clustering can result in faster data analysis, such  as  information
 retrieval  and  information  extraction,  by  grouping  similar kind  of  information.
-While performing clusterization, a similarity between a pair of objects has to be defined. Accurate clustering requires a definition of it in terms of either similarity or distance. Different similarity and distance measures have already been described and used, for example Euclidean  distance or cosine  similarity. Cosine  similarity  is  one  of  the  most  popular  similarity  measure and it is often  applied for  text  documents clusterization. The main advantage of the cosine similarity is its independence of document length. For two documents di and dj, the cosine similarity between them can be defined as
+While performing clusterization, a similarity between a pair of objects has to be defined. Accurate clustering requires a definition of it in terms of either similarity or distance. Different similarity and distance measures have already been described and used, for example Euclidean  distance or cosine  similarity. Cosine  similarity  is  one  of  the  most  popular  similarity  measure and it is often  applied for  text  documents clusterization. The main advantage of the cosine similarity is its independence of document length. For two documents \(d_i\) and \(d_j\), the cosine similarity between them can be defined as
 \[cos(d_i, d_j)=\frac{d_i . d_j}{|| d_i || ||d_j ||}\]
 The above equation can be simplified, because the document vectors have unit length
 \[cos(d_i, d_j)={d_i . d_j}\]
