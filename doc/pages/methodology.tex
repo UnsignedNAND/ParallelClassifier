@@ -242,23 +242,23 @@ As can be expected, documents are identical if value of cosine similarity is 1, 
 document vectors are orthogonal to each other this value is 0 and it means that documents are totally different.
 In proposed solution this metric could be used to define a level of similarity between a pair of objects in order to group together nearest documents.
 \subsection{Clusterization}
-Once documents are in a form of vectors it is possible to prepare data clusters. For this, one of the most frequenlty used unsupervised methods is a K-means algorithm. It has linear time complexity in relevance to the number of documents and it is possible to make it run concurrently on multiple threads. 
+Once documents are in a form of vectors it is possible to prepare data clusters. For this, one of the most frequenlty used unsupervised methods is the K-means algorithm. It has linear time complexity in relevance to the number of documents and it is possible to run it concurrently on multiple threads. 
 
 First step in K-means is to select K documents that will function as centers of groups. Most often these centers are selected randomly, which makes each run of K-means a bit different.
-Knowing the distances between each of documents, we divide them into K groups. Each group is a set of documents with the distances closest to one center. Once groups are created, new centers are selected by looking for a document that is closest to the calculated average of document distances in its cluster. We repeat these steps until centers are still - during iteration no new centers were selected. 
+Knowing the distances between each pair of documents, we divide them into K groups. Each group is a set of documents with the distances closest to center of each group. Once groups are created, new centers are selected by looking for a document that is closest to the calculated average of document distances in its cluster. We repeat these steps until centers are still - during iteration new centers are the same as previous ones. 
 More detailed implementation of a single-process K-means was described in \ref{k_means_algorithm}.
 
 There are many variants of K-means parallel implementation, mostly depending on architecture of the solution. In our implementation, the following steps are proposed:
 
 \begin{enumerate}
 	\item \textbf{Initialization} - in this step N processes are initialized.
-	Each of processes receives own copy of all documents represented by a single matrix containing calculated vectors. If processes are running on seperate nodes and document set is large, it should be considered to compress data to save time sending it over network.
+	Each of processes receives own copy of all documents represented by a single matrix containing calculated vectors. If processes are running on seperate nodes and document set is large, it should be considered to compress data to save time while sending it over network.
 	
 	\item \textbf{Select K centers}
 	Master process selects K centers and distributes them to processes. With an assumption that each process has an equal processing power, each process receives \(\frac{K}{N}\) centers.
 	
 	\item \textbf{Computing distances between documents and centers}
-	Each process calculated distances between each of documents and centers that were received in a previous steps. This partial result is sent back to master process.
+	Each process calculates distances between each pair of documents and centers that were received in a previous steps. This partial result is sent back to master process.
 	
 	\item \textbf{Assigning documents to groups}
 	Master process using the distances received from other processes, can assign each document to the closest group created around one of K documents selected previously.
@@ -270,7 +270,7 @@ There are many variants of K-means parallel implementation, mostly depending on 
 	Master process sends updated group centers to other processes. Repeat step 4.
 	
 	\item \textbf{Ending condition}
-	If gropus centers did not change in past iteration - clusterization has finished.
+	If groups centers did not change in past iteration - clusterization has finished.
 \end{enumerate}
 
 \subsection{Classification}
