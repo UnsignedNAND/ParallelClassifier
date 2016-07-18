@@ -189,7 +189,6 @@ Consider following sentences and matrix of tokens as an examples for further pre
 	
 	\item \textbf{IDF - Inverse Document Frequency} - it can be observed that certain words that do not carry much information appear very frequently across all documents written in English. Example of these words are: 'a', 'an', 'the' and many others. But because not only articles and stop words can turn out to be redundant, IDF was introduced to counter the emphasis that these words carry with them. IDF diminishes the weight of words that occur frequently and increases the weight of words that occur rarely across all documents in corpus.
 
-	
 	\begin{table}[H]
 		\centering
 		\caption{Terms with IDF values assigned}
@@ -232,12 +231,35 @@ Consider following sentences and matrix of tokens as an examples for further pre
 
 \subsubsection{Cosine similarity}
  The documents clustering can result in faster data analysis, such  as  information retrieval  and  information  extraction,  by  grouping  similar kind  of  information. While performing clusterization, a similarity between a pair of objects has to be defined. Accurate clustering requires a definition of it in terms of either similarity or distance. Different similarity and distance measures have already been described and used, for example Euclidean  distance or cosine  similarity. Cosine  similarity  is  one  of  the  most  popular  similarity  measure and it is often  applied for  text  documents clusterization. The main advantage of the cosine similarity is its independence of document length. For two documents \(d_i\) and \(d_j\), the cosine similarity between them can be defined as
-\[cos(d_i, d_j)=\frac{d_i . d_j}{|| d_i || ||d_j ||}\]
-The above equation can be simplified, because the document vectors have unit length
-\[cos(d_i, d_j)={d_i . d_j}\]
+\[cos(d_i, d_j)=\frac{d_i \cdot d_j}{|| d_i || ||d_j ||}\]
+where \(d_i \cdot d_j\) is a \textit{dot product} (def. \ref{def_dot_product}) and \(|| d_i || ||d_j ||\) is an \textit{Euclidean norm} (def. \ref{def_euclidean_norm}) of the vector (the intuitive notion of length of the vector).
+
+ \begin{definition}[Dot product]
+ 	\label{def_dot_product}
+ \end{definition}
+ 
+  \begin{definition}[Euclidean norm]
+  	\label{def_euclidean_norm}
+  \end{definition}
+
 As can be expected, documents are identical if value of cosine similarity is 1, and if the 
 document vectors are orthogonal to each other this value is 0 and it means that documents are totally different.
 In proposed solution this metric could be used to define a level of similarity between a pair of objects in order to group together nearest documents.
+
+\begin{table}[H]
+	\centering
+	\caption{Cosine similarity calculated between documents in example set}
+	\label{casine_similarity}
+	\begin{tabular}{@{}lcccc@{}}
+		\toprule
+		& \multicolumn{1}{l}{Document 1} & \multicolumn{1}{l}{Document 2} & \multicolumn{1}{l}{Document 3} & \multicolumn{1}{l}{Document 4} \\ \midrule
+		Document 1 & 1.0                            & 0.0                            & 0.394                          & 0.0                            \\
+		Document 2 & 0.0                            & 1.0                            & 0.732                          & 0.615                          \\
+		Document 3 & 0.394                          & 0.732                          & 1.0                            & 0.45                           \\
+		Document 4 & 0.0                            & 0.615                          & 0.45                           & 1.0                            \\ \bottomrule
+	\end{tabular}
+\end{table}
+
 \subsection{Clusterization}
 Once documents are in a form of vectors it is possible to prepare data clusters. For this, one of the most frequenlty used unsupervised methods is the K-means algorithm. It has linear time complexity in relevance to the number of documents and it is possible to run it concurrently on multiple threads. 
 
