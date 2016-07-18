@@ -76,7 +76,8 @@ docs = []
 for document in documents:
     doc = Doc()
     doc.text = document
-    doc.terms = [LEMMATIZER.lemmatize(word.lower()) for word in document.split()
+    doc.terms = [LEMMATIZER.lemmatize(re.sub(r'\W+', '', word).lower())
+                 for word in document.split()
                  if word.lower() not in STOPWORDS]
     docs.append(doc)
     print(doc)
@@ -96,3 +97,11 @@ print('*'*5 + ' TFIDF ' + '*'*5)
 docs = f_tfidf(docs)
 for doc in docs:
     print(doc.tfidf)
+
+terms = []
+for doc in docs:
+    for term in doc.tf:
+        terms.append(term)
+terms = list(set(terms))
+print('*'*8)
+print(terms)
