@@ -62,7 +62,20 @@ def f_distance(doc1, doc2):
     ||d2|| = square root(d2[0]2 + d2[1]2 + ... + d2[n]2)
     """
     dot_product = 0
+    for term in doc1.tfidf:
+        if term in doc2.tfidf:
+            dot_product += doc1.tfidf[term] * doc2.tfidf[term]
+    d1 = 0
+    d2 = 0
+    for term in doc1.tfidf:
+        d1 += doc1.tfidf[term] * doc1.tfidf[term]
+    d1 = math.sqrt(d1)
 
+    for term in doc2.tfidf:
+        d2 += doc2.tfidf[term] * doc2.tfidf[term]
+    d2 = math.sqrt(d2)
+
+    return int(dot_product / (d1 * d2) * 1000) / 1000.0
 
 documents = [
     "The sky is blue",
@@ -70,6 +83,12 @@ documents = [
     "The sun in the sky is bright",
     "We can see the shining sun, the bright sun"
 ]
+query = Doc()
+query.text = "sun"
+query.terms = [LEMMATIZER.lemmatize(word.lower())
+               for word in query.text.split()]
+query = f_tf([query])[0]
+print(query.tf)
 
 print('*'*5 + ' docs ' + '*'*5)
 docs = []
@@ -88,6 +107,9 @@ docs = f_idf(docs)
 for doc in docs:
     print(doc.idf)
 
+query.idf = {'sun': 1.2876820724517808}
+query.tfidf = {'sun': query.tf['sun'] * query.idf['sun']}
+
 print('*'*5 + ' TF ' + '*'*5)
 docs = f_tf(docs)
 for doc in docs:
@@ -98,10 +120,11 @@ docs = f_tfidf(docs)
 for doc in docs:
     print(doc.tfidf)
 
-terms = []
-for doc in docs:
-    for term in doc.tf:
-        terms.append(term)
-terms = list(set(terms))
-print('*'*8)
-print(terms)
+print('*'*5 + ' DISTANCE ' + '*'*5)
+#for doc in docs:
+#    print(doc, str(f_distance(doc, query)))
+for doc1 in docs:
+    print(doc1.terms)
+    for doc2 in docs:
+        print '\t', f_distance(doc1, doc2), doc2.terms
+
