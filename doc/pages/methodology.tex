@@ -147,7 +147,7 @@ Consider following sentences and matrix of tokens as an examples for further pre
 	\label{tf_idf_example_sentences}
 	\begin{tabular}{@{}lll@{}}
 		\toprule
-		& Content                                     & Tokens      \\ \midrule
+		& Content                                     & Terms      \\ \midrule
 		Document 1. & The sky is blue.                            & sky blue               \\
 		Document 2. & The sun is bright.                          & sun bright             \\
 		Document 3. & The sun in the sky is bright.               & sun sky bright         \\
@@ -156,35 +156,35 @@ Consider following sentences and matrix of tokens as an examples for further pre
 \end{table}
 
 \begin{itemize}
-	\item \textbf{TF - Term Frequency} - is a measure of frequency with which given word occurs in document. Because every document is different in length and thus longer documents will contain words with higher occurence count, value returned by TF is usually normalized. Words that occur more often in a document have higher value than those that do not.
+	\item \textbf{TF - Term Frequency} - is a measure of frequency with which given word occurs in document. Because every document is different in length and thus longer documents will contain words with higher occurrence count, value returned by TF is usually normalized. Words that occur more often in a document have higher value than those that do not.
 	
 	As can be observed in \ref{tf_idf_tf_freq}, matrix created in a process tends to contain many empty cells (word does not occur in a document). It might be worth to consider using sparse matrix implementation in order to preserve memory.
 	\[TF\textsubscript{word}=\frac{word\ occurence\ count}{total\ words\ in\ document}\]	
-\begin{table}[H]
+\begin{table}[H]	
 	\centering
 	\caption{TF - Words frequencies}
 	\label{tf_idf_tf_freq}
-	\begin{tabular}{@{}lccccccccccc|c|@{}}
-		\toprule
-		& \multicolumn{1}{l}{a} & \multicolumn{1}{l}{species} & \multicolumn{1}{l}{is} & \multicolumn{1}{l}{kind} & \multicolumn{1}{l}{of} & \multicolumn{1}{l}{organism} & \multicolumn{1}{l}{living} & \multicolumn{1}{l}{thing} & \multicolumn{1}{l}{bacteria} & \multicolumn{1}{l}{the} & \multicolumn{1}{l|}{letter} & \multicolumn{1}{l|}{Total} \\ \midrule
-		D1 & 2                     & 1                           & 1                      & 1                        & 1                      & 1                            &                            &                           &                              &                         &                             & 7                          \\ \cmidrule(l){13-13} 
-		D2 & 2                     &                             & 1                      &                          &                        & 1                            & 1                          & 1                         &                              &                         &                             & 6                          \\ \cmidrule(l){13-13} 
-		D3 & 1                     &                             & 1                      &                          &                        & 1                            & 1                          &                           & 1                            &                         &                             & 5                          \\ \cmidrule(l){13-13} 
-		D4 & 1                     &                             & 1                      &                          &                        &                              &                            &                           &                              & 1                       & 1                           & 4                          \\ \bottomrule
-	\end{tabular}
+\begin{tabular}{@{}lllllll@{}}
+	\toprule
+	& blue & sun & sky & see & bright & shining \\ \midrule
+	Document 1. & 1    &     & 1   &     &        &         \\
+	Document 2. &      & 1   &     &     & 1      &         \\
+	Document 3. &      & 1   & 1   &     & 1      &         \\
+	Document 4. &      & 2   &     & 1   & 1      & 1       \\ \bottomrule
+\end{tabular}
 \end{table}
 \begin{table}[H]
 	\centering
 	\caption{TF - Normalized words frequencies}
 	\label{tf_idf_tf_norm_freq}
-	\begin{tabular}{@{}lccccccccccc@{}}
-		\toprule
-		& \multicolumn{1}{l}{a} & \multicolumn{1}{l}{species} & \multicolumn{1}{l}{is} & \multicolumn{1}{l}{kind} & \multicolumn{1}{l}{of} & \multicolumn{1}{l}{organism} & \multicolumn{1}{l}{living} & \multicolumn{1}{l}{thing} & \multicolumn{1}{l}{bacteria} & \multicolumn{1}{l}{the} & \multicolumn{1}{l}{letter} \\ \midrule
-		D1 & 0.29                  & 0.14                        & 0.14                   & 0.14                     & 0.14                   & 0.14                         &                            &                           &                              &                         &                            \\
-		D2 & 0.33                  &                             & 0.16                   &                          &                        & 0.16                         & 0.16                       & 0.16                      &                              &                         &                            \\
-		D3 & 0.20                  &                             & 0.20                   &                          &                        & 0.20                         & 0.20                       &                           & 0.20                         &                         &                            \\
-		D4 & 0.25                  &                             & 0.25                   &                          &                        &                              &                            &                           &                              & 0.25                    & 0.25                       \\ \bottomrule
-	\end{tabular}
+\begin{tabular}{@{}lllllll@{}}
+	\toprule
+	& blue & sun & sky & see & bright & shining \\ \midrule
+	Document 1. & 0.5    &     & 0.5   &     &        &         \\
+	Document 2. &      & 0.5   &     &     & 0.5      &         \\
+	Document 3. &      & 0.333   & 0.333   &     & 0.333      &         \\
+	Document 4. &      & 0.4   &     & 0.2   & 0.2      & 0.2       \\ \bottomrule
+\end{tabular}
 \end{table}
 	
 	\item \textbf{IDF - Inverse Document Frequency} - it can be observed that certain words that do not carry much information appear very frequently across all documents written in English. Example of these words are: 'a', 'an', 'the' and many others. But because not only articles and stop words can turn out to be redundant, IDF was introduced to counter the emphasis that these words carry with them. IDF diminishes the weight of words that occur frequently and increases the weight of words that occur rarely across all documents in corpus.
@@ -192,23 +192,18 @@ Consider following sentences and matrix of tokens as an examples for further pre
 	
 	\begin{table}[H]
 		\centering
-		\caption{My caption}
-		\label{my-label}
-		\begin{tabular}{@{}ll@{}}
-			\toprule
-			Term     & IDF  \\ \midrule
-			is       & 1.00 \\
-			species  & 2.39 \\
-			a        & 1.00 \\
-			organism & 1.29 \\
-			the      & 2.39 \\
-			thing    & 2.39 \\
-			letter   & 2.39 \\
-			of       & 2.39 \\
-			kind     & 2.39 \\
-			bacteria & 2.39 \\
-			living   & 1.69 \\ \bottomrule
-		\end{tabular}
+		\caption{Terms with IDF values assigned}
+		\label{tf_idf_idf}
+	\begin{tabular}{@{}ll@{}}
+		\toprule
+		Term     & IDF   \\ \midrule
+		blue     & 2.386 \\
+		sun      & 1.288 \\
+		sky      & 1.693 \\
+		see      & 2.386 \\
+		bright   & 1.288 \\
+		shinning & 2.386 \\ \bottomrule
+	\end{tabular}
 	\end{table}
 	
 		\[IDF\textsubscript{word}=1+log_e \frac{total\ number\ of\ documents\ in\ corpus}{number\ of\ documents\ with\ word\ in\ it}\]
@@ -221,15 +216,15 @@ Consider following sentences and matrix of tokens as an examples for further pre
 
 	\begin{table}[H]
 		\centering
-		\caption{TF-IDF}
+		\caption{Final result of TF-IDF}
 		\label{tf_idf}
-		\begin{tabular}{@{}lccccccccccc@{}}
-			\toprule
-			& \multicolumn{1}{l}{a} & \multicolumn{1}{l}{species} & \multicolumn{1}{l}{is} & \multicolumn{1}{l}{kind} & \multicolumn{1}{l}{of} & \multicolumn{1}{l}{organism} & \multicolumn{1}{l}{living} & \multicolumn{1}{l}{thing} & \multicolumn{1}{l}{bacteria} & \multicolumn{1}{l}{the} & \multicolumn{1}{l}{letter} \\ \midrule
-			D1 & 0.29                  & 0.34                        & 0.14                   & 0.14                     & 0.14                   & 0.14                         &                            &                           &                              &                         &                            \\
-			D2 & 0.33                  &                             & 0.16                   &                          &                        & 0.16                         & 0.16                       & 0.16                      &                              &                         &                            \\
-			D3 & 0.20                  &                             & 0.20                   &                          &                        & 0.20                         & 0.20                       &                           & 0.20                         &                         &                            \\
-			D4 & 0.25                  &                             & 0.25                   &                          &                        &                              &                            &                           &                              & 0.25                    & 0.25                       \\ \bottomrule
+		\begin{tabular}{lllllll}
+			\hline
+			& blue  & sun   & sky   & see   & bright & shining \\ \hline
+			Document 1. & 1.193 &       & 0.847 &       &        &         \\
+			Document 2. &       & 0.644 &       &       & 0.644  &         \\
+			Document 3. &       & 0.429 & 0.429 &       & 0.564  &         \\
+			Document 4. &       & 0.515 &       & 0.477 & 0.258  & 0.477   \\ \hline
 		\end{tabular}
 	\end{table}
 	
