@@ -139,17 +139,19 @@ In linguistics, a lemmatization is the process of grouping together the various 
 \subsubsection{Term Frequency and Inverse Document Index}
 In order to define document's topic it is essential to find relevant keywords. To achieve this, TF-IDF term weighting algorithm can be utilized. It is a numerical statistic method which reflects how important is a given word to a document in corpus. Value calculated by this method increases proportionally to the number of times a given word appears in a document, but is reduced by the frequency of the word in corpus. This approach allows words that are important for one document and appear frequently in it but rarely in corpus to score higher than ones that appear frequently in whole corpus.
 
-Consider following sentences and matrix of tokens as an examples for further presentation of TD-IDF:
+Consider following sentences and matrix of tokens as an examples for further presentation of TD-IDF (tokens were lemmatized and stopwords were removed, for the sake of simplicity of visualization n-grams were not used):
 
-\begin{table}[ht]
+\begin{table}[H]
 	\centering
 	\caption{TF-IDF - Example documents}
 	\label{tf_idf_example_sentences}
-	\begin{tabular}{@{}ll@{}}
-		Document 1. & A species is a kind of organism. \\
-		Document 2. & An organism is a living thing.   \\
-		Document 3. & Bacteria is a living organism.   \\
-		Document 4. & A is the letter.                
+	\begin{tabular}{@{}lll@{}}
+		\toprule
+		& Content                                     & Tokens      \\ \midrule
+		Document 1. & The sky is blue.                            & sky blue               \\
+		Document 2. & The sun is bright.                          & sun bright             \\
+		Document 3. & The sun in the sky is bright.               & sun sky bright         \\
+		Document 4. & We can see the shining sun, the bright sun. & sun see bright shining \\ \bottomrule
 	\end{tabular}
 \end{table}
 

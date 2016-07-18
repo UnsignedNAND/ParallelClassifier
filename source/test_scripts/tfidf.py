@@ -43,9 +43,7 @@ def f_idf(docs):
     for doc in docs:
         doc.idf = {}
         for term in set(doc.terms):
-            print(term)
             doc.idf[term] = 1 + math.log(len(docs) / float(terms[term]))
-        print('===')
     return docs
 
 
