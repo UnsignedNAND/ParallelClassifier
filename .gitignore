@@ -89,3 +89,6 @@ venv*
 
 # OSX
 .DS_Store
+
+# Temporary files
+*.swp
