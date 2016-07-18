@@ -32,6 +32,7 @@ class Page(object):
 
         temp_words = {}
         for word in words:
+            word = word.lower()
             if word in STOPWORDS:
                 continue
             # to make sure we only count really relative words
