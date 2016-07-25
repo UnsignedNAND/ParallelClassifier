@@ -1,6 +1,8 @@
+import math
+import multiprocessing
+import numpy
 import xml.sax
 
-import multiprocessing
 from parsing.wiki_content_handler import WikiContentHandler
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
@@ -135,7 +137,7 @@ class Process(object):
 
 
 def _receive_parsed_docs(process_num, queue_parsed_docs):
-    docs = []
+    docs = {}
     processes_returned = 0
     while True:
         doc = queue_parsed_docs.get()
@@ -144,16 +146,55 @@ def _receive_parsed_docs(process_num, queue_parsed_docs):
             if processes_returned == process_num:
                 break
         else:
-            print(doc.title, [(token.stem, token.tf_idf) for token in doc.top_tokens()])
-            docs.append(doc)
+            docs[doc.id] = doc
     LOG.debug('Received {0} parsed docs.'.format(len(docs)))
     return docs
+
+
+def f_distance(doc1, doc2):
+    """
+    Cosine Similarity (d1, d2) =  Dot product(d1, d2) / ||d1|| * ||d2||
+    Dot product (d1,d2) = d1[0] * d2[0] + d1[1] * d2[1] * ... * d1[n] * d2[n]
+    ||d1|| = square root(d1[0]2 + d1[1]2 + ... + d1[n]2)
+    ||d2|| = square root(d2[0]2 + d2[1]2 + ... + d2[n]2)
+    """
+    if doc1.id == doc2.id:
+        return 1.0
+
+    dot_product = 0.0
+    d1 = 0.0
+    d2 = 0.0
+
+    for token_1 in doc1.tokens:
+        token_2 = [t for t in doc2.tokens if t.stem == token_1.stem]
+        if token_2:
+            dot_product += token_1.tf_idf * token_2[0].tf_idf
+
+        # d1
+        d1 += math.pow(token_1.tf_idf, 2)
+    d1 = math.sqrt(d1)
+
+    for token_2 in doc2.tokens:
+        d2 += math.pow(token_2.tf_idf, 2)
+    d2 = math.sqrt(d2)
+
+    return int(dot_product / (d1 * d2) * 1000) / 1000.0
+
+
+def calc_distance(docs, distances):
+    for i in range(len(docs)):
+        for j in range(0, i+1):
+            distance = f_distance(docs[i], docs[j])
+            distances[i][j] = distance
+            distances[j][i] = distance
 
 
 @timer
 def parse():
     LOG.info("Started loading to database")
     process_num = int(CONF['general']['processes'])
+
+    # initialize communication
 
     queue_unparsed_docs = multiprocessing.Queue()
     queue_parsed_docs = multiprocessing.Queue()
@@ -167,6 +208,8 @@ def parse():
         pipes_tokens_to_processes_child.append(pipe_tokens_to_processes_child)
     event = multiprocessing.Event()
     event.clear()
+
+    # set up processes
 
     ps_reader = Process.Reader(q_unparsed_docs=queue_unparsed_docs)
     ps_parsers = Process.create_parsers(
@@ -184,6 +227,7 @@ def parse():
         pipes_tokens_to_processes_parent=pipes_tokens_to_processes_parent
     )
 
+    # read all the articles from XML and do TF-IDF
     ps_reader.start()
 
     LOG.debug('Spawning {0} parser processes'.format(process_num))
@@ -194,10 +238,18 @@ def parse():
     ps_reader.join()
     ps_idf.join()
 
+    # processes will not end until all the data is not received
     parsed_docs = _receive_parsed_docs(process_num, queue_parsed_docs)
 
     for ps_parser in ps_parsers:
         ps_parser.join()
+
+    # count distances to avoid counting distances twice we measure it only
+        # once for each pair of documents
+    distances = numpy.zeros((5, 5))
+    calc_distance(parsed_docs, distances)
+
+    print(distances)
 
 
 if __name__ == '__main__':

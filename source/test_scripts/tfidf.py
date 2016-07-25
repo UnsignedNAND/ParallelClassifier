@@ -126,5 +126,5 @@ print('*'*5 + ' DISTANCE ' + '*'*5)
 for doc1 in docs:
     print(doc1.terms)
     for doc2 in docs:
-        print '\t', f_distance(doc1, doc2), doc2.terms
+        print('\t', f_distance(doc1, doc2), doc2.terms)
 
