@@ -1,8 +1,8 @@
-import math
 import multiprocessing
 import numpy
 import xml.sax
 
+from parsing.utils import calc_distance
 from parsing.wiki_content_handler import WikiContentHandler
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
@@ -118,6 +118,23 @@ class Process(object):
                 pipe.send(self._tokens)
             print('IDF sent {0} tokens'.format(len(self._tokens)))
 
+    class Distance(multiprocessing.Process):
+        def __init__(self, pid, iteration_size):
+            """
+            This process calculates distance between documents.
+            :param pid: process id.
+            :param iteration_size: usually should be equal to the number of
+            processes working on the same data. Incrementing data cell by
+            this value will ensure that each process is working without any
+            collisions.
+            """
+            self.pid = pid
+            self.iteration_size = iteration_size
+            super(self.__class__, self).__init__()
+
+        def run(self):
+            pass
+
     @staticmethod
     def create_parsers(process_num, queue_unparsed_documents,
                        pipe_tokens_to_idf_child, event,
@@ -149,44 +166,6 @@ def _receive_parsed_docs(process_num, queue_parsed_docs):
             docs[doc.id] = doc
     LOG.debug('Received {0} parsed docs.'.format(len(docs)))
     return docs
-
-
-def f_distance(doc1, doc2):
-    """
-    Cosine Similarity (d1, d2) =  Dot product(d1, d2) / ||d1|| * ||d2||
-    Dot product (d1,d2) = d1[0] * d2[0] + d1[1] * d2[1] * ... * d1[n] * d2[n]
-    ||d1|| = square root(d1[0]2 + d1[1]2 + ... + d1[n]2)
-    ||d2|| = square root(d2[0]2 + d2[1]2 + ... + d2[n]2)
-    """
-    if doc1.id == doc2.id:
-        return 1.0
-
-    dot_product = 0.0
-    d1 = 0.0
-    d2 = 0.0
-
-    for token_1 in doc1.tokens:
-        token_2 = [t for t in doc2.tokens if t.stem == token_1.stem]
-        if token_2:
-            dot_product += token_1.tf_idf * token_2[0].tf_idf
-
-        # d1
-        d1 += math.pow(token_1.tf_idf, 2)
-    d1 = math.sqrt(d1)
-
-    for token_2 in doc2.tokens:
-        d2 += math.pow(token_2.tf_idf, 2)
-    d2 = math.sqrt(d2)
-
-    return int(dot_product / (d1 * d2) * 1000) / 1000.0
-
-
-def calc_distance(docs, distances):
-    for i in range(len(docs)):
-        for j in range(0, i+1):
-            distance = f_distance(docs[i], docs[j])
-            distances[i][j] = distance
-            distances[j][i] = distance
 
 
 @timer
@@ -240,14 +219,20 @@ def parse():
 
     # processes will not end until all the data is not received
     parsed_docs = _receive_parsed_docs(process_num, queue_parsed_docs)
+    docs_num = len(parsed_docs)
 
     for ps_parser in ps_parsers:
         ps_parser.join()
 
     # count distances to avoid counting distances twice we measure it only
         # once for each pair of documents
-    distances = numpy.zeros((5, 5))
-    calc_distance(parsed_docs, distances)
+    distances = numpy.zeros((docs_num, docs_num))
+
+    for i in range(docs_num):
+        for j in range(0, i + 1):
+            distance = calc_distance(parsed_docs[i], parsed_docs[j])
+            distances[i][j] = distance
+            distances[j][i] = distance
 
     print(distances)
 
