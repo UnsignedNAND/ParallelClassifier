@@ -1,5 +1,6 @@
 import multiprocessing
 import numpy
+import timeit
 import xml.sax
 
 from parsing.utils import calc_distance
@@ -11,6 +12,8 @@ from utils.timer import timer
 
 CONF = get_conf()
 LOG = get_log()
+parsed_docs = {}
+largest_id = -1
 
 
 class Process(object):
@@ -119,21 +122,37 @@ class Process(object):
             print('IDF sent {0} tokens'.format(len(self._tokens)))
 
     class Distance(multiprocessing.Process):
-        def __init__(self, pid, iteration_size):
+        def __init__(self, iteration_offset, iteration_size, pipe):
             """
             This process calculates distance between documents.
-            :param pid: process id.
+            :param iteration_offset: offset by which the iteration will be
+            started.
             :param iteration_size: usually should be equal to the number of
             processes working on the same data. Incrementing data cell by
             this value will ensure that each process is working without any
             collisions.
             """
-            self.pid = pid
+            self.iteration_offset = iteration_offset
             self.iteration_size = iteration_size
+            self.pipe = pipe
             super(self.__class__, self).__init__()
 
         def run(self):
-            pass
+            x = self.iteration_offset
+            while x < largest_id+1:
+                if x not in parsed_docs.keys():
+                    self.pipe.send((x, x, -1.0))
+                    x += self.iteration_size
+                    continue
+                doc1 = parsed_docs[x]
+                for y in range(x+1):
+                    dist = -1.0
+                    if y in parsed_docs.keys():
+                        doc2 = parsed_docs[y]
+                        dist = calc_distance(doc1, doc2)
+                    self.pipe.send((x, y, dist))
+                x += self.iteration_size
+            self.pipe.send((None, None, None))
 
     @staticmethod
     def create_parsers(process_num, queue_unparsed_documents,
@@ -154,6 +173,7 @@ class Process(object):
 
 
 def _receive_parsed_docs(process_num, queue_parsed_docs):
+    global largest_id
     docs = {}
     processes_returned = 0
     while True:
@@ -164,12 +184,16 @@ def _receive_parsed_docs(process_num, queue_parsed_docs):
                 break
         else:
             docs[doc.id] = doc
+            if largest_id < doc.id:
+                largest_id = doc.id
     LOG.debug('Received {0} parsed docs.'.format(len(docs)))
     return docs
 
 
 @timer
 def parse():
+    global parsed_docs
+    global largest_id
     LOG.info("Started loading to database")
     process_num = int(CONF['general']['processes'])
 
@@ -219,23 +243,45 @@ def parse():
 
     # processes will not end until all the data is not received
     parsed_docs = _receive_parsed_docs(process_num, queue_parsed_docs)
-    docs_num = len(parsed_docs)
 
     for ps_parser in ps_parsers:
         ps_parser.join()
 
     # count distances to avoid counting distances twice we measure it only
         # once for each pair of documents
-    distances = numpy.zeros((docs_num, docs_num))
 
-    for i in range(docs_num):
-        for j in range(0, i + 1):
-            distance = calc_distance(parsed_docs[i], parsed_docs[j])
-            distances[i][j] = distance
-            distances[j][i] = distance
+    time_distance_start = timeit.default_timer()
+    distances = numpy.zeros((largest_id+1, largest_id+1))
+    pipe_dist_parent, pipe_dist_child = multiprocessing.Pipe()
 
-    print(distances)
+    dist_ps = []
+    for i in range(process_num):
+        dist_p = Process.Distance(i, process_num, pipe_dist_child)
+        dist_p.start()
+        dist_ps.append(dist_p)
 
+    kill = process_num
+    while kill:
+        (x, y, dist) = pipe_dist_parent.recv()
+        print((x,y,dist))
+        if not dist:
+            kill -= 1
+            continue
+        distances[x][y] = dist
+        distances[y][x] = dist
+
+    for dist_p in dist_ps:
+        dist_p.join()
+    time_distance_end = timeit.default_timer()
+    time_distance_delta = time_distance_end - time_distance_start
+
+    for doc_id in parsed_docs:
+        print(parsed_docs[doc_id].title)
+        for doc_id2 in parsed_docs:
+            print('\t', distances[parsed_docs[doc_id].id][parsed_docs[
+                doc_id2].id],
+                  parsed_docs[doc_id2].title)
+    print(time_distance_delta)
 
 if __name__ == '__main__':
     parse()
