@@ -141,7 +141,7 @@ class Process(object):
             x = self.iteration_offset
             while x < largest_id+1:
                 if x not in parsed_docs.keys():
-                    self.pipe.send((x, x, -1.0))
+                    # self.pipe.send((x, x, -1.0))
                     x += self.iteration_size
                     continue
                 doc1 = parsed_docs[x]
@@ -150,7 +150,7 @@ class Process(object):
                     if y in parsed_docs.keys():
                         doc2 = parsed_docs[y]
                         dist = calc_distance(doc1, doc2)
-                    self.pipe.send((x, y, dist))
+                    # self.pipe.send((x, y, dist))
                 x += self.iteration_size
             self.pipe.send((None, None, None))
 
@@ -263,8 +263,8 @@ def parse():
     kill = process_num
     while kill:
         (x, y, dist) = pipe_dist_parent.recv()
-        print((x,y,dist))
         if not dist:
+            print('KILL')
             kill -= 1
             continue
         distances[x][y] = dist
@@ -275,12 +275,6 @@ def parse():
     time_distance_end = timeit.default_timer()
     time_distance_delta = time_distance_end - time_distance_start
 
-    for doc_id in parsed_docs:
-        print(parsed_docs[doc_id].title)
-        for doc_id2 in parsed_docs:
-            print('\t', distances[parsed_docs[doc_id].id][parsed_docs[
-                doc_id2].id],
-                  parsed_docs[doc_id2].title)
     print(time_distance_delta)
 
 if __name__ == '__main__':
