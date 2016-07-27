@@ -14,6 +14,7 @@ CONF = get_conf()
 LOG = get_log()
 parsed_docs = {}
 largest_id = -1
+process_num = int(CONF['general']['processes'])
 
 
 class Process(object):
@@ -98,7 +99,7 @@ class Process(object):
 
         def run(self):
             pills = 0
-            while pills < 4:
+            while pills < process_num:
                 msg = self._pipe_tokens_to_idf_parent.recv()
                 if msg is None:
                     pills += 1
@@ -205,7 +206,6 @@ def parse():
     global parsed_docs
     global largest_id
     LOG.info("Started loading to database")
-    process_num = int(CONF['general']['processes'])
 
     # initialize communication
 
