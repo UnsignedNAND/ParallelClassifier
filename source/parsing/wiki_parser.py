@@ -3,7 +3,7 @@ import numpy
 import timeit
 import xml.sax
 
-from parsing.utils import calc_distance
+from parsing.utils import calc_distance, coord_2d_to_1d
 from parsing.wiki_content_handler import WikiContentHandler
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
@@ -122,7 +122,7 @@ class Process(object):
             print('IDF sent {0} tokens'.format(len(self._tokens)))
 
     class Distance(multiprocessing.Process):
-        def __init__(self, iteration_offset, iteration_size, pipe):
+        def __init__(self, iteration_offset, iteration_size, distances):
             """
             This process calculates distance between documents.
             :param iteration_offset: offset by which the iteration will be
@@ -134,25 +134,35 @@ class Process(object):
             """
             self.iteration_offset = iteration_offset
             self.iteration_size = iteration_size
-            self.pipe = pipe
+            self.distances = distances
             super(self.__class__, self).__init__()
 
         def run(self):
-            x = self.iteration_offset
-            while x < largest_id+1:
-                if x not in parsed_docs.keys():
-                    # self.pipe.send((x, x, -1.0))
-                    x += self.iteration_size
-                    continue
-                doc1 = parsed_docs[x]
-                for y in range(x+1):
-                    dist = -1.0
-                    if y in parsed_docs.keys():
-                        doc2 = parsed_docs[y]
-                        dist = calc_distance(doc1, doc2)
-                    # self.pipe.send((x, y, dist))
-                x += self.iteration_size
-            self.pipe.send((None, None, None))
+            row = self.iteration_offset
+            while row < largest_id:
+                if row not in parsed_docs.keys():
+                    # there is no document with such ID, fill it with -1
+                    # distances
+                    for col in range(row):
+                        self.distances[coord_2d_to_1d(col, row, largest_id)] \
+                            = -1
+                        self.distances[coord_2d_to_1d(row, col, largest_id)] \
+                            = -1
+                else:
+                    self.distances[coord_2d_to_1d(row, row, largest_id)] \
+                        = 1.0
+                    doc1 = parsed_docs[row]
+                    for col in range(row):
+                        if col in parsed_docs.keys():
+                            doc2 = parsed_docs[col]
+                            distance = calc_distance(doc1, doc2)
+                        else:
+                            distance = -2
+                        self.distances[coord_2d_to_1d(col, row, largest_id)] \
+                            = distance
+                        self.distances[coord_2d_to_1d(row, col, largest_id)] \
+                            = distance
+                row += self.iteration_size
 
     @staticmethod
     def create_parsers(process_num, queue_unparsed_documents,
@@ -249,32 +259,29 @@ def parse():
 
     # count distances to avoid counting distances twice we measure it only
         # once for each pair of documents
-
+    print('DISTANCES')
     time_distance_start = timeit.default_timer()
-    distances = numpy.zeros((largest_id+1, largest_id+1))
-    pipe_dist_parent, pipe_dist_child = multiprocessing.Pipe()
+    distances = multiprocessing.Array('d', largest_id*largest_id)
 
     dist_ps = []
     for i in range(process_num):
-        dist_p = Process.Distance(i, process_num, pipe_dist_child)
+        dist_p = Process.Distance(i, process_num, distances)
         dist_p.start()
         dist_ps.append(dist_p)
-
-    kill = process_num
-    while kill:
-        (x, y, dist) = pipe_dist_parent.recv()
-        if not dist:
-            print('KILL')
-            kill -= 1
-            continue
-        distances[x][y] = dist
-        distances[y][x] = dist
 
     for dist_p in dist_ps:
         dist_p.join()
     time_distance_end = timeit.default_timer()
     time_distance_delta = time_distance_end - time_distance_start
 
+    # s = ''
+    # c = 1
+    # for i in range(len(distances)):
+    #     s += '{:>6}'.format(distances[i])
+    #     if c % largest_id == 0:
+    #         print(s)
+    #         s = ''
+    #     c += 1
     print(time_distance_delta)
 
 if __name__ == '__main__':

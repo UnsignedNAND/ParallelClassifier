@@ -1,6 +1,17 @@
 import math
 
 
+def coord_2d_to_1d(col, row, items):
+    """
+    Converts 2D array coordinates into 1D coordinate
+    Args:
+        col:
+        row:
+        items: number of items (size of single dimension)
+    """
+    return col + row * items
+
+
 def calc_distance(doc1, doc2):
     """
     Cosine Similarity (d1, d2) =  Dot product(d1, d2) / ||d1|| * ||d2||
