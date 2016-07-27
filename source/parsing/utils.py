@@ -40,3 +40,11 @@ def calc_distance(doc1, doc2):
     d2 = math.sqrt(d2)
 
     return int(dot_product / (d1 * d2) * 1000) / 1000.0
+
+
+def print_as_2d(arr, size):
+    for row in range(size):
+        line = ''
+        for col in range(size):
+            line += '{:>6}'.format(arr[coord_2d_to_1d(col, row, size)])
+        print(line, '\n')
