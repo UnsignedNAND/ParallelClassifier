@@ -78,7 +78,7 @@ class Process(object):
                 for token in page.tokens:
                     try:
                         token.idf = recv_tokens[token.stem]
-                        token.calc_tf_idf()
+                        page.tfidf[token.stem] = token.calc_tf_idf()
                     except KeyError as ke:
                         print('error', token)
                 self._queue_parsed_docs.put(page)
@@ -140,7 +140,24 @@ class Process(object):
         def run(self):
             row = self.iteration_offset
             while row < (largest_id+1):
-                if row not in parsed_docs.keys():
+                try:
+                    doc1 = parsed_docs[row]
+                    self.distances[coord_2d_to_1d(row, row, (largest_id+1))] \
+                        = 1.0
+                    for col in range(row):
+                        distance = 0.0
+                        try:
+                            doc2 = parsed_docs[col]
+                            distance = calc_distance(doc1, doc2)
+                        except:
+                            distance = -2
+                        self.distances[
+                            coord_2d_to_1d(col, row, (largest_id+1))
+                        ] = distance
+                        self.distances[
+                            coord_2d_to_1d(row, col, (largest_id+1))
+                        ] = distance
+                except:
                     # there is no document with such ID, fill it with -1
                     # distances
                     for col in range(row):
@@ -150,22 +167,6 @@ class Process(object):
                         self.distances[
                             coord_2d_to_1d(row, col, (largest_id+1))
                         ] = -1
-                else:
-                    self.distances[coord_2d_to_1d(row, row, (largest_id+1))] \
-                        = 1.0
-                    doc1 = parsed_docs[row]
-                    for col in range(row):
-                        if col in parsed_docs.keys():
-                            doc2 = parsed_docs[col]
-                            distance = calc_distance(doc1, doc2)
-                        else:
-                            distance = -2
-                        self.distances[
-                            coord_2d_to_1d(col, row, (largest_id+1))
-                        ] = distance
-                        self.distances[
-                            coord_2d_to_1d(row, col, (largest_id+1))
-                        ] = distance
                 row += self.iteration_size
 
     @staticmethod

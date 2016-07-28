@@ -14,3 +14,4 @@ class Token(object):
 
     def calc_tf_idf(self):
         self.tf_idf = self.idf * self.tf
+        return self.tf_idf
