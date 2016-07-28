@@ -1,9 +1,8 @@
 import multiprocessing
-import numpy
 import timeit
 import xml.sax
 
-from parsing.utils import calc_distance, coord_2d_to_1d
+from parsing.utils import calc_distance, coord_2d_to_1d, print_as_2d
 from parsing.wiki_content_handler import WikiContentHandler
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
@@ -140,17 +139,19 @@ class Process(object):
 
         def run(self):
             row = self.iteration_offset
-            while row < largest_id:
+            while row < (largest_id+1):
                 if row not in parsed_docs.keys():
                     # there is no document with such ID, fill it with -1
                     # distances
                     for col in range(row):
-                        self.distances[coord_2d_to_1d(col, row, largest_id)] \
-                            = -1
-                        self.distances[coord_2d_to_1d(row, col, largest_id)] \
-                            = -1
+                        self.distances[
+                            coord_2d_to_1d(col, row, (largest_id+1))
+                        ] = -1
+                        self.distances[
+                            coord_2d_to_1d(row, col, (largest_id+1))
+                        ] = -1
                 else:
-                    self.distances[coord_2d_to_1d(row, row, largest_id)] \
+                    self.distances[coord_2d_to_1d(row, row, (largest_id+1))] \
                         = 1.0
                     doc1 = parsed_docs[row]
                     for col in range(row):
@@ -159,10 +160,12 @@ class Process(object):
                             distance = calc_distance(doc1, doc2)
                         else:
                             distance = -2
-                        self.distances[coord_2d_to_1d(col, row, largest_id)] \
-                            = distance
-                        self.distances[coord_2d_to_1d(row, col, largest_id)] \
-                            = distance
+                        self.distances[
+                            coord_2d_to_1d(col, row, (largest_id+1))
+                        ] = distance
+                        self.distances[
+                            coord_2d_to_1d(row, col, (largest_id+1))
+                        ] = distance
                 row += self.iteration_size
 
     @staticmethod
@@ -259,9 +262,9 @@ def parse():
 
     # count distances to avoid counting distances twice we measure it only
         # once for each pair of documents
-    print('DISTANCES')
+
     time_distance_start = timeit.default_timer()
-    distances = multiprocessing.Array('d', largest_id*largest_id)
+    distances = multiprocessing.Array('d', (largest_id+1)*(largest_id+1))
 
     dist_ps = []
     for i in range(process_num):
@@ -274,15 +277,8 @@ def parse():
     time_distance_end = timeit.default_timer()
     time_distance_delta = time_distance_end - time_distance_start
 
-    # s = ''
-    # c = 1
-    # for i in range(len(distances)):
-    #     s += '{:>6}'.format(distances[i])
-    #     if c % largest_id == 0:
-    #         print(s)
-    #         s = ''
-    #     c += 1
-    print(time_distance_delta)
+    LOG.debug('Calculating distance for {0} took {1} s'.format(
+        len(parsed_docs), time_distance_delta))
 
 if __name__ == '__main__':
     parse()
