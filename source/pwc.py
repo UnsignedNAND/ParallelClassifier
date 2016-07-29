@@ -4,7 +4,7 @@ import argparse
 import logging
 
 from data.db import Db
-from parsing.wiki_parser import parse
+from parsing.wiki_parser import parse, distance
 from utils.config import get_conf
 from utils.log import get_log
 
@@ -44,6 +44,12 @@ arg_parser.add_argument(
     action='store_true',
     help='Extract features from articles'
 )
+arg_parser.add_argument(
+    '--distance',
+    default=False,
+    action='store_true',
+    help='Count distance between articles'
+)
 
 args = arg_parser.parse_args()
 
@@ -58,3 +64,6 @@ if args.parse:
 
 if args.features:
     pass
+
+if args.distance:
+    distance()

@@ -261,10 +261,9 @@ def parse():
     for ps_parser in ps_parsers:
         ps_parser.join()
 
-    # count distances to avoid counting distances twice we measure it only
-        # once for each pair of documents
 
-    time_distance_start = timeit.default_timer()
+@timer
+def distance():
     distances = multiprocessing.Array('d', (largest_id+1)*(largest_id+1))
 
     dist_ps = []
@@ -275,11 +274,11 @@ def parse():
 
     for dist_p in dist_ps:
         dist_p.join()
-    time_distance_end = timeit.default_timer()
-    time_distance_delta = time_distance_end - time_distance_start
 
-    LOG.debug('Calculating distance for {0} took {1} s'.format(
-        len(parsed_docs), time_distance_delta))
+    print_as_2d(distances, largest_id+1)
+    LOG.debug('Done calculating distance for {0}'.format(
+        len(parsed_docs)))
 
 if __name__ == '__main__':
     parse()
+    distance()
