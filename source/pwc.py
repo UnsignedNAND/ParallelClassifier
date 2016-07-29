@@ -4,7 +4,7 @@ import argparse
 import logging
 
 from data.db import Db
-from parsing.wiki_parser import parse, distance
+from parsing.wiki_parser import parse, distance, cluster
 from utils.config import get_conf
 from utils.log import get_log
 
@@ -51,6 +51,13 @@ arg_parser.add_argument(
     help='Count distance between articles'
 )
 
+arg_parser.add_argument(
+    '--cluster',
+    default=False,
+    action='store_true',
+    help='Divide documents into clusters'
+)
+
 args = arg_parser.parse_args()
 
 if args.debug:
@@ -67,3 +74,6 @@ if args.features:
 
 if args.distance:
     distance()
+
+if args.cluster:
+    cluster()

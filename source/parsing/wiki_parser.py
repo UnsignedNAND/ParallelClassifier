@@ -2,7 +2,7 @@ import multiprocessing
 import timeit
 import xml.sax
 
-from parsing.utils import calc_distance, coord_2d_to_1d, print_as_2d
+from parsing.utils import calc_distance, coord_2d_to_1d, str_1d_as_2d
 from parsing.wiki_content_handler import WikiContentHandler
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
@@ -275,10 +275,16 @@ def distance():
     for dist_p in dist_ps:
         dist_p.join()
 
-    print_as_2d(distances, largest_id+1)
+    LOG.debug('Distances: \n' + str_1d_as_2d(distances, largest_id+1))
     LOG.debug('Done calculating distance for {0}'.format(
         len(parsed_docs)))
+
+
+@timer
+def cluster():
+    pass
 
 if __name__ == '__main__':
     parse()
     distance()
+    cluster()

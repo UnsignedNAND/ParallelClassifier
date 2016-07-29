@@ -44,25 +44,18 @@ def calc_distance(doc1, doc2):
     d2 = math.sqrt(d2)
     return int(dot_product / (d1 * d2) * 1000) / 1000.0
 
-    # for token_1 in doc1.tokens:
-    #     token_2 = [t for t in doc2.tokens if t.stem == token_1.stem]
-    #     if token_2:
-    #         dot_product += token_1.tf_idf * token_2[0].tf_idf
-    #
-    #     # d1
-    #     d1 += math.pow(token_1.tf_idf, 2)
-    # d1 = math.sqrt(d1)
-    #
-    # for token_2 in doc2.tokens:
-    #     d2 += math.pow(token_2.tf_idf, 2)
-    # d2 = math.sqrt(d2)
-    #
-    # return int(dot_product / (d1 * d2) * 1000) / 1000.0
 
+def str_1d_as_2d(arr, size):
+    s = ''
 
-def print_as_2d(arr, size):
+    line = '{:>8}'.format('')
+    for col in range(size):
+        line += '{:>8}'.format(col)
+    s += line + '\n'
+
     for row in range(size):
-        line = ''
+        line = '{:>8}'.format(row)
         for col in range(size):
-            line += '{:>6}'.format(arr[coord_2d_to_1d(col, row, size)])
-        print(line, '\n')
+            line += '{:>8}'.format(arr[coord_2d_to_1d(col, row, size)])
+        s += line + '\n'
+    return s
