@@ -1,5 +1,5 @@
 import multiprocessing
-import timeit
+import random
 import xml.sax
 
 from parsing.utils import calc_distance, coord_2d_to_1d, str_1d_as_2d
@@ -14,6 +14,7 @@ LOG = get_log()
 parsed_docs = {}
 largest_id = -1
 process_num = int(CONF['general']['processes'])
+distances = None
 
 
 class Process(object):
@@ -169,6 +170,13 @@ class Process(object):
                         ] = -1
                 row += self.iteration_size
 
+    class Clusterization(multiprocessing.Process):
+        def __init__(self):
+            super(self.__class__, self).__init__()
+
+        def run(self):
+            pass
+
     @staticmethod
     def create_parsers(process_num, queue_unparsed_documents,
                        pipe_tokens_to_idf_child, event,
@@ -209,7 +217,6 @@ def _receive_parsed_docs(process_num, queue_parsed_docs):
 def parse():
     global parsed_docs
     global largest_id
-    LOG.info("Started loading to database")
 
     # initialize communication
 
@@ -247,7 +254,7 @@ def parse():
     # read all the articles from XML and do TF-IDF
     ps_reader.start()
 
-    LOG.debug('Spawning {0} parser processes'.format(process_num))
+    LOG.info("Started parsing documents using {0} processes".format(process_num))
     for ps_parser in ps_parsers:
         ps_parser.start()
     ps_idf.start()
@@ -264,6 +271,10 @@ def parse():
 
 @timer
 def distance():
+    global distances
+    LOG.info('Starting calculating distance using {0} processes'.format(
+        process_num)
+    )
     distances = multiprocessing.Array('d', (largest_id+1)*(largest_id+1))
 
     dist_ps = []
@@ -276,13 +287,43 @@ def distance():
         dist_p.join()
 
     LOG.debug('Distances: \n' + str_1d_as_2d(distances, largest_id+1))
-    LOG.debug('Done calculating distance for {0}'.format(
+    LOG.info('Done calculating distance for {0}'.format(
         len(parsed_docs)))
 
 
 @timer
 def cluster():
-    pass
+
+    def initialize_centers(center_num, start=0, end=largest_id):
+        if len(parsed_docs) > center_num > end-start:
+            msg = 'Trying to select more centers ({0})than documents' \
+                  '{1}.'.format(center_num, end-start)
+            LOG.error(msg)
+            raise Exception(msg)
+
+        centers = {}
+        for i in range(center_num):
+            center = None
+            while center is None or center in centers.keys() \
+                    or distances[center] < 0:
+                center = random.randint(start, end)
+            centers[center] = {}
+        return centers
+
+    center_num = int(CONF['clusterization']['centers'])
+    centers = initialize_centers(center_num)
+    LOG.debug('Starting with centers: {0}'.format([c for c in
+                                                   sorted(centers.keys())]))
+
+    cluster_ps = []
+    for i in range(process_num):
+        cluster_p = Process.Clusterization()
+        cluster_p.start()
+        cluster_ps.append(cluster_p)
+
+    for cluster_p in cluster_ps:
+        cluster_p.join()
+
 
 if __name__ == '__main__':
     parse()
