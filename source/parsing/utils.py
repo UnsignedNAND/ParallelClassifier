@@ -1,4 +1,5 @@
 import math
+import random
 
 
 def coord_2d_to_1d(col, row, items):
@@ -59,3 +60,26 @@ def str_1d_as_2d(arr, size):
             line += '{:>8}'.format(arr[coord_2d_to_1d(col, row, size)])
         s += line + '\n'
     return s
+
+
+def initialize_cluster_centers(center_num, start, end, parsed_docs, distances):
+    if len(parsed_docs) > center_num > end - start:
+        msg = 'Trying to select more centers ({0})than documents' \
+              '{1}.'.format(center_num, end - start)
+        raise Exception(msg)
+    centers = {}
+    for i in range(center_num):
+        center = None
+        while True:
+            center = random.randint(start, end)
+            if center in centers.keys():
+                continue
+            if distances[center] < 0:
+                continue
+            break
+        centers[i] = {
+            'center_id': center,
+            'docs': {},
+            'avg': 0
+        }
+    return centers

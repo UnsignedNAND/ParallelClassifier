@@ -1,8 +1,8 @@
 import multiprocessing
-import random
 import xml.sax
 
-from parsing.utils import calc_distance, coord_2d_to_1d, str_1d_as_2d
+from parsing.utils import calc_distance, coord_2d_to_1d, str_1d_as_2d, \
+    initialize_cluster_centers
 from parsing.wiki_content_handler import WikiContentHandler
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
@@ -204,7 +204,7 @@ class Process(object):
             self.pipe_child.send(None)
 
     @staticmethod
-    def create_parsers(process_num, queue_unparsed_documents,
+    def create_parsers(queue_unparsed_documents,
                        pipe_tokens_to_idf_child, event,
                        pipes_tokens_to_processes_child, queue_parsed_docs):
         processes = []
@@ -221,7 +221,7 @@ class Process(object):
         return processes
 
 
-def _receive_parsed_docs(process_num, queue_parsed_docs):
+def _receive_parsed_docs(queue_parsed_docs):
     global largest_id
     docs = {}
     processes_returned = 0
@@ -263,7 +263,6 @@ def parse():
 
     ps_reader = Process.Reader(q_unparsed_docs=queue_unparsed_docs)
     ps_parsers = Process.create_parsers(
-        process_num=process_num,
         queue_unparsed_documents=queue_unparsed_docs,
         pipe_tokens_to_idf_child=pipe_tokens_to_idf_child,
         event=event,
@@ -289,7 +288,7 @@ def parse():
     ps_idf.join()
 
     # processes will not end until all the data is not received
-    parsed_docs = _receive_parsed_docs(process_num, queue_parsed_docs)
+    parsed_docs = _receive_parsed_docs(queue_parsed_docs)
 
     for ps_parser in ps_parsers:
         ps_parser.join()
@@ -322,36 +321,18 @@ def cluster():
     global distances
     LOG.info('Starting clusterization using {0} processes'.format(process_num))
 
-    def initialize_centers(center_num, start=0, end=largest_id):
-        if len(parsed_docs) > center_num > end-start:
-            msg = 'Trying to select more centers ({0})than documents' \
-                  '{1}.'.format(center_num, end-start)
-            LOG.error(msg)
-            raise Exception(msg)
-        centers = []
-        for i in range(center_num):
-            center = None
-            while True:
-                center = random.randint(start, end)
-                if center in centers:
-                    continue
-                if distances[center] < 0:
-                    continue
-                break
-            centers.append(center)
-        return centers
-
     center_num = int(CONF['clusterization']['centers'])
-    centers = initialize_centers(center_num)
+    centers = initialize_cluster_centers(center_num, 0, largest_id,
+                                         parsed_docs, distances)
     pipe_parent, pipe_child = multiprocessing.Pipe()
     cluster_ps = []
     not_finished = process_num
 
-    LOG.debug('Starting with centers: {0}'.format(sorted(centers)))
+    LOG.debug('Starting with centers: {0}'.format(sorted([c for c in centers])))
 
     for i in range(process_num):
         cluster_p = Process.Clusterization(pipe_child, i, process_num,
-                                           distances, centers)
+                                           distances, [c for c in centers])
         cluster_p.start()
         cluster_ps.append(cluster_p)
 
@@ -359,6 +340,9 @@ def cluster():
         recv = pipe_parent.recv()
         if not recv:
             not_finished -= 1
+        else:
+            # TODO: add to list
+            pass
 
     for cluster_p in cluster_ps:
         cluster_p.join()
