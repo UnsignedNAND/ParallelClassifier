@@ -171,11 +171,37 @@ class Process(object):
                 row += self.iteration_size
 
     class Clusterization(multiprocessing.Process):
-        def __init__(self):
+        def __init__(self, pipe_child, iteration_offset, iteration_size,
+                     distances, centers):
+            self.iteration_offset = iteration_offset
+            self.iteration_size = iteration_size
+            self.distances = distances
+            self.centers = centers
+            self.pipe_child = pipe_child
             super(self.__class__, self).__init__()
 
         def run(self):
-            pass
+            doc_id = self.iteration_offset
+            while doc_id < (largest_id+1):
+                if self.distances[doc_id] >= 0:
+                    closest_center = None
+                    closest_center_distance = None
+                    for center_id in self.centers:
+                        center_distance = distances[
+                            coord_2d_to_1d(center_id, doc_id, largest_id+1)
+                        ]
+                        if closest_center_distance is None or \
+                                closest_center_distance < center_distance:
+                            closest_center_distance = center_distance
+                            closest_center = center_id
+                    self.pipe_child.send(
+                        {
+                            'doc_id': doc_id,
+                            'closest_center_id': closest_center
+                        }
+                    )
+                doc_id += self.iteration_size
+            self.pipe_child.send(None)
 
     @staticmethod
     def create_parsers(process_num, queue_unparsed_documents,
@@ -286,13 +312,15 @@ def distance():
     for dist_p in dist_ps:
         dist_p.join()
 
-    LOG.debug('Distances: \n' + str_1d_as_2d(distances, largest_id+1))
-    LOG.info('Done calculating distance for {0}'.format(
+    # LOG.debug('Distances: \n' + str_1d_as_2d(distances, largest_id+1))
+    LOG.info('Done calculating distance for {0} documents'.format(
         len(parsed_docs)))
 
 
 @timer
 def cluster():
+    global distances
+    LOG.info('Starting clusterization using {0} processes'.format(process_num))
 
     def initialize_centers(center_num, start=0, end=largest_id):
         if len(parsed_docs) > center_num > end-start:
@@ -300,26 +328,37 @@ def cluster():
                   '{1}.'.format(center_num, end-start)
             LOG.error(msg)
             raise Exception(msg)
-
-        centers = {}
+        centers = []
         for i in range(center_num):
             center = None
-            while center is None or center in centers.keys() \
-                    or distances[center] < 0:
+            while True:
                 center = random.randint(start, end)
-            centers[center] = {}
+                if center in centers:
+                    continue
+                if distances[center] < 0:
+                    continue
+                break
+            centers.append(center)
         return centers
 
     center_num = int(CONF['clusterization']['centers'])
     centers = initialize_centers(center_num)
-    LOG.debug('Starting with centers: {0}'.format([c for c in
-                                                   sorted(centers.keys())]))
-
+    pipe_parent, pipe_child = multiprocessing.Pipe()
     cluster_ps = []
+    not_finished = process_num
+
+    LOG.debug('Starting with centers: {0}'.format(sorted(centers)))
+
     for i in range(process_num):
-        cluster_p = Process.Clusterization()
+        cluster_p = Process.Clusterization(pipe_child, i, process_num,
+                                           distances, centers)
         cluster_p.start()
         cluster_ps.append(cluster_p)
+
+    while not_finished:
+        recv = pipe_parent.recv()
+        if not recv:
+            not_finished -= 1
 
     for cluster_p in cluster_ps:
         cluster_p.join()
