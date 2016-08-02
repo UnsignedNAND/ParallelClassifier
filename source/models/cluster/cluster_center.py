@@ -37,10 +37,13 @@ class ClusterCenter(object):
         self.center_changed = False
         self.previous_center_id = self.center_id
 
+        if len(self.doc_ids) == 1:
+            return self.center_id
+
         for doc_id in self.doc_ids.keys():
             current_doc = self.doc_ids[doc_id]
             diff = math.fabs(current_doc['doc_center_distance'] - self.avg_distance)
-            if diff < closest_diff:
+            if diff <= closest_diff:
                 closest_diff = diff
                 closest_doc_id = doc_id
 

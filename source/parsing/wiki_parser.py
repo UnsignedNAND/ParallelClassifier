@@ -188,14 +188,19 @@ class Process(object):
                 row += self.iteration_size
 
     class Clusterization(multiprocessing.Process):
-        def __init__(self, pipe_child, iteration_offset, iteration_size,
-                     distances, centers):
+        centers = {}
+
+        def __init__(self, pipe_results_child, iteration_offset, iteration_size,
+                     distances, pipe_centers_child):
             self.iteration_offset = iteration_offset
             self.iteration_size = iteration_size
             self.distances = distances
-            self.centers = centers
-            self.pipe_child = pipe_child
+            self.pipe_results_child = pipe_results_child
+            self.pipe_centers_child = pipe_centers_child
             super(self.__class__, self).__init__()
+
+        def _receive_centers(self):
+            self.centers = self.pipe_centers_child.recv()
 
         def _find_closest_docs_to_center(self):
             doc_id = self.iteration_offset
@@ -211,7 +216,7 @@ class Process(object):
                                         closest_center_distance < center_distance:
                             closest_center_distance = center_distance
                             closest_center = center_id
-                    self.pipe_child.send(
+                    self.pipe_results_child.send(
                         {
                             'doc_id': doc_id,
                             'closest_center_id': closest_center,
@@ -219,10 +224,14 @@ class Process(object):
                         }
                     )
                 doc_id += self.iteration_size
-            self.pipe_child.send(None)
+            self.pipe_results_child.send(None)
 
         def run(self):
-            self._find_closest_docs_to_center()
+            while True:
+                self._receive_centers()
+                if not self.centers:
+                    break
+                self._find_closest_docs_to_center()
 
 
 def _receive_parsed_docs(queue_parsed_docs):
@@ -328,42 +337,63 @@ def cluster():
     center_num = int(CONF['clusterization']['centers'])
     centers = initialize_cluster_centers(center_num, 0, largest_id,
                                          parsed_docs, distances)
-    pipe_parent, pipe_child = multiprocessing.Pipe()
+    pipe_results_parent, pipe_results_child = multiprocessing.Pipe()
     cluster_ps = []
-    not_finished = process_num
+    pipes_centers = []
 
     LOG.debug('Starting with centers: {0}'.format(sorted(centers.keys())))
 
     for i in range(process_num):
-        cluster_p = Process.Clusterization(pipe_child, i, process_num,
-                                           distances, centers.keys())
+        pipe_centers_parent, pipe_centers_child = multiprocessing.Pipe()
+        pipes_centers.append((pipe_centers_parent, pipe_centers_child))
+        cluster_p = Process.Clusterization(
+            pipe_results_child=pipe_results_child,
+            iteration_offset=i,
+            iteration_size=process_num,
+            distances=distances,
+            pipe_centers_child=pipe_centers_child,
+        )
         cluster_p.start()
         cluster_ps.append(cluster_p)
 
-    while not_finished:
-        recv = pipe_parent.recv()
-        if not recv:
-            not_finished -= 1
-        else:
-            # TODO: add to list
-            centers[recv['closest_center_id']].add_doc(
-                doc_id=recv['doc_id'],
-                doc_center_distance=recv['distance']
-            )
-    new_centers = {}
-    for c in centers:
-        print(centers[c])
-        centers[c].find_closest_doc_to_average()
-        print('{0} Closest to avg: {1} '.format(centers[
-                                                c].center_changed, centers[
-            c].center_id))
-        centers[c].doc_ids = {}
-        new_centers[centers[c].center_id] = centers[c]
-    centers = new_centers
-    new_centers = {}
-    print('*'*20)
-    for c in centers.keys():
-        print(centers[c])
+    changes = int(CONF['clusterization']['centers'])
+    test = 5
+    while changes:
+        print('-'*20)
+        changes = int(CONF['clusterization']['centers'])
+        not_finished = process_num
+        new_centers = {}
+        for (pipe_center_parent,_) in pipes_centers:
+            pipe_center_parent.send(centers)
+
+        while not_finished:
+            recv = pipe_results_parent.recv()
+            if not recv:
+                not_finished -= 1
+            else:
+                centers[recv['closest_center_id']].add_doc(
+                    doc_id=recv['doc_id'],
+                    doc_center_distance=recv['distance']
+                )
+        new_centers = {}
+        for c in centers:
+            print(centers[c])
+            centers[c].find_closest_doc_to_average()
+            if not centers[c].center_changed:
+                changes -= 1
+            print('{0} Closest to avg: {1} '.format(
+                centers[c].center_changed,
+                centers[c].center_id
+            ))
+            centers[c].doc_ids = {}
+            new_centers[centers[c].center_id] = centers[c]
+        centers = new_centers
+        test -= 1
+        if not test:
+            break
+
+    for (pipe_center_parent, _) in pipes_centers:
+        pipe_center_parent.send(None)
 
     for cluster_p in cluster_ps:
         cluster_p.join()

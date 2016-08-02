@@ -83,4 +83,15 @@ def initialize_cluster_centers(center_num, start, end, parsed_docs, distances):
         cc.doc_ids = {}
         cc.center_id = center_id
         centers[center_id] = cc
+
+    centers = {}
+    c = ClusterCenter()
+    c.doc_ids = {}
+    c.center_id = 1
+    centers[c.center_id] = c
+    c = ClusterCenter()
+    c.doc_ids = {}
+    c.center_id = 2
+    centers[c.center_id] = c
+
     return centers
