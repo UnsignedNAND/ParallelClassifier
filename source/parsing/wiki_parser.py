@@ -197,7 +197,8 @@ class Process(object):
                     self.pipe_child.send(
                         {
                             'doc_id': doc_id,
-                            'closest_center_id': closest_center
+                            'closest_center_id': closest_center,
+                            'distance': closest_center_distance,
                         }
                     )
                 doc_id += self.iteration_size
@@ -311,7 +312,7 @@ def distance():
     for dist_p in dist_ps:
         dist_p.join()
 
-    # LOG.debug('Distances: \n' + str_1d_as_2d(distances, largest_id+1))
+    LOG.debug('Distances: \n' + str_1d_as_2d(distances, largest_id+1))
     LOG.info('Done calculating distance for {0} documents'.format(
         len(parsed_docs)))
 
@@ -328,11 +329,11 @@ def cluster():
     cluster_ps = []
     not_finished = process_num
 
-    LOG.debug('Starting with centers: {0}'.format(sorted([c for c in centers])))
+    LOG.debug('Starting with centers: {0}'.format(sorted(centers.keys())))
 
     for i in range(process_num):
         cluster_p = Process.Clusterization(pipe_child, i, process_num,
-                                           distances, [c for c in centers])
+                                           distances, centers.keys())
         cluster_p.start()
         cluster_ps.append(cluster_p)
 
@@ -342,7 +343,12 @@ def cluster():
             not_finished -= 1
         else:
             # TODO: add to list
-            pass
+            centers[recv['closest_center_id']].add_doc(
+                doc_id=recv['doc_id'],
+                doc_center_distance=recv['distance']
+            )
+    for c in centers:
+        print(centers[c])
 
     for cluster_p in cluster_ps:
         cluster_p.join()

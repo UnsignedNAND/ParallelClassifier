@@ -1,6 +1,8 @@
 import math
 import random
 
+from models.cluster.cluster_center import ClusterCenter
+
 
 def coord_2d_to_1d(col, row, items):
     """
@@ -69,17 +71,16 @@ def initialize_cluster_centers(center_num, start, end, parsed_docs, distances):
         raise Exception(msg)
     centers = {}
     for i in range(center_num):
-        center = None
+        center_id = None
         while True:
-            center = random.randint(start, end)
-            if center in centers.keys():
+            center_id = random.randint(start, end)
+            if center_id in centers.keys():
                 continue
-            if distances[center] < 0:
+            if distances[center_id] < 0:
                 continue
             break
-        centers[i] = {
-            'center_id': center,
-            'docs': {},
-            'avg': 0
-        }
+        cc = ClusterCenter()
+        cc.doc_ids = {}
+        cc.center_id = center_id
+        centers[center_id] = cc
     return centers
