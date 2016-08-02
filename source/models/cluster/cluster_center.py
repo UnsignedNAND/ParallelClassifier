@@ -9,6 +9,15 @@ class ClusterCenter(object):
     previous_center_id = None
     pre_previous_center_id = None
 
+    def __init__(self, cluster_center=None):
+        if cluster_center:
+            self.center_id = cluster_center.center_id
+            self.doc_ids = cluster_center.doc_ids
+            self.avg_distance = cluster_center.avg_distance
+            self.center_changed = cluster_center.center_changed
+            self.previous_center_id = cluster_center.previous_center_id
+            self.pre_previous_center_id = cluster_center.pre_previous_center_id
+
     def add_doc(self, doc_id, doc_center_distance):
         self.doc_ids[doc_id] = {
             'doc_id': doc_id,

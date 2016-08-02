@@ -1,3 +1,4 @@
+import logging
 import multiprocessing
 import xml.sax
 
@@ -384,9 +385,21 @@ def cluster():
                 centers[c].center_changed,
                 centers[c].center_id
             ))
+            # TODO: clearing documents is required, but also results in
+            # empty set at the end
             centers[c].doc_ids = {}
             new_centers[centers[c].center_id] = centers[c]
         centers = new_centers
+
+    if LOG.level is logging.DEBUG:
+        for center in centers:
+            msg = '\nCenter: {1} [{0}]'.format(
+                centers[center].center_id,
+                parsed_docs[centers[center].center_id].title
+            )
+            for did in centers[center].doc_ids:
+                msg += '\n{0} - {1}'.format(did, parsed_docs[did].title)
+            LOG.debug(msg)
 
     for (pipe_center_parent, _) in pipes_centers:
         pipe_center_parent.send(None)
