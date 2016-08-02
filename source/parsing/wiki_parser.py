@@ -18,6 +18,23 @@ distances = None
 
 
 class Process(object):
+    @staticmethod
+    def create_parsers(queue_unparsed_documents,
+                       pipe_tokens_to_idf_child, event,
+                       pipes_tokens_to_processes_child, queue_parsed_docs):
+        processes = []
+        for i in range(process_num):
+            process = Process.Parser(
+                queue_unparsed_docs=queue_unparsed_documents,
+                pipe_tokens_to_idf_child=pipe_tokens_to_idf_child,
+                event=event,
+                pipe_tokens_to_processes_child
+                =pipes_tokens_to_processes_child[i],
+                queue_parsed_docs=queue_parsed_docs
+            )
+            processes.append(process)
+        return processes
+
     class Reader(multiprocessing.Process):
         def __init__(self, q_unparsed_docs):
             self._q_unparsed_docs = q_unparsed_docs
@@ -180,18 +197,18 @@ class Process(object):
             self.pipe_child = pipe_child
             super(self.__class__, self).__init__()
 
-        def run(self):
+        def _find_closest_docs_to_center(self):
             doc_id = self.iteration_offset
-            while doc_id < (largest_id+1):
+            while doc_id < (largest_id + 1):
                 if self.distances[doc_id] >= 0:
                     closest_center = None
                     closest_center_distance = None
                     for center_id in self.centers:
                         center_distance = distances[
-                            coord_2d_to_1d(center_id, doc_id, largest_id+1)
+                            coord_2d_to_1d(center_id, doc_id, largest_id + 1)
                         ]
                         if closest_center_distance is None or \
-                                closest_center_distance < center_distance:
+                                        closest_center_distance < center_distance:
                             closest_center_distance = center_distance
                             closest_center = center_id
                     self.pipe_child.send(
@@ -204,22 +221,8 @@ class Process(object):
                 doc_id += self.iteration_size
             self.pipe_child.send(None)
 
-    @staticmethod
-    def create_parsers(queue_unparsed_documents,
-                       pipe_tokens_to_idf_child, event,
-                       pipes_tokens_to_processes_child, queue_parsed_docs):
-        processes = []
-        for i in range(process_num):
-            process = Process.Parser(
-                queue_unparsed_docs=queue_unparsed_documents,
-                pipe_tokens_to_idf_child=pipe_tokens_to_idf_child,
-                event=event,
-                pipe_tokens_to_processes_child
-                =pipes_tokens_to_processes_child[i],
-                queue_parsed_docs=queue_parsed_docs
-            )
-            processes.append(process)
-        return processes
+        def run(self):
+            self._find_closest_docs_to_center()
 
 
 def _receive_parsed_docs(queue_parsed_docs):
@@ -347,7 +350,19 @@ def cluster():
                 doc_id=recv['doc_id'],
                 doc_center_distance=recv['distance']
             )
+    new_centers = {}
     for c in centers:
+        print(centers[c])
+        centers[c].find_closest_doc_to_average()
+        print('{0} Closest to avg: {1} '.format(centers[
+                                                c].center_changed, centers[
+            c].center_id))
+        centers[c].doc_ids = {}
+        new_centers[centers[c].center_id] = centers[c]
+    centers = new_centers
+    new_centers = {}
+    print('*'*20)
+    for c in centers.keys():
         print(centers[c])
 
     for cluster_p in cluster_ps:
