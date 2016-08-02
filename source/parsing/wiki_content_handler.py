@@ -55,6 +55,8 @@ class WikiContentHandler(xml.sax.ContentHandler):
             if not self._redirect:
                 # Page
                 page = Page()
+                # reading is run in a single thread, so we can generate an
+                # unique ID here
                 page.id = self.items_saved
                 page.content = self._text
                 page.title = self._title
@@ -62,7 +64,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
                 del page
             else:
                 pass
-                # write_redirect(title=self.title, target=self.redirect)
+                # TODO do redirects carry any relevant information?
             self._monitor_progress()
 
     def _monitor_progress(self):

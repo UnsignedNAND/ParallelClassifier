@@ -13,6 +13,7 @@ class Page(object):
     title = None
     content = None
     tokens = []
+    tfidf = {}
     word_count = None  # Word count in original text
 
     def number_of_tokens(self):
@@ -22,6 +23,7 @@ class Page(object):
         del self.content
 
     def create_tokens(self):
+        self.tfidf = {}
         self.tokens = []
         self.word_count = 0
         # remote special characters
