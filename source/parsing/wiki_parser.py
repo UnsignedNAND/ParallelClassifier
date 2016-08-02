@@ -357,7 +357,6 @@ def cluster():
         cluster_ps.append(cluster_p)
 
     changes = int(CONF['clusterization']['centers'])
-    test = 5
     while changes:
         print('-'*20)
         changes = int(CONF['clusterization']['centers'])
@@ -388,9 +387,6 @@ def cluster():
             centers[c].doc_ids = {}
             new_centers[centers[c].center_id] = centers[c]
         centers = new_centers
-        test -= 1
-        if not test:
-            break
 
     for (pipe_center_parent, _) in pipes_centers:
         pipe_center_parent.send(None)

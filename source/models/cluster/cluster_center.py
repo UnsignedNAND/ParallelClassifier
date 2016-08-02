@@ -7,6 +7,7 @@ class ClusterCenter(object):
     avg_distance = 0.0
     center_changed = False
     previous_center_id = None
+    pre_previous_center_id = None
 
     def add_doc(self, doc_id, doc_center_distance):
         self.doc_ids[doc_id] = {
@@ -35,6 +36,7 @@ class ClusterCenter(object):
         closest_diff = 9999
         closest_doc_id = None
         self.center_changed = False
+        self.pre_previous_center_id = self.previous_center_id
         self.previous_center_id = self.center_id
 
         if len(self.doc_ids) == 1:
@@ -43,9 +45,13 @@ class ClusterCenter(object):
         for doc_id in self.doc_ids.keys():
             current_doc = self.doc_ids[doc_id]
             diff = math.fabs(current_doc['doc_center_distance'] - self.avg_distance)
-            if diff <= closest_diff:
+            if 0.1 < diff <= closest_diff:
                 closest_diff = diff
                 closest_doc_id = doc_id
+
+        # this is hack for avoiding endless loops
+        if closest_doc_id == self.pre_previous_center_id:
+            return closest_doc_id
 
         if self.previous_center_id != closest_doc_id:
             self.center_changed = True
