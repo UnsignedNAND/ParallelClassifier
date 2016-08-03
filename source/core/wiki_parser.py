@@ -336,8 +336,13 @@ def cluster():
     LOG.info('Starting clusterization using {0} processes'.format(process_num))
 
     center_num = int(CONF['clusterization']['centers'])
-    centers = initialize_cluster_centers(center_num, 0, largest_id,
-                                         parsed_docs, distances)
+    centers = initialize_cluster_centers(
+        center_num=center_num,
+        start=0,
+        end=largest_id,
+        docs_num=len(parsed_docs),
+        distances=distances
+    )
     pipe_results_parent, pipe_results_child = multiprocessing.Pipe()
     cluster_ps = []
     pipes_centers = []
