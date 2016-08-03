@@ -214,7 +214,7 @@ class Process(object):
                             coord_2d_to_1d(center_id, doc_id, largest_id + 1)
                         ]
                         if closest_center_distance is None or \
-                                        closest_center_distance < center_distance:
+                           closest_center_distance < center_distance:
                             closest_center_distance = center_distance
                             closest_center = center_id
                     self.pipe_results_child.send(
@@ -357,8 +357,10 @@ def cluster():
         cluster_p.start()
         cluster_ps.append(cluster_p)
 
-    changes = int(CONF['clusterization']['centers'])
+    changes = int(CONF['clusterization']['centers'])  # 1st ending condition
+    iterations = 0
     while changes:
+        iterations += 1
         print('-'*20)
         changes = int(CONF['clusterization']['centers'])
         not_finished = process_num
@@ -373,38 +375,44 @@ def cluster():
             else:
                 centers[recv['closest_center_id']].add_doc(
                     doc_id=recv['doc_id'],
-                    doc_center_distance=recv['distance']
+                    distance=recv['distance']
                 )
         new_centers = {}
-        for c in centers:
-            print(centers[c])
-            centers[c].find_closest_doc_to_average()
-            if not centers[c].center_changed:
+        for cid in centers:
+            center = centers[cid]
+            print(center)
+            center.find_closest_doc_to_average()
+            if not center.center_changed:
                 changes -= 1
             print('{0} Closest to avg: {1} '.format(
-                centers[c].center_changed,
-                centers[c].center_id
+                center.center_changed,
+                center.center_id
             ))
-            centers[c].pre_doc_ids = centers[c].doc_ids
-            centers[c].doc_ids = {}
-            new_centers[centers[c].center_id] = centers[c]
+            # moving documents assigned to this center to backup list so they
+            # do not get lost if this is the last iteration
+            center.pre_doc_ids = centers[cid].doc_ids
+            center.doc_ids = {}
+            new_centers[center.center_id] = center
         centers = new_centers
 
     if LOG.level is logging.DEBUG:
-        for center in centers:
+        for cid in centers.keys():
+            center = centers[cid]
             msg = '\nCenter: {1} [{0}]'.format(
-                centers[center].center_id,
-                parsed_docs[centers[center].center_id].title
+                center.center_id,
+                parsed_docs[center.center_id].title
             )
-            for did in centers[center].pre_doc_ids:
+            for did in center.pre_doc_ids:
                 msg += '\n{0} - {1}'.format(did, parsed_docs[did].title)
             LOG.debug(msg)
 
     for (pipe_center_parent, _) in pipes_centers:
+        # send pills to processes
         pipe_center_parent.send(None)
 
     for cluster_p in cluster_ps:
         cluster_p.join()
+    LOG.info('Finished clusterization in {0} iterations'.format(iterations))
 
 
 if __name__ == '__main__':

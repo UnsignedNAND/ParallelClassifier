@@ -19,13 +19,12 @@ class ClusterCenter(object):
             self.previous_center_id = cluster_center.previous_center_id
             self.pre_previous_center_id = cluster_center.pre_previous_center_id
 
-    def add_doc(self, doc_id, doc_center_distance):
+    def add_doc(self, doc_id, distance):
         self.doc_ids[doc_id] = {
             'doc_id': doc_id,
-            'doc_center_distance': doc_center_distance,  # distance to the
-            # closest center
+            'distance': distance,  # distance to the closest center
         }
-        self.avg_distance += (doc_center_distance-self.avg_distance)/len(
+        self.avg_distance += (distance - self.avg_distance) / len(
             self.doc_ids)
 
     def __str__(self):
@@ -54,7 +53,7 @@ class ClusterCenter(object):
 
         for doc_id in self.doc_ids.keys():
             current_doc = self.doc_ids[doc_id]
-            diff = math.fabs(current_doc['doc_center_distance'] - self.avg_distance)
+            diff = math.fabs(current_doc['distance'] - self.avg_distance)
             if 0.1 < diff <= closest_diff:
                 closest_diff = diff
                 closest_doc_id = doc_id
