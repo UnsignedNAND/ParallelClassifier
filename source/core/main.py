@@ -2,6 +2,7 @@ import logging
 import multiprocessing
 
 from core.process.reader import Reader
+from core.process.parser import create_parsers
 from core.utils import calc_distance, coord_2d_to_1d, str_1d_as_2d, \
     initialize_cluster_centers
 from utils.config import get_conf
@@ -17,69 +18,6 @@ distances = None
 
 
 class Process(object):
-    @staticmethod
-    def create_parsers(queue_unparsed_documents,
-                       pipe_tokens_to_idf_child, event,
-                       pipes_tokens_to_processes_child, queue_parsed_docs):
-        processes = []
-        for i in range(process_num):
-            process = Process.Parser(
-                queue_unparsed_docs=queue_unparsed_documents,
-                pipe_tokens_to_idf_child=pipe_tokens_to_idf_child,
-                event=event,
-                pipe_tokens_to_processes_child
-                =pipes_tokens_to_processes_child[i],
-                queue_parsed_docs=queue_parsed_docs
-            )
-            processes.append(process)
-        return processes
-
-    class Parser(multiprocessing.Process):
-        def __init__(self, queue_unparsed_docs, pipe_tokens_to_idf_child,
-                     event, pipe_tokens_to_processes_child, queue_parsed_docs):
-            self._queue_unparsed_docs = queue_unparsed_docs
-            self._pipe_tokens_to_idf_child = pipe_tokens_to_idf_child
-            self._event = event
-            self._pipe_tokens_to_processes_child = \
-                pipe_tokens_to_processes_child
-            self._queue_parsed_docs = queue_parsed_docs
-            super(self.__class__, self).__init__()
-
-        def run(self):
-            parsed_pages_num = 0
-            parsed_pages = []
-            while True:
-                page = self._queue_unparsed_docs.get()
-                if page is None:
-                    # Just to be sure that other threads can also take a pill
-                    self._queue_unparsed_docs.put(None)
-                    self._pipe_tokens_to_idf_child.send(None)
-                    print('Process {0} finished after core {1} '
-                          'docs'.format(self.pid, parsed_pages_num))
-                    break
-                page.create_tokens()
-                for token in page.tokens:
-                    self._pipe_tokens_to_idf_child.send(token.stem)
-                page.content_clean()
-                parsed_pages_num += 1
-                parsed_pages.append(page)
-
-            print('Process {0} waiting on IDF to finish...'.format(self.pid))
-            self._event.wait()
-            recv_tokens = self._pipe_tokens_to_processes_child.recv()
-            print('Process {0} received {1} tokens from IDF'.format(
-                self.pid, len(recv_tokens)))
-            for page in parsed_pages:
-                for token in page.tokens:
-                    try:
-                        token.idf = recv_tokens[token.stem]
-                        page.tfidf[token.stem] = token.calc_tf_idf()
-                    except KeyError as ke:
-                        print('error', token)
-                self._queue_parsed_docs.put(page)
-            # sending process-end pill
-            self._queue_parsed_docs.put(None)
-
     class IDF(multiprocessing.Process):
         def __init__(self, pipe_tokens_to_idf_parent, docs_num, event,
                      pipes_tokens_to_processes_parent):
@@ -252,12 +190,13 @@ def parse():
     # set up processes
 
     ps_reader = Reader(q_unparsed_docs=queue_unparsed_docs)
-    ps_parsers = Process.create_parsers(
+    ps_parsers = create_parsers(
         queue_unparsed_documents=queue_unparsed_docs,
         pipe_tokens_to_idf_child=pipe_tokens_to_idf_child,
         event=event,
         pipes_tokens_to_processes_child=pipes_tokens_to_processes_child,
-        queue_parsed_docs=queue_parsed_docs
+        queue_parsed_docs=queue_parsed_docs,
+        process_num=process_num
     )
     ps_idf = Process.IDF(
         pipe_tokens_to_idf_parent=pipe_tokens_to_idf_parent,
