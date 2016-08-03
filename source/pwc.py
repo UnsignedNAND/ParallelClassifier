@@ -4,7 +4,7 @@ import argparse
 import logging
 
 from data.db import Db
-from core.wiki_parser import parse, distance, cluster
+from core.main import parse, distance, cluster
 from utils.config import get_conf
 from utils.log import get_log
 

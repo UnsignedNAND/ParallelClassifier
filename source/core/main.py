@@ -1,12 +1,10 @@
 import logging
 import multiprocessing
-import xml.sax
 
+from core.process.reader import Reader
 from core.utils import calc_distance, coord_2d_to_1d, str_1d_as_2d, \
     initialize_cluster_centers
-from core.wiki_content_handler import WikiContentHandler
 from utils.config import get_conf
-from utils.exceptions import PageLimitException
 from utils.log import get_log
 from utils.timer import timer
 
@@ -35,28 +33,6 @@ class Process(object):
             )
             processes.append(process)
         return processes
-
-    class Reader(multiprocessing.Process):
-        def __init__(self, q_unparsed_docs):
-            self._q_unparsed_docs = q_unparsed_docs
-            super(self.__class__, self).__init__()
-
-        def run(self):
-            wiki_handler = WikiContentHandler(self._q_unparsed_docs)
-            sax_parser = xml.sax.make_parser()
-            sax_parser.setContentHandler(wiki_handler)
-
-            try:
-                data_source = open('../data/wiki_dump.xml')
-                sax_parser.parse(data_source)
-                LOG.info('Parsed {0} items'.format(wiki_handler.items_saved))
-            except PageLimitException as page_limit_exception:
-                LOG.info(page_limit_exception)
-            except KeyboardInterrupt:
-                exit()
-            finally:
-                # A pill for other threads
-                self._q_unparsed_docs.put(None)
 
     class Parser(multiprocessing.Process):
         def __init__(self, queue_unparsed_docs, pipe_tokens_to_idf_child,
@@ -275,7 +251,7 @@ def parse():
 
     # set up processes
 
-    ps_reader = Process.Reader(q_unparsed_docs=queue_unparsed_docs)
+    ps_reader = Reader(q_unparsed_docs=queue_unparsed_docs)
     ps_parsers = Process.create_parsers(
         queue_unparsed_documents=queue_unparsed_docs,
         pipe_tokens_to_idf_child=pipe_tokens_to_idf_child,
