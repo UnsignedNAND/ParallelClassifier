@@ -385,8 +385,7 @@ def cluster():
                 centers[c].center_changed,
                 centers[c].center_id
             ))
-            # TODO: clearing documents is required, but also results in
-            # empty set at the end
+            centers[c].pre_doc_ids = centers[c].doc_ids
             centers[c].doc_ids = {}
             new_centers[centers[c].center_id] = centers[c]
         centers = new_centers
@@ -397,7 +396,7 @@ def cluster():
                 centers[center].center_id,
                 parsed_docs[centers[center].center_id].title
             )
-            for did in centers[center].doc_ids:
+            for did in centers[center].pre_doc_ids:
                 msg += '\n{0} - {1}'.format(did, parsed_docs[did].title)
             LOG.debug(msg)
 

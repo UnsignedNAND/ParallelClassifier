@@ -4,6 +4,7 @@ import math
 class ClusterCenter(object):
     center_id = None
     doc_ids = {}
+    pre_doc_ids = {}
     avg_distance = 0.0
     center_changed = False
     previous_center_id = None
