@@ -361,7 +361,7 @@ def cluster():
     iterations = 0
     while changes:
         iterations += 1
-        print('-'*20)
+        LOG.debug('{0} Iteration {1} {2}'.format('-'*10, iterations, '-'*10))
         changes = int(CONF['clusterization']['centers'])
         not_finished = process_num
         new_centers = {}
@@ -380,11 +380,11 @@ def cluster():
         new_centers = {}
         for cid in centers:
             center = centers[cid]
-            print(center)
+            LOG.debug(str(center))
             center.find_closest_doc_to_average()
             if not center.center_changed:
                 changes -= 1
-            print('{0} Closest to avg: {1} '.format(
+            LOG.debug('{0} Closest to avg: {1} '.format(
                 center.center_changed,
                 center.center_id
             ))
