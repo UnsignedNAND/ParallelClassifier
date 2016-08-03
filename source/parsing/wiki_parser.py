@@ -360,6 +360,11 @@ def cluster():
     changes = int(CONF['clusterization']['centers'])  # 1st ending condition
     iterations = 0
     while changes:
+        if int(CONF['clusterization']['iterations_limit']) <= iterations:
+            LOG.info('Clusterization hit iterations hard limit ({0})'.format(
+                CONF['clusterization']['iterations_limit']
+            ))
+            break
         iterations += 1
         LOG.debug('{0} Iteration {1} {2}'.format('-'*10, iterations, '-'*10))
         changes = int(CONF['clusterization']['centers'])
