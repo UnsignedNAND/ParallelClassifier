@@ -3,6 +3,7 @@ import multiprocessing
 
 from core.process.reader import Reader
 from core.process.parser import create_parsers
+from core.process.idf import IDF
 from core.utils import calc_distance, coord_2d_to_1d, str_1d_as_2d, \
     initialize_cluster_centers
 from utils.config import get_conf
@@ -18,41 +19,6 @@ distances = None
 
 
 class Process(object):
-    class IDF(multiprocessing.Process):
-        def __init__(self, pipe_tokens_to_idf_parent, docs_num, event,
-                     pipes_tokens_to_processes_parent):
-            self._pipe_tokens_to_idf_parent = pipe_tokens_to_idf_parent
-            self._docs_num = docs_num  # total number of documents
-            self._event = event
-            self._tokens = {}
-            self._pipes_tokens_to_processes_parent = \
-                pipes_tokens_to_processes_parent
-            super(self.__class__, self).__init__()
-
-        def run(self):
-            pills = 0
-            while pills < process_num:
-                msg = self._pipe_tokens_to_idf_parent.recv()
-                if msg is None:
-                    pills += 1
-                    continue
-                if msg in self._tokens.keys():
-                    self._tokens[msg] += 1
-                else:
-                    self._tokens[msg] = 1
-
-            for token in self._tokens:
-                # IDF(token) = 1 + log_e(Total Number Of Documents / Number Of
-                # Documents with token in it)
-                import math
-                token_idf = 1 + math.log(self._docs_num / self._tokens[token],
-                                         math.e)
-                self._tokens[token] = token_idf
-
-            self._event.set()
-            for pipe in self._pipes_tokens_to_processes_parent:
-                pipe.send(self._tokens)
-            print('IDF sent {0} tokens'.format(len(self._tokens)))
 
     class Distance(multiprocessing.Process):
         def __init__(self, iteration_offset, iteration_size, distances):
@@ -198,11 +164,12 @@ def parse():
         queue_parsed_docs=queue_parsed_docs,
         process_num=process_num
     )
-    ps_idf = Process.IDF(
+    ps_idf = IDF(
         pipe_tokens_to_idf_parent=pipe_tokens_to_idf_parent,
         docs_num=int(CONF['dev']['item_limit']),
         event=event,
-        pipes_tokens_to_processes_parent=pipes_tokens_to_processes_parent
+        pipes_tokens_to_processes_parent=pipes_tokens_to_processes_parent,
+        process_num=process_num
     )
 
     # read all the articles from XML and do TF-IDF
