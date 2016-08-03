@@ -1,12 +1,12 @@
 import logging
 import multiprocessing
 
-from core.process.reader import Reader
-from core.process.parser import create_parsers
-from core.process.idf import IDF
+from core.process.clusterization import Clusterization
 from core.process.distance import Distance
-from core.utils import coord_2d_to_1d, str_1d_as_2d, \
-    initialize_cluster_centers
+from core.process.idf import IDF
+from core.process.parser import create_parsers
+from core.process.reader import Reader
+from core.utils import str_1d_as_2d, initialize_cluster_centers
 from utils.config import get_conf
 from utils.log import get_log
 from utils.timer import timer
@@ -17,55 +17,6 @@ parsed_docs = {}
 largest_id = -1
 process_num = int(CONF['general']['processes'])
 distances = None
-
-
-class Process(object):
-
-    class Clusterization(multiprocessing.Process):
-        centers = {}
-
-        def __init__(self, pipe_results_child, iteration_offset, iteration_size,
-                     distances, pipe_centers_child):
-            self.iteration_offset = iteration_offset
-            self.iteration_size = iteration_size
-            self.distances = distances
-            self.pipe_results_child = pipe_results_child
-            self.pipe_centers_child = pipe_centers_child
-            super(self.__class__, self).__init__()
-
-        def _receive_centers(self):
-            self.centers = self.pipe_centers_child.recv()
-
-        def _find_closest_docs_to_center(self):
-            doc_id = self.iteration_offset
-            while doc_id < (largest_id + 1):
-                if self.distances[doc_id] >= 0:
-                    closest_center = None
-                    closest_center_distance = None
-                    for center_id in self.centers:
-                        center_distance = distances[
-                            coord_2d_to_1d(center_id, doc_id, largest_id + 1)
-                        ]
-                        if closest_center_distance is None or \
-                           closest_center_distance < center_distance:
-                            closest_center_distance = center_distance
-                            closest_center = center_id
-                    self.pipe_results_child.send(
-                        {
-                            'doc_id': doc_id,
-                            'closest_center_id': closest_center,
-                            'distance': closest_center_distance,
-                        }
-                    )
-                doc_id += self.iteration_size
-            self.pipe_results_child.send(None)
-
-        def run(self):
-            while True:
-                self._receive_centers()
-                if not self.centers:
-                    break
-                self._find_closest_docs_to_center()
 
 
 def _receive_parsed_docs(queue_parsed_docs):
@@ -193,12 +144,13 @@ def cluster():
     for i in range(process_num):
         pipe_centers_parent, pipe_centers_child = multiprocessing.Pipe()
         pipes_centers.append((pipe_centers_parent, pipe_centers_child))
-        cluster_p = Process.Clusterization(
+        cluster_p = Clusterization(
             pipe_results_child=pipe_results_child,
             iteration_offset=i,
             iteration_size=process_num,
             distances=distances,
             pipe_centers_child=pipe_centers_child,
+            largest_id=largest_id
         )
         cluster_p.start()
         cluster_ps.append(cluster_p)
