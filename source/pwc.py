@@ -7,6 +7,7 @@ from data.db import Db
 from core.main import parse, distance, cluster
 from utils.config import get_conf
 from utils.log import get_log
+from utils.timer import timer
 
 CONF = get_conf()
 LOG = get_log()
@@ -60,20 +61,26 @@ arg_parser.add_argument(
 
 args = arg_parser.parse_args()
 
-if args.debug:
-    LOG.setLevel(logging.DEBUG)
 
-if args.clean:
-    Db.clean()
+@timer
+def process():
+    if args.debug:
+        LOG.setLevel(logging.DEBUG)
 
-if args.parse:
-    parse()
+    if args.clean:
+        Db.clean()
 
-if args.features:
-    pass
+    if args.parse:
+        parse()
 
-if args.distance:
-    distance()
+    if args.features:
+        pass
 
-if args.cluster:
-    cluster()
+    if args.distance:
+        distance()
+
+    if args.cluster:
+        cluster()
+
+if __name__ == '__main__':
+    process()
