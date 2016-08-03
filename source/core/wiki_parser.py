@@ -2,9 +2,9 @@ import logging
 import multiprocessing
 import xml.sax
 
-from parsing.utils import calc_distance, coord_2d_to_1d, str_1d_as_2d, \
+from core.utils import calc_distance, coord_2d_to_1d, str_1d_as_2d, \
     initialize_cluster_centers
-from parsing.wiki_content_handler import WikiContentHandler
+from core.wiki_content_handler import WikiContentHandler
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
 from utils.log import get_log
@@ -78,7 +78,7 @@ class Process(object):
                     # Just to be sure that other threads can also take a pill
                     self._queue_unparsed_docs.put(None)
                     self._pipe_tokens_to_idf_child.send(None)
-                    print('Process {0} finished after parsing {1} '
+                    print('Process {0} finished after core {1} '
                           'docs'.format(self.pid, parsed_pages_num))
                     break
                 page.create_tokens()
@@ -293,7 +293,7 @@ def parse():
     # read all the articles from XML and do TF-IDF
     ps_reader.start()
 
-    LOG.info("Started parsing documents using {0} processes".format(process_num))
+    LOG.info("Started core documents using {0} processes".format(process_num))
     for ps_parser in ps_parsers:
         ps_parser.start()
     ps_idf.start()
