@@ -70,7 +70,7 @@ def parse():
     )
     ps_idf = IDF(
         pipe_tokens_to_idf_parent=pipe_tokens_to_idf_parent,
-        docs_num=int(CONF['dev']['item_limit']),
+        docs_num=int(CONF['general']['item_limit']),
         event=event,
         pipes_tokens_to_processes_parent=pipes_tokens_to_processes_parent,
         process_num=process_num

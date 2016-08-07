@@ -17,7 +17,9 @@ class WikiContentHandler(xml.sax.ContentHandler):
         self._text = None
         self._title = None
         self._redirect = None
-        self._items_limit = int(CONF['dev']['item_limit'])
+        self._items_limit = int(CONF['general']['item_limit'])
+        self._classification_items_limit = int(
+            CONF['classification']['item_limit'])
         self.items_saved = 0
         self._documents_saved = 0
         self._redirects_saved = 0
