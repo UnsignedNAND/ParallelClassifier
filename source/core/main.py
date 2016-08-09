@@ -79,7 +79,8 @@ def parse():
     # read all the articles from XML and do TF-IDF
     ps_reader.start()
 
-    LOG.info("Started core documents using {0} processes".format(process_num))
+    LOG.info("Started processing documents using {0} processes".format(
+        process_num))
     for ps_parser in ps_parsers:
         ps_parser.start()
     ps_idf.start()

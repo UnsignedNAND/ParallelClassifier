@@ -23,8 +23,6 @@ class Models:
                     primary_key=True)
         title = Column(UnicodeText(250),
                        nullable=False)
-        redirect = Column(UnicodeText(250),
-                          nullable=True)
         # MySQL UnicodeText default length is too short to store certain Wiki
         # pages, so it has to be defined
         text = Column(UnicodeText(320000),
@@ -41,6 +39,7 @@ class Db:
 
     @staticmethod
     def clean():
+        LOG.info('Cleaning database')
         global ENGINE
         global BASE
         BASE.metadata.bind = ENGINE
@@ -59,6 +58,7 @@ class Db:
 
     @staticmethod
     def init():
+        LOG.info('Initializing connection to database')
         Db._connect()
         BASE.metadata.bind = ENGINE
 

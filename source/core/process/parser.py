@@ -1,7 +1,5 @@
 import multiprocessing
 
-from utils.config import get_conf
-
 
 class Parser(multiprocessing.Process):
     def __init__(self, queue_unparsed_docs, pipe_tokens_to_idf_child,
@@ -23,7 +21,7 @@ class Parser(multiprocessing.Process):
                 # Just to be sure that other threads can also take a pill
                 self._queue_unparsed_docs.put(None)
                 self._pipe_tokens_to_idf_child.send(None)
-                print('Process {0} finished after core {1} '
+                print('Process {0} finished after processing {1} '
                       'docs'.format(self.pid, parsed_pages_num))
                 break
             page.create_tokens()

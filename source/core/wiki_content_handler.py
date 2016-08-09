@@ -1,9 +1,11 @@
 import math
 import xml.sax
 
+from data.db import Db, Models
 from models.page import Page
 from utils.config import get_conf
 from utils.exceptions import PageLimitException
+from utils.general import str2bool
 from utils.log import get_log
 
 CONF = get_conf()
@@ -24,6 +26,12 @@ class WikiContentHandler(xml.sax.ContentHandler):
         self._documents_saved = 0
         self._redirects_saved = 0
         self._q_unparsed_documents = q_unparsed_documents
+
+        if str2bool(CONF['general']['save_to_db']):
+            Db.init()
+            Db.clean()  # database has to be cleaned every time to ensure
+            # that IDs are unique
+            self.session = Db.create_session()
 
     def startElement(self, name, attributes):
         if name == "page":
@@ -63,7 +71,13 @@ class WikiContentHandler(xml.sax.ContentHandler):
                 page.content = self._text
                 page.title = self._title
                 self._q_unparsed_documents.put(page)
-                del page
+
+                if str2bool(CONF['general']['save_to_db']):
+                    page = Models.Page()
+                    page.id = page.id = self.items_saved
+                    page.text = self._text
+                    page.title = self._title
+                    self.session.add(page)
             else:
                 pass
                 # TODO do redirects carry any relevant information?
@@ -76,6 +90,10 @@ class WikiContentHandler(xml.sax.ContentHandler):
         else:
             self._redirects_saved += 1
 
+        if str2bool(CONF['general']['save_to_db']):
+            if self.items_saved % 10:
+                self.session.commit()
+
         if self.items_saved % (int(math.ceil(self._items_limit/10)) if int(
                 math.ceil(self._items_limit/10)) > 0 else 1) == 0:
             LOG.debug('[{0:6.2f} %] Parsed {1} / {2} items'.format(
@@ -83,6 +101,8 @@ class WikiContentHandler(xml.sax.ContentHandler):
                 self.items_saved, self._items_limit),
             )
         if self._items_limit and self.items_saved >= self._items_limit:
+            if str2bool(CONF['general']['save_to_db']):
+                self.session.commit()
             raise PageLimitException('Parser hit items limit ({0}), '
                                      'Parsed pages: {1}, '
                                      'Parsed redirects {2}'.format(
