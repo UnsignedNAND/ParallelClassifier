@@ -39,12 +39,7 @@ arg_parser.add_argument(
     action='store_true',
     help='Parse Wikipedia XML dump and load it do database.'
 )
-arg_parser.add_argument(
-    '--features',
-    default=False,
-    action='store_true',
-    help='Extract features from articles'
-)
+
 arg_parser.add_argument(
     '--distance',
     default=False,
@@ -72,9 +67,6 @@ def process():
 
     if args.parse:
         parse()
-
-    if args.features:
-        pass
 
     if args.distance:
         distance()
