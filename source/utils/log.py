@@ -10,13 +10,16 @@ def get_log():
     if not _LOG:
         log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] "
                                           "[%(levelname)-5.5s]  %(message)s")
-        log_file = _CONF['log']['path']
 
         _LOG = logging.getLogger('wiki')
 
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setFormatter(log_formatter)
-        _LOG.addHandler(file_handler)
+        try:
+            log_file = _CONF['log']['path']
+            file_handler = logging.FileHandler(log_file)
+            file_handler.setFormatter(log_formatter)
+            _LOG.addHandler(file_handler)
+        except:
+            pass
 
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(log_formatter)
