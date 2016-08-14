@@ -4,7 +4,7 @@ import argparse
 import logging
 
 from data.db import Db
-from core.main import parse, distance, cluster
+from core.main import parse, distance, cluster, classify
 from utils.config import get_conf
 from utils.log import get_log
 from utils.timer import timer
@@ -54,6 +54,13 @@ arg_parser.add_argument(
     help='Divide documents into clusters'
 )
 
+arg_parser.add_argument(
+    '--classify',
+    default=False,
+    action='store_true',
+    help='Classificate new documents using kNN algorithm'
+)
+
 args = arg_parser.parse_args()
 
 
@@ -73,6 +80,9 @@ def process():
 
     if args.cluster:
         cluster()
+
+    if args.classify:
+        classify()
 
 if __name__ == '__main__':
     process()

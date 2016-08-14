@@ -9,8 +9,8 @@ from utils.exceptions import PageLimitException
 from utils.general import str2bool
 from utils.log import get_log
 
-LOG = get_log()
 CONF = get_conf()
+LOG = get_log()
 
 
 class Reader(multiprocessing.Process):
@@ -38,7 +38,7 @@ class Reader(multiprocessing.Process):
     def _read_from_db(self):
         Db.init()
         session = Db.create_session()
-        pages = session.query(Models.Page).all()
+        pages = session.query(Models.Doc).all()
         for page in pages:
             p = Page()
             p.id = page.id

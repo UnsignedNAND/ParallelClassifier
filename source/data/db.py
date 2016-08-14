@@ -11,7 +11,7 @@ LOG = get_log()
 
 
 class Models:
-    class Page(BASE):
+    class Doc(BASE):
         # This table holds all pages read from Wikipedia database that was
         # dumped into XML file.
         __tablename__ = 'page'
@@ -27,6 +27,19 @@ class Models:
         # pages, so it has to be defined
         text = Column(UnicodeText(320000),
                       nullable=False)
+
+    class Token(BASE):
+        __tablename__ = 'token'
+        __table_args__ = {
+            'mysql_engine': 'InnoDB',
+            'mysql_charset': 'utf8mb4',
+            'mysql_collate': 'utf8mb4_unicode_ci'}
+        id = Column(Integer,
+                    primary_key=True)
+        stem = Column(UnicodeText(35),
+                      nullable=False)
+        idf = Column(Integer,
+                     default=0)
 
 
 class Db:
@@ -45,7 +58,7 @@ class Db:
         BASE.metadata.bind = ENGINE
         db_delete_session = sessionmaker(bind=ENGINE)
         delete_session = db_delete_session()
-        clear_tables = [Models.Page]
+        clear_tables = [Models.Doc]
         try:
             for clear_table in clear_tables:
                 LOG.debug("Deleted {0} rows from {1}".format(
@@ -74,13 +87,13 @@ if __name__ == '__main__':
     session = Db.create_session()
 
     for i in range(0, 5):
-        page = Models.Page()
-        page.title = 'Title' + str(i)
-        page.text = 'Text ' + str(i)
-        session.add(page)
+        doc = Models.Doc()
+        doc.title = 'Title' + str(i)
+        doc.text = 'Text ' + str(i)
+        session.add(doc)
 
     session.commit()
 
-    pages = session.query(Models.Page).all()
-    for page in pages:
-        print(page.id)
+    docs = session.query(Models.Doc).all()
+    for doc in docs:
+        print(doc.id)

@@ -1,4 +1,5 @@
 import logging
+import math
 import multiprocessing
 
 from core.process.clusterization import Clusterization
@@ -7,6 +8,7 @@ from core.process.idf import IDF
 from core.process.parser import create_parsers
 from core.process.reader import Reader
 from core.utils import str_1d_as_2d, initialize_cluster_centers
+from models.page import Page
 from utils.config import get_conf
 from utils.log import get_log
 from utils.timer import timer
@@ -17,6 +19,7 @@ parsed_docs = {}
 largest_id = -1
 process_num = int(CONF['general']['processes'])
 distances = None
+tokens_idf = {}
 
 
 def _receive_parsed_docs(queue_parsed_docs):
@@ -41,6 +44,7 @@ def _receive_parsed_docs(queue_parsed_docs):
 def parse():
     global parsed_docs
     global largest_id
+    global tokens_idf
 
     # initialize communication
 
@@ -54,6 +58,11 @@ def parse():
             multiprocessing.Pipe()
         pipes_tokens_to_processes_parent.append(pipe_tokens_to_processes_parent)
         pipes_tokens_to_processes_child.append(pipe_tokens_to_processes_child)
+
+    # additional pipe to transfer IDF values from IDF process to master
+    pipe_idf_master_parent, pipe_idf_master_child = multiprocessing.Pipe()
+    pipes_tokens_to_processes_parent.append(pipe_idf_master_parent)
+
     event = multiprocessing.Event()
     event.clear()
 
@@ -84,6 +93,9 @@ def parse():
     for ps_parser in ps_parsers:
         ps_parser.start()
     ps_idf.start()
+
+    # receive tokens IDF values from IDF process
+    tokens_idf = pipe_idf_master_child.recv()
 
     ps_reader.join()
     ps_idf.join()
@@ -219,7 +231,35 @@ def cluster():
     LOG.info('Finished clusterization in {0} iterations'.format(iterations))
 
 
+def classify():
+    from data.db import Db, Models
+    Db.init()
+    session = Db.create_session()
+    docs = session.query(Models.Doc).filter(Models.Doc.id == 1)
+    if docs.count():
+        for doc in docs:
+            LOG.info('Classifying "{0}"'.format(doc.title))
+            page = Page()
+            page.title = doc.title
+            page.content = doc.text
+            page.create_tokens()
+            for page_token in page.tokens:
+                try:
+                    # TODO increment total number of docs by 1
+                    page_token.idf = tokens_idf[page_token.stem]
+                except KeyError:
+                    # token did not appear in previous documents
+                    page_token.idf = 1 + math.log((len(parsed_docs)+1) / 1.0,
+                                                  math.e)
+                    LOG.debug('Classification: token \'{0}\' is new.'.format(
+                        page_token.stem))
+
+    else:
+        LOG.error('No documents to classify')
+
+
 if __name__ == '__main__':
     parse()
     distance()
     cluster()
+    classify()

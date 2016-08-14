@@ -8,8 +8,8 @@ from utils.exceptions import PageLimitException
 from utils.general import str2bool
 from utils.log import get_log
 
-CONF = get_conf()
 LOG = get_log()
+CONF = get_conf()
 session = None
 
 
@@ -73,7 +73,7 @@ class WikiContentHandler(xml.sax.ContentHandler):
                 self._q_unparsed_documents.put(page)
 
                 if str2bool(CONF['general']['save_to_db']):
-                    page = Models.Page()
+                    page = Models.Doc()
                     page.id = page.id = self.items_saved
                     page.text = self._text
                     page.title = self._title
