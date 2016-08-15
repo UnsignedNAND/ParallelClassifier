@@ -211,16 +211,16 @@ def cluster():
             new_centers[center.center_id] = center
         centers = new_centers
 
-    if LOG.level is logging.DEBUG:
-        for cid in centers.keys():
-            center = centers[cid]
-            msg = '\nCenter: {1} [{0}]'.format(
-                center.center_id,
-                parsed_docs[center.center_id].title
-            )
-            for did in center.pre_doc_ids:
-                msg += '\n{0} - {1}'.format(did, parsed_docs[did].title)
-            LOG.debug(msg)
+    for cid in centers.keys():
+        center = centers[cid]
+        msg = '\nCenter: {1} [{0}]'.format(
+            center.center_id,
+            parsed_docs[center.center_id].title
+        )
+        for did in center.pre_doc_ids:
+            parsed_docs[did].center_id = center.center_id
+            msg += '\n{0} - {1}'.format(did, parsed_docs[did].title)
+        LOG.debug(msg)
 
     for (pipe_center_parent, _) in pipes_centers:
         # send pills to processes
@@ -253,7 +253,6 @@ def classify():
                                                   math.e)
                     LOG.debug('Classification: token \'{0}\' is new.'.format(
                         page_token.stem))
-
     else:
         LOG.error('No documents to classify')
 

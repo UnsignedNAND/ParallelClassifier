@@ -15,6 +15,7 @@ class Page(object):
     tokens = []
     tfidf = {}
     word_count = None  # Word count in original text
+    center_id = 0
 
     def number_of_tokens(self):
         return len(self.tokens)
