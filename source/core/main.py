@@ -20,6 +20,7 @@ parsed_docs = {}
 largest_id = -1
 process_num = int(CONF['general']['processes'])
 distances = None
+class_distances = None
 tokens_idf = {}
 
 
@@ -261,7 +262,29 @@ def classify():
     if docs.count():
         for doc in docs:
             LOG.info('Classifying "{0}"'.format(doc.title))
-            page = _prepare_new_doc(doc)
+            new_doc = _prepare_new_doc(doc)
+            class_distances = multiprocessing.Array('d', (largest_id + 1))
+            class_ps = []
+            for i in range(process_num):
+                class_p = Classification(
+                    iteration_offset=i,
+                    iteration_size=process_num,
+                    class_distances=class_distances,
+                    largest_id=largest_id,
+                    parsed_docs=parsed_docs,
+                    new_doc=new_doc,
+                )
+                class_p.start()
+                class_ps.append(class_p)
+
+            for class_p in class_ps:
+                class_p.join()
+
+            for i in range(largest_id+1):
+                try:
+                    print(i, parsed_docs[i].title, class_distances[i])
+                except KeyError:
+                    print(i, parsed_docs[i].title,  '-')
     else:
         LOG.error('No documents to classify')
 
