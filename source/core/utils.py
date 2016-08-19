@@ -45,7 +45,13 @@ def calc_distance(doc1, doc2):
         tfidf_2 = doc2.tfidf[token_2]
         d2 += math.pow(tfidf_2, 2)
     d2 = math.sqrt(d2)
-    return int(dot_product / (d1 * d2) * 1000) / 1000.0
+
+    try:
+        cos_similarity = int(dot_product / (d1 * d2) * 1000) / 1000.0
+    except ZeroDivisionError:
+        cos_similarity = 0.0
+
+    return cos_similarity
 
 
 def str_1d_as_2d(arr, size):

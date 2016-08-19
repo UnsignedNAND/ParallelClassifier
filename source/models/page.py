@@ -67,3 +67,8 @@ class Page(object):
             reverse=True,
             key=lambda token: token.tf_idf
         ))[:num]
+
+    def calc_tokens_tfidf(self):
+        for token in self.tokens:
+            tfidf = token.calc_tf_idf()
+            self.tfidf[token.stem] = tfidf

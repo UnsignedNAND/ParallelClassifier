@@ -34,7 +34,7 @@ class Distance(multiprocessing.Process):
                     try:
                         doc2 = self.parsed_docs[col]
                         distance = calc_distance(doc1, doc2)
-                    except:
+                    except IndexError:
                         distance = -2
                     self.distances[
                         coord_2d_to_1d(col, row, (self.largest_id + 1))
@@ -42,7 +42,7 @@ class Distance(multiprocessing.Process):
                     self.distances[
                         coord_2d_to_1d(row, col, (self.largest_id + 1))
                     ] = distance
-            except:
+            except IndexError:
                 # there is no document with such ID, fill it with -1
                 # distances
                 for col in range(row):

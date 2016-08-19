@@ -1,13 +1,15 @@
-import logging
 import math
 import multiprocessing
 
+from collections import Counter
+from core.process.classification import Classification
 from core.process.clusterization import Clusterization
 from core.process.distance import Distance
 from core.process.idf import IDF
 from core.process.parser import create_parsers
 from core.process.reader import Reader
 from core.utils import str_1d_as_2d, initialize_cluster_centers
+from data.db import Db, Models
 from models.page import Page
 from utils.config import get_conf
 from utils.log import get_log
@@ -19,6 +21,7 @@ parsed_docs = {}
 largest_id = -1
 process_num = int(CONF['general']['processes'])
 distances = None
+class_distances = None
 tokens_idf = {}
 
 
@@ -231,30 +234,81 @@ def cluster():
     LOG.info('Finished clusterization in {0} iterations'.format(iterations))
 
 
+@timer
+def _prepare_new_doc(doc):
+    page = Page()
+    page.title = doc.title
+    page.content = doc.text
+    page.create_tokens()
+    # import tokens IDF values from already classified documents
+    # TODO check if multiprocessing would be of any benefit
+    for page_token in page.tokens:
+        try:
+            # TODO increment total number of docs by 1
+            page_token.idf = tokens_idf[page_token.stem]
+        except KeyError:
+            # token did not appear in previous documents
+            page_token.idf = 1 + math.log((len(parsed_docs) + 1) / 1.0,
+                                          math.e)
+            LOG.debug('Classification: token \'{0}\' is new.'.format(
+                page_token.stem))
+        finally:
+            page.calc_tokens_tfidf()
+    return page
+
+
+@timer
 def classify():
-    from data.db import Db, Models
     Db.init()
     session = Db.create_session()
-    docs = session.query(Models.Doc).filter(Models.Doc.id == 1)
+    docs = session.query(Models.Doc).filter(
+        Models.Doc.id == int(CONF['classification']['new_doc_start_id'])
+    )
     if docs.count():
         for doc in docs:
             LOG.info('Classifying "{0}"'.format(doc.title))
-            page = Page()
-            page.title = doc.title
-            page.content = doc.text
-            page.create_tokens()
-            for page_token in page.tokens:
+            new_doc = _prepare_new_doc(doc)
+            class_distances = multiprocessing.Array('d', (largest_id + 1))
+            class_ps = []
+            for i in range(process_num):
+                class_p = Classification(
+                    iteration_offset=i,
+                    iteration_size=process_num,
+                    class_distances=class_distances,
+                    largest_id=largest_id,
+                    parsed_docs=parsed_docs,
+                    new_doc=new_doc,
+                )
+                class_p.start()
+                class_ps.append(class_p)
+
+            for class_p in class_ps:
+                class_p.join()
+
+            id_dist = []
+            for i in range(largest_id + 1):
                 try:
-                    # TODO increment total number of docs by 1
-                    page_token.idf = tokens_idf[page_token.stem]
+                    item = {
+                        'id': i,
+                        'distance': class_distances[i],
+                        'class': parsed_docs[i].center_id
+                    }
+                    id_dist.append(item)
                 except KeyError:
-                    # token did not appear in previous documents
-                    page_token.idf = 1 + math.log((len(parsed_docs)+1) / 1.0,
-                                                  math.e)
-                    LOG.debug('Classification: token \'{0}\' is new.'.format(
-                        page_token.stem))
+                    pass
+
+            # finding most frequent center in close neighborhood
+            id_dist.sort(key=lambda x: x['distance'], reverse=True)
+            k_id_dist = id_dist[:int(CONF['classification']['k'])]
+            classes = [c['class'] for c in k_id_dist]
+            counted_classes = Counter(classes)
+            new_doc.center_id, _ = counted_classes.most_common(1)[0]
+            LOG.info('New doc ({0}) classified as belonging to {1} : {2}'.
+                     format(new_doc.title, new_doc.center_id,
+                     parsed_docs[new_doc.center_id].title))
+
     else:
-        LOG.error('No documents to classify')
+        LOG.info('No documents to classify')
 
 
 if __name__ == '__main__':
