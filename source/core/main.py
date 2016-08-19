@@ -251,6 +251,8 @@ def _prepare_new_doc(doc):
                                           math.e)
             LOG.debug('Classification: token \'{0}\' is new.'.format(
                 page_token.stem))
+        finally:
+            page.calc_tokens_tfidf()
     return page
 
 
