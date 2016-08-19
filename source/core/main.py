@@ -1,6 +1,7 @@
 import math
 import multiprocessing
 
+from collections import Counter
 from core.process.classification import Classification
 from core.process.clusterization import Clusterization
 from core.process.distance import Distance
@@ -260,7 +261,9 @@ def _prepare_new_doc(doc):
 def classify():
     Db.init()
     session = Db.create_session()
-    docs = session.query(Models.Doc).filter(Models.Doc.id == 1)
+    docs = session.query(Models.Doc).filter(
+        Models.Doc.id == int(CONF['classification']['new_doc_start_id'])
+    )
     if docs.count():
         for doc in docs:
             LOG.info('Classifying "{0}"'.format(doc.title))
@@ -282,13 +285,30 @@ def classify():
             for class_p in class_ps:
                 class_p.join()
 
-            for i in range(largest_id+1):
+            id_dist = []
+            for i in range(largest_id + 1):
                 try:
-                    print(i, parsed_docs[i].title, class_distances[i])
+                    item = {
+                        'id': i,
+                        'distance': class_distances[i],
+                        'class': parsed_docs[i].center_id
+                    }
+                    id_dist.append(item)
                 except KeyError:
-                    print(i, parsed_docs[i].title,  '-')
+                    pass
+
+            # finding most frequent center in close neighborhood
+            id_dist.sort(key=lambda x: x['distance'], reverse=True)
+            k_id_dist = id_dist[:int(CONF['classification']['k'])]
+            classes = [c['class'] for c in k_id_dist]
+            counted_classes = Counter(classes)
+            new_doc.center_id, _ = counted_classes.most_common(1)[0]
+            LOG.info('New doc ({0}) classified as belonging to {1} : {2}'.
+                     format(new_doc.title, new_doc.center_id,
+                     parsed_docs[new_doc.center_id].title))
+
     else:
-        LOG.error('No documents to classify')
+        LOG.info('No documents to classify')
 
 
 if __name__ == '__main__':
