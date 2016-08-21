@@ -139,74 +139,70 @@ In linguistics, a lemmatization is the process of grouping together the various 
 \subsubsection{Term Frequency and Inverse Document Index}
 In order to define document's topic it is essential to find relevant keywords. To achieve this, TF-IDF term weighting algorithm can be utilized. It is a numerical statistic method which reflects how important is a given word to a document in corpus. Value calculated by this method increases proportionally to the number of times a given word appears in a document, but is reduced by the frequency of the word in corpus. This approach allows words that are important for one document and appear frequently in it but rarely in corpus to score higher than ones that appear frequently in whole corpus.
 
-Consider following sentences and matrix of tokens as an examples for further presentation of TD-IDF:
+Consider following sentences and matrix of tokens as an examples for further presentation of TD-IDF (tokens were lemmatized and stopwords were removed, for the sake of simplicity of visualization n-grams were not used):
 
-\begin{table}[ht]
+\begin{table}[H]
 	\centering
 	\caption{TF-IDF - Example documents}
 	\label{tf_idf_example_sentences}
-	\begin{tabular}{@{}ll@{}}
-		Document 1. & A species is a kind of organism. \\
-		Document 2. & An organism is a living thing.   \\
-		Document 3. & Bacteria is a living organism.   \\
-		Document 4. & A is the letter.                
+	\begin{tabular}{@{}lll@{}}
+		\toprule
+		& Content                                     & Terms      \\ \midrule
+		Document 1. & The sky is blue.                            & sky blue               \\
+		Document 2. & The sun is bright.                          & sun bright             \\
+		Document 3. & The sun in the sky is bright.               & sun sky bright         \\
+		Document 4. & We can see the shining sun, the bright sun. & sun see bright shining \\ \bottomrule
 	\end{tabular}
 \end{table}
 
 \begin{itemize}
-	\item \textbf{TF - Term Frequency} - is a measure of frequency with which given word occurs in document. Because every document is different in length and thus longer documents will contain words with higher occurence count, value returned by TF is usually normalized. Words that occur more often in a document have higher value than those that do not.
+	\item \textbf{TF - Term Frequency} - is a measure of frequency with which given word occurs in document. Because every document is different in length and thus longer documents will contain words with higher occurrence count, value returned by TF is usually normalized. Words that occur more often in a document have higher value than those that do not.
 	
 	As can be observed in \ref{tf_idf_tf_freq}, matrix created in a process tends to contain many empty cells (word does not occur in a document). It might be worth to consider using sparse matrix implementation in order to preserve memory.
 	\[TF\textsubscript{word}=\frac{word\ occurence\ count}{total\ words\ in\ document}\]	
-\begin{table}[H]
+\begin{table}[H]	
 	\centering
 	\caption{TF - Words frequencies}
 	\label{tf_idf_tf_freq}
-	\begin{tabular}{@{}lccccccccccc|c|@{}}
-		\toprule
-		& \multicolumn{1}{l}{a} & \multicolumn{1}{l}{species} & \multicolumn{1}{l}{is} & \multicolumn{1}{l}{kind} & \multicolumn{1}{l}{of} & \multicolumn{1}{l}{organism} & \multicolumn{1}{l}{living} & \multicolumn{1}{l}{thing} & \multicolumn{1}{l}{bacteria} & \multicolumn{1}{l}{the} & \multicolumn{1}{l|}{letter} & \multicolumn{1}{l|}{Total} \\ \midrule
-		D1 & 2                     & 1                           & 1                      & 1                        & 1                      & 1                            &                            &                           &                              &                         &                             & 7                          \\ \cmidrule(l){13-13} 
-		D2 & 2                     &                             & 1                      &                          &                        & 1                            & 1                          & 1                         &                              &                         &                             & 6                          \\ \cmidrule(l){13-13} 
-		D3 & 1                     &                             & 1                      &                          &                        & 1                            & 1                          &                           & 1                            &                         &                             & 5                          \\ \cmidrule(l){13-13} 
-		D4 & 1                     &                             & 1                      &                          &                        &                              &                            &                           &                              & 1                       & 1                           & 4                          \\ \bottomrule
-	\end{tabular}
+\begin{tabular}{@{}lllllll@{}}
+	\toprule
+	& blue & sun & sky & see & bright & shining \\ \midrule
+	Document 1. & 1    &     & 1   &     &        &         \\
+	Document 2. &      & 1   &     &     & 1      &         \\
+	Document 3. &      & 1   & 1   &     & 1      &         \\
+	Document 4. &      & 2   &     & 1   & 1      & 1       \\ \bottomrule
+\end{tabular}
 \end{table}
 \begin{table}[H]
 	\centering
 	\caption{TF - Normalized words frequencies}
 	\label{tf_idf_tf_norm_freq}
-	\begin{tabular}{@{}lccccccccccc@{}}
-		\toprule
-		& \multicolumn{1}{l}{a} & \multicolumn{1}{l}{species} & \multicolumn{1}{l}{is} & \multicolumn{1}{l}{kind} & \multicolumn{1}{l}{of} & \multicolumn{1}{l}{organism} & \multicolumn{1}{l}{living} & \multicolumn{1}{l}{thing} & \multicolumn{1}{l}{bacteria} & \multicolumn{1}{l}{the} & \multicolumn{1}{l}{letter} \\ \midrule
-		D1 & 0.29                  & 0.14                        & 0.14                   & 0.14                     & 0.14                   & 0.14                         &                            &                           &                              &                         &                            \\
-		D2 & 0.33                  &                             & 0.16                   &                          &                        & 0.16                         & 0.16                       & 0.16                      &                              &                         &                            \\
-		D3 & 0.20                  &                             & 0.20                   &                          &                        & 0.20                         & 0.20                       &                           & 0.20                         &                         &                            \\
-		D4 & 0.25                  &                             & 0.25                   &                          &                        &                              &                            &                           &                              & 0.25                    & 0.25                       \\ \bottomrule
-	\end{tabular}
+\begin{tabular}{@{}lllllll@{}}
+	\toprule
+	& blue & sun & sky & see & bright & shining \\ \midrule
+	Document 1. & 0.5    &     & 0.5   &     &        &         \\
+	Document 2. &      & 0.5   &     &     & 0.5      &         \\
+	Document 3. &      & 0.333   & 0.333   &     & 0.333      &         \\
+	Document 4. &      & 0.4   &     & 0.2   & 0.2      & 0.2       \\ \bottomrule
+\end{tabular}
 \end{table}
 	
 	\item \textbf{IDF - Inverse Document Frequency} - it can be observed that certain words that do not carry much information appear very frequently across all documents written in English. Example of these words are: 'a', 'an', 'the' and many others. But because not only articles and stop words can turn out to be redundant, IDF was introduced to counter the emphasis that these words carry with them. IDF diminishes the weight of words that occur frequently and increases the weight of words that occur rarely across all documents in corpus.
 
-	
 	\begin{table}[H]
 		\centering
-		\caption{My caption}
-		\label{my-label}
-		\begin{tabular}{@{}ll@{}}
-			\toprule
-			Term     & IDF  \\ \midrule
-			is       & 1.00 \\
-			species  & 2.39 \\
-			a        & 1.00 \\
-			organism & 1.29 \\
-			the      & 2.39 \\
-			thing    & 2.39 \\
-			letter   & 2.39 \\
-			of       & 2.39 \\
-			kind     & 2.39 \\
-			bacteria & 2.39 \\
-			living   & 1.69 \\ \bottomrule
-		\end{tabular}
+		\caption{Terms with IDF values assigned}
+		\label{tf_idf_idf}
+	\begin{tabular}{@{}ll@{}}
+		\toprule
+		Term     & IDF   \\ \midrule
+		blue     & 2.386 \\
+		sun      & 1.288 \\
+		sky      & 1.693 \\
+		see      & 2.386 \\
+		bright   & 1.288 \\
+		shinning & 2.386 \\ \bottomrule
+	\end{tabular}
 	\end{table}
 	
 		\[IDF\textsubscript{word}=1+log_e \frac{total\ number\ of\ documents\ in\ corpus}{number\ of\ documents\ with\ word\ in\ it}\]
@@ -219,15 +215,15 @@ Consider following sentences and matrix of tokens as an examples for further pre
 
 	\begin{table}[H]
 		\centering
-		\caption{TF-IDF}
+		\caption{Final result of TF-IDF}
 		\label{tf_idf}
-		\begin{tabular}{@{}lccccccccccc@{}}
-			\toprule
-			& \multicolumn{1}{l}{a} & \multicolumn{1}{l}{species} & \multicolumn{1}{l}{is} & \multicolumn{1}{l}{kind} & \multicolumn{1}{l}{of} & \multicolumn{1}{l}{organism} & \multicolumn{1}{l}{living} & \multicolumn{1}{l}{thing} & \multicolumn{1}{l}{bacteria} & \multicolumn{1}{l}{the} & \multicolumn{1}{l}{letter} \\ \midrule
-			D1 & 0.29                  & 0.34                        & 0.14                   & 0.14                     & 0.14                   & 0.14                         &                            &                           &                              &                         &                            \\
-			D2 & 0.33                  &                             & 0.16                   &                          &                        & 0.16                         & 0.16                       & 0.16                      &                              &                         &                            \\
-			D3 & 0.20                  &                             & 0.20                   &                          &                        & 0.20                         & 0.20                       &                           & 0.20                         &                         &                            \\
-			D4 & 0.25                  &                             & 0.25                   &                          &                        &                              &                            &                           &                              & 0.25                    & 0.25                       \\ \bottomrule
+		\begin{tabular}{lllllll}
+			\hline
+			& blue  & sun   & sky   & see   & bright & shining \\ \hline
+			Document 1. & 1.193 &       & 0.847 &       &        &         \\
+			Document 2. &       & 0.644 &       &       & 0.644  &         \\
+			Document 3. &       & 0.429 & 0.429 &       & 0.564  &         \\
+			Document 4. &       & 0.515 &       & 0.477 & 0.258  & 0.477   \\ \hline
 		\end{tabular}
 	\end{table}
 	
@@ -235,12 +231,37 @@ Consider following sentences and matrix of tokens as an examples for further pre
 
 \subsubsection{Cosine similarity}
  The documents clustering can result in faster data analysis, such  as  information retrieval  and  information  extraction,  by  grouping  similar kind  of  information. While performing clusterization, a similarity between a pair of objects has to be defined. Accurate clustering requires a definition of it in terms of either similarity or distance. Different similarity and distance measures have already been described and used, for example Euclidean  distance or cosine  similarity. Cosine  similarity  is  one  of  the  most  popular  similarity  measure and it is often  applied for  text  documents clusterization. The main advantage of the cosine similarity is its independence of document length. For two documents \(d_i\) and \(d_j\), the cosine similarity between them can be defined as
-\[cos(d_i, d_j)=\frac{d_i . d_j}{|| d_i || ||d_j ||}\]
-The above equation can be simplified, because the document vectors have unit length
-\[cos(d_i, d_j)={d_i . d_j}\]
+\[cos(d_i, d_j)=\frac{d_i \cdot d_j}{|| d_i || ||d_j ||} \]
+where \(d_i \cdot d_j\) is a \textit{dot product} (def. \ref{def_dot_product}) and \(|| d_i || ||d_j ||\) is an \textit{Euclidean norm} (def. \ref{def_euclidean_norm}) of the vector (the intuitive notion of length of the vector).
+
 As can be expected, documents are identical if value of cosine similarity is 1, and if the 
 document vectors are orthogonal to each other this value is 0 and it means that documents are totally different.
 In proposed solution this metric could be used to define a level of similarity between a pair of objects in order to group together nearest documents.
+
+\begin{table}[H]
+	\centering
+	\caption{Cosine similarity calculated between documents in example set}
+	\label{casine_similarity}
+	\begin{tabular}{@{}lcccc@{}}
+		\toprule
+		& \multicolumn{1}{l}{Document 1} & \multicolumn{1}{l}{Document 2} & \multicolumn{1}{l}{Document 3} & \multicolumn{1}{l}{Document 4} \\ \midrule
+		Document 1 & 1.0                            & 0.0                            & 0.394                          & 0.0                            \\
+		Document 2 & 0.0                            & 1.0                            & 0.732                          & 0.615                          \\
+		Document 3 & 0.394                          & 0.732                          & 1.0                            & 0.45                           \\
+		Document 4 & 0.0                            & 0.615                          & 0.45                           & 1.0                            \\ \bottomrule
+	\end{tabular}
+\end{table}
+
+ \begin{definition}[Dot product] \label{def_dot_product}
+ 	Dot product indicates the length of projection of one vector onto another in n-dimensional vector space. Returned value is a scalar number. Dot product of two vectors \(A\) and \(B\) can be defined as following:
+ 	\[A \cdot B = \sum_{n=1}^{n} A_i B_i = A_1 B_1 + A_2 B_2 + \cdots + A_n B_n \]
+ \end{definition}
+ 
+ \begin{definition}[Euclidean norm] \label{def_euclidean_norm}
+ 	Norm is a function that measures length of given vector in n-dimensional vector space. 
+ 	\[ ||X|| = \sqrt{\sum_{i=1}^{n}x_i^2} = \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2} \]
+ \end{definition}
+
 \subsection{Clusterization}
 Once documents are in a form of vectors it is possible to prepare data clusters. For this, one of the most frequenlty used unsupervised methods is the K-means algorithm. It has linear time complexity in relevance to the number of documents and it is possible to run it concurrently on multiple threads. 
 
@@ -254,23 +275,18 @@ There are many variants of K-means parallel implementation, mostly depending on 
 	\item \textbf{Initialization} - in this step N processes are initialized.
 	Each of processes receives own copy of all documents represented by a single matrix containing calculated vectors. If processes are running on seperate nodes and document set is large, it should be considered to compress data to save time while sending it over network.
 	
-	\item \textbf{Select K centers}
-	Master process selects K centers and distributes them to processes. With an assumption that each process has an equal processing power, each process receives \(\frac{K}{N}\) centers.
+	\item \textbf{Select K centers} - master process selects K centers and distributes them to processes. With an assumption that each process has an equal processing power, each process receives \(\frac{K}{N}\) centers.
 	
 	\item \textbf{Computing distances between documents and centers}
 	Each process calculates distances between each pair of documents and centers that were received in a previous steps. This partial result is sent back to master process.
 	
-	\item \textbf{Assigning documents to groups}
-	Master process using the distances received from other processes, can assign each document to the closest group created around one of K documents selected previously.
+	\item \textbf{Assigning documents to groups} - master process using the distances received from other processes, can assign each document to the closest group created around one of K documents selected previously.
 	
-	\item \textbf{Calculating new centers for the groups}
-	Once the gorups are formed, next step is to find new centers. For each group, master process calculates mean value of distances between vectors that form it. It is possible that calculated mean value does not indicate any document directly, so the one with closest distance to it is selected.
+	\item \textbf{Calculating new centers for the groups} - once the gorups are formed, next step is to find new centers. For each group, master process calculates mean value of distances between vectors that form it. It is possible that calculated mean value does not indicate any document directly, so the one with closest distance to it is selected.
 	
-	\item \textbf{Sending updated centers}
-	Master process sends updated group centers to other processes. Repeat step 4.
+	\item \textbf{Sending updated centers} - master process sends updated group centers to other processes. Repeat step 4.
 	
-	\item \textbf{Ending condition}
-	If groups centers did not change in past iteration - clusterization has finished.
+	\item \textbf{Ending condition} - if groups centers did not change in past iteration - clusterization has finished.
 \end{enumerate}
 
 \subsection{Classification}

@@ -87,3 +87,8 @@ venv*
 # docs
 *.pdf
 
+# OSX
+.DS_Store
+
+# Temporary files
+*.swp

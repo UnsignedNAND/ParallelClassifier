@@ -3,8 +3,7 @@ class Token(object):
     page_id = None
     count = 0
     tf = 0
-    idf = 1.0  # because of formula, even if word does not exist in corpus it
-    #  should have 1.0 value
+    idf = 0.0
     tf_idf = 0.0
 
     def __str__(self):
@@ -14,3 +13,4 @@ class Token(object):
 
     def calc_tf_idf(self):
         self.tf_idf = self.idf * self.tf
+        return self.tf_idf

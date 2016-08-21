@@ -4,9 +4,10 @@ import argparse
 import logging
 
 from data.db import Db
-from parsing.wiki_parser import parse
+from core.main import parse, distance, cluster, classify
 from utils.config import get_conf
 from utils.log import get_log
+from utils.timer import timer
 
 CONF = get_conf()
 LOG = get_log()
@@ -38,23 +39,50 @@ arg_parser.add_argument(
     action='store_true',
     help='Parse Wikipedia XML dump and load it do database.'
 )
+
 arg_parser.add_argument(
-    '--features',
+    '--distance',
     default=False,
     action='store_true',
-    help='Extract features from articles'
+    help='Count distance between articles'
+)
+
+arg_parser.add_argument(
+    '--cluster',
+    default=False,
+    action='store_true',
+    help='Divide documents into clusters'
+)
+
+arg_parser.add_argument(
+    '--classify',
+    default=False,
+    action='store_true',
+    help='Classificate new documents using kNN algorithm'
 )
 
 args = arg_parser.parse_args()
 
-if args.debug:
-    LOG.setLevel(logging.DEBUG)
 
-if args.clean:
-    Db.clean()
+@timer
+def process():
+    if args.debug:
+        LOG.setLevel(logging.DEBUG)
 
-if args.parse:
-    parse()
+    if args.clean:
+        Db.clean()
 
-if args.features:
-    pass
+    if args.parse:
+        parse()
+
+    if args.distance:
+        distance()
+
+    if args.cluster:
+        cluster()
+
+    if args.classify:
+        classify()
+
+if __name__ == '__main__':
+    process()
