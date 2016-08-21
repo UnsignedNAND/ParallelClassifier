@@ -1,2 +1,196 @@
-\chapter{Design}
-\label{design}
+\chapter{System design}
+\label{des}
+\section{Introduction}
+This chapter defines the aim of the project and specifies potential users of the application. Secondly it describes functional, non functional, hardware, software and quality requirements. In next section, the project of the system was presented by UML and classes diagrams. Finally most important libraries used for document classification were defined. 
+
+
+\section{Aim of the project}
+
+Main aim of the project is to 
+
+The application will be created with the intent of 
+
+It should also indicate how 
+
+The project may become a useful tool used for 
+
+
+
+\section{Potential users}
+\label{users}
+
+The application will be dedicated mainly to 
+
+On the other hand users who ........ will also be able to use this tool to 
+
+
+\section{System requirements}
+
+\subsection{General requirements}
+
+\begin{enumerate}
+
+\item \textbf{Business context} The program will be available online, so everyone will be able to use it. The application sharing with a remote access will make it very useful in the context of:
+
+\begin{enumerate}
+
+\item 
+
+\item 
+
+\end{enumerate}
+
+Furthermore 
+
+\item \textbf{Prospectiveness}
+
+Created application can be used as a module of a larger system that.... 
+
+In future it can be expanded with ....... This fact indicates the prospectiveness of a proposed system. 
+
+\end{enumerate}
+
+\subsection{Functional requirements}
+
+
+Diagram presented in the figure \ref{functional} shows general functional requirements available in the application. The aim of the diagram is to describe possible interactions between actors and functions offered by the application. Each oval shows a single use case within which different flows called scenarios may occur. Every use case characterizes possible system functionalities and defines steps that lead to the effect observable by the actor. A dependency marked as \textbf{extend} describes some additional behavior, which in some cases may be included into the base use case. 
+The base use case is the one which is pointed by the arrowhead of the connection. The extend use case continues the behavior of the base use case by inserting additional actions into the base sequence when the appropriate extension point is reached in the base use case and the extension condition is filled. An \textbf{include} dependency is a relationship which describes the inclusion of another use case responsible for different behavior. The including dependency is the one pointed by the arrowhead of the connection.
+
+  \begin{figure}[ht]
+\begin{center}
+ \includegraphics[width=0.9\linewidth]{}
+ \caption{Use case model of the application - all functionalities}
+ \label{functional}
+ \end{center}
+ \end{figure}
+
+
+To present more detailed interactions, use cases from following categories were extended and shown on separate diagrams.
+
+ 
+Descriptions of all of the use cases including their initial, alternative and results were collected in the table \ref{tab:tableusecase}.
+\vspace{5em}
+
+\begin{longtable}{| p{2.5cm} | p{2.3cm} | p{2.2cm} | p{2cm} | p{2.5cm} |}
+\hline
+\textbf{Use case}       &\parbox[t]{5cm}{\textbf{Initial\\conditions}} &\textbf{Alternative conditions} &\parbox[t]{5cm}{\textbf{Results}} &\textbf{Description}\\\hline
+opens a website in a browser     &has a device with a supported web browser and access to the Internet  &any   &any   &a user opens a web browser and a website of the application. \\\hline
+
+reads instructions      &a website of the application opened, access to the Internet       &any   &any   &a user opens a website of the application, chooses an instruction page and read it\\\hline
+
+reads a compendium of knowledge &a website of the application opened, access to the Internet        &any   &any &a user opens a website of the application, chooses a compendium of knowledge page and read it\\\hline
+
+registers a new account           &a website of the application opened, access to the Internet, valid values in the registration form, terms of use accepted    &any   &any &user opens a website of the application, chooses a registration page and fills a form with correct values\\\hline
+
+
+
+log in to the application    &a website of the application opened, active user account, access to the Internet, valid combination of a username and a password           &any   &access to the examination page   &a user opens a website of the application, chooses a log-in page and fills a form with correct values to get access to the examination page\\\hline
+
+logs in to a server             &correct ssh keys which allows to log in to a server    &any   &a user is logged in &a user logs in to a server using ssh client and has access to results \\\hline
+
+starts an examination  &a website of the application opened, access to the Internet, user logged in, user accepted turning on the webcam  &any   &the face appeared on the canvas   &a user opens a website of the application, put a valid combination of  a username and a password into login form,  gave a web browser access to a webcam, which starts to capture a face of the user, draws it on the canvas and sends it to a server in order to process frames.\\\hline
+
+allows a web browser to access a webcam     &a user has logged in to the application &any &an examination started &this action is required in order to start the examination, so this use case is included by the previous one, the user logs in to the application and in order to start an examination, he has to allow a browser to use a webcam \\\hline
+
+marks specific frames as gesture frames   &a user started the examination, access to the Internet     &any  &marked frames are drawn in specified places on the website   &a user started the examination, makes a specific facial gesture and pushes and appropriate button, after that current frames are marked as gesture frames and they appear on the website\\\hline
+
+chooses a specific patient's directory  &a user is logged to a server      &any &any    & a user logs in to a server using ssh client and opens chosen directory\\\hline
+
+previews processed frames and examines results        &a user is logged in to a server or a user starter the examination    &any       &any   &a user is logged in to a server or a user started the examination and examines results \\\hline
+
+has frames of the face taken      &a user started the examination        &any &frames are sent to a server
+&a user started the examination and gave a browser access to a webcam, which takes pictures of his face every 250 milliseconds\\\hline
+
+makes a specific facial gesture &a user started the examination   &any      &any  &a user started the examination, makes a specific facial gesture  \\\hline
+
+push a button to mark a current frame as a gesture frame  &a user started the examination and made a specific gesture &any &marked frames appear on specific places on the website &a user is taking the examination, he can make chosen gestures in any order and then push an appropriate button to mark current frames as gesture frames \\\hline
+ 
+checks the relation between left and right distance      &a user started the examination, both eyes and mouth corners were detected         &any &any &a user is logged in and a browser has access to a webcam, the user started the examination, points needed to calculate distances were detected and all of the values were computed, the user can examine them \\\hline   
+            
+compares results with previous ones      &the examination was taken, all necessary values were calculated   &any &any &both during the examination and after finishing it, a user can examine results as they are saved on the server and compare them \\\hline  
+           
+           examines approximation errors for geometrical relations and colour difference      &the examination was taken, results and their approximation errors were calculated &any &any &approximation errors of geometrical relations and colour differences are calculated for every examination \\\hline
+ checks colours of the left and right side     &a user started the examination and a face was detected     &any &any &a user is logged in and a browser has access to a webcam, the user started the examination, the face was detected, colours were calculated and displayed on frames and the user can examine them \\\hline  
+   
+previews face, eyes and mouth area      &a user started the examination, all areas were detected         &any &any &a user is logged in and a browser has access to a webcam, the user started the examination, area of the face, eyes and mouth were detected and displayed to the user \\\hline  
+           
+analyses a slope of the line passes through values of errors over time     &approximation errors were calculated         &any &decision about the size of a progress &approximation errors of geometrical relations and colour differences are calculated for every examination, so it is possible to plot them and pass a line through points calculated over time, finally a slope of this line can be computed to decide how big the progress is\\\hline   
+ 
+           
+\caption{Use cases description}
+\label{tab:tableusecase}\\                                                                                
+\end{longtable}
+    
+\subsection{Non functional requirements}
+\textbf{Quality requirements}
+
+
+\textbf{Ergonomy}
+\label{interfaceerg}
+
+
+\textbf{Restrictive requirements}
+
+A user of the application, will have to have basic skills of 
+
+
+In order to use the application the following software and hardware requirements will have to be filled.
+
+\subsection{Software and hardware requirements}
+In order to use the application a user will need a computer equipped with 
+
+
+ Taking software requirements into consideration 
+ 
+ 
+There are no specified requirements about the operating system installed on the device until it supports 
+
+
+ Moreover in order to use the application a user will have to have 
+ 
+ 
+ 
+\section{Project of a system}
+\label{project}
+This section provides the project of the described solution for......
+
+ The project was presented by the diagrams employed in UML (Unified Modeling Language), a standard notation for the modeling of real-world objects and systems. 
+ 
+\subsection{Activity diagram of the performing test flow}
+The activity diagram shows the logic of workflows of step-wise actions. Rectangles with rounded corners present sequences of activities. A rhombus represents a decision after which it is possible to choose one of the alternatives. A diagram in the figure \ref{activity} shows a sequence of actions needed to ......
+
+........ is a starting point, ....... is a final point. 
+
+
+\subsection{Sequence diagram of processing frames}
+
+
+
+\subsection{Diagram of classes}
+A diagram of classes (figure \ref{classes})is one of the most popular UML diagrams. Rectangles show classes, their attributes and methods. Association connections were used to present relations between entities. Classes communicates with each other by sending messages (by association connections) and as a result they are able to fill tasks presented on the dynamic diagrams, for example use case model \ref{tab:tableusecase}.
+
+ 
+  
+
+\subsection{Architecture}
+The whole application will be based on ....... model. It is a distributed application structure that partitions tasks between the ..........
+
+
+The main idea of this model is presented in the figure \ref{client}.
+ 
+ 
+ 
+ 
+\subsection{Libraries}
+
+
+
+\subsection{Application release}
+The application will be uploaded 
+
+
+
+\section{Conclusion}
+This chapter includes a complete description of the methodology used to prepare analysis of the requirements for the created application. The proposed algorithm takes advantage of the possibilities of new technologies to .......
+
+Moreover the project of the system was also described and presented taking into consideration all of the specified requirements.
