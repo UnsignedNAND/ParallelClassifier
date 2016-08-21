@@ -272,24 +272,50 @@ More detailed implementation of a single-process K-means was described in \ref{k
 There are many variants of K-means parallel implementation, mostly depending on architecture of the solution. In our implementation, the following steps are proposed:
 
 \begin{enumerate}
-	\item \textbf{Initialization} - in this step N processes are initialized.
+	\item \textbf{Initialization}\newline
 	Each of processes receives own copy of all documents represented by a single matrix containing calculated vectors. If processes are running on seperate nodes and document set is large, it should be considered to compress data to save time while sending it over network.
 	
-	\item \textbf{Select K centers} - master process selects K centers and distributes them to processes. With an assumption that each process has an equal processing power, each process receives \(\frac{K}{N}\) centers.
+	\item \textbf{Select K centers}\newline
+	Master process selects K centers and distributes them to processes. With an assumption that each process has an equal processing power, each process receives \(\frac{K}{N}\) centers.
 	
-	\item \textbf{Computing distances between documents and centers}
+	\item \textbf{Calculating distances between documents and centers}\newline
 	Each process calculates distances between each pair of documents and centers that were received in a previous steps. This partial result is sent back to master process.
 	
-	\item \textbf{Assigning documents to groups} - master process using the distances received from other processes, can assign each document to the closest group created around one of K documents selected previously.
+	\item \textbf{Assigning documents to groups}\newline
+	Master process using the distances received from other processes, can assign each document to the closest group created around one of K documents selected previously.
 	
-	\item \textbf{Calculating new centers for the groups} - once the gorups are formed, next step is to find new centers. For each group, master process calculates mean value of distances between vectors that form it. It is possible that calculated mean value does not indicate any document directly, so the one with closest distance to it is selected.
+	\item \textbf{Calculating new centers for the groups}\newline
+	Once the gorups are formed, next step is to find new centers. For each group, master process calculates mean value of distances between vectors that form it. It is possible that calculated mean value does not indicate any document directly, so the one with closest distance to it is selected.
 	
-	\item \textbf{Sending updated centers} - master process sends updated group centers to other processes. Repeat step 4.
+	\item \textbf{Sending updated centers}\newline
+	Master process sends updated group centers to other processes. Repeat step 4.
 	
-	\item \textbf{Ending condition} - if groups centers did not change in past iteration - clusterization has finished.
+	\item \textbf{Ending condition}\newline
+	If groups centers did not change in past iteration - clusterization has finished.
 \end{enumerate}
 
 \subsection{Classification}
+Classification is process of assigning a label to new document. It is basing on knowledge gathered in previous step and assumes that documents are grouped and labeled. In this project a two-step classification is proposed. In first step a kNN algorith is used for narrowing the potential class memberships. In second step a SVM algorith used for a precise decision to which class new documet should be assigned to. As both algorithms were described in details in previous chapter ([\ref{soa-classification}]), this section focuses on an aspects of parallelism.
+
+\subsubsection{k-Nearest-Neighbors}
+k-Nearest-Neighbors is a simple distance-based classification algorithm which gives information about class membership of the most similar (in nearest neighborhood) documents. Knowing that the majority of neighbors belong to certain class, it assumes that this document must be this class as well. Because of its simplicity its parallel implementation is not complex and looks very similar to the single-threaded one.
+\begin{enumerate}
+	\item \textbf{Extracting features from new document}\newline
+	First step is a repetition of document parsing that was made for all the documents that are already in the system. Because in this process only one document is taken into account, this part is not parallelised because all operations are atomic and run on a small set of words. In this step words in new document are stemmed and their statistic are counted. This allows to present new document in a form of features that is comparable with other documents that are already in the system.
+	
+	\item \textbf{Calculating distances between documents}\newline
+	Once the document is presented as a feature matrix, the distances between new and all existing documents can be calculated. This step is run in parallel with an assumption that every process has an equal procesing power. Each of \textit{N} processes is given a \(\frac{1}{N}\) of known documents and does the distance calculations.
+	
+	\item \textbf{Aggregating results and finding nearest neighbors}\newline
+	All results are aggregated by a single process. Once done, \textit{k} documents with highest distance value (distance is a function of similarity which value ranges from 0 to 1, the higher value the more similar documents are) are selected.
+	
+	\item \textbf{Calculating class membership for new document}\newline
+	\textit{Optional. Because this implementation uses \textit{kNN} to narrow data on which \textit{SVM} will work this step is not required.}
+	
+	For final \textit{kNN} result documents selected in previous step are checked for their class membership. Class that contains the most documents is chosen as a label for new document.
+	
+\end{enumerate}
+\subsubsection{Support Vector Machine}
 
 \section{Conclusion}
 This chapter includes a complete description of the methodology used to prepare analysis of the requirements for created system. Parallelization of documents classification is the main scientific part of proposed solution. Providing algorithms for documents features extraction, clasterization and classification in the application based on parallel processing may lead to previously undiscovered system that allows to accelerate document classification significantly. 

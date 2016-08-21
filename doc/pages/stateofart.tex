@@ -286,73 +286,6 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 	
 	\end{enumerate}
 	
-	\subsubsection{K-Nearest Neighbors algorithm}
-	This section focuses on important classification algorithm called K-Nearest Neighbors (kNN). It is simple and efficient to use, as it does not require any labeling for data processing \cite{knn}. KNN is an non parametric lazy learning algorithm, because it doesn't make any assumptions on distribution of information and it doesn't contain any training phase or this phase is very minimal \cite{knn2}.  
-	
-	In KNN algorithm some assumptions are made:
-	\begin{enumerate}
-		\item Each training dataset consists of vectors labeled by a class differentiator. 
-		\item Data is in feature/metric space, so it is a scalar or multidimensional vector. This assumption is necessary to be able to use a notion of distance \cite{knn2}.
-		\item It is necessary to specify a kn number which determines number of neighbors that have influence on classification. 
-	\end{enumerate}
-	
-	The algorithm of labeling a sample using kNN algorithm involves following steps:
-	\begin{itemize}
-		\item \textbf{Case 1, k=1}
-
-	\begin{enumerate}
-		\item Let \textbf{A} be a point, which we want to label.
-		\item Find a point \textbf{B}, that is closest to \textbf{A} taking into account the distance between \textbf{A} and \textbf{B}.
-		\item Assign label of \textbf{B} to \textbf{A}
-		
-	\end{enumerate}
-	
-		\item \textbf{Case 2, k=k}
-		\begin{enumerate}
-			\item We want to find \textit{k} Nearest Neighbors and perform the majority voting.
-			\item Let assume that we have \textit{k} nearest neighbors of the point \textbf{A}, such as \textit{k=2n+1} and \textit{n} instances belong to class 1 - \textbf{C1} and \textit{n+1} instances belong to class 2 - \textbf{C2}.
-			\item We want to label \textbf{A} sample.
-			\item The sample \textbf{A} will be labeled as \textbf{C2}, as instances from this group form majority.
-		\end{enumerate}
-		All of the described steps are illustrated using figures \ref{knn1}, \ref{knn2}, \ref{knn3}.
-		We have two labeled groups \textbf{C1} and \textbf{C2}. 
-		 
-		\begin{figure}[H]
-	\begin{center}
-	\includegraphics[width=0.5\linewidth]{images/knn1.png}
-	\caption{K-nearest neighbor algorithm, two labeled groups}
-	\label{knn1}
-	\end{center}
-	\end{figure}
-	We want to label a new sample \textbf{A}, so we find \textit{k} nearest neighbors (let \textit{k} equals 3).
-	\begin{figure}[H]
-	\begin{center}
-	\includegraphics[width=0.5\linewidth]{images/knn2.png}
-	\caption{K-nearest neighbor algorithm, finding nearest neighbors}
-	\label{knn2}
-	\end{center}
-	\end{figure}
-	As can be seen instances from group \textbf{C2} forms majority of nearest neighbors, so the sample \textbf{A} is labeled as \textbf{C2}.
-	\begin{figure}[H]
-	\begin{center}
-	\includegraphics[width=0.5\linewidth]{images/knn3.png}
-	\caption{K-nearest neighbor algorithm, labelling sample}
-	\label{knn3}
-	\end{center}
-	\end{figure}
-		
-			\item \textbf{Case 3, weightened kNN} - in this case each point has a weight which is  calculated using the distance to the sample, instead of giving all points weight equals 1. 
-		\end{itemize}
-		
-		Obviously this algorithm may result an error. However this statement holds only when a dataset is not big and the error turns out to be quite small, less than twice the Bayes error rate as described in \cite{duda-hart-classification}. One of the authors statements is to obtain a tight error bound to the Nearest Neighbor Rule:
-		\[P*\leqslant P\leqslant P*(2-\frac{c}{c-1}P*)\]
-		where:
-		\begin{itemize}
-			\item \textit{P*} - Bayes error rate
-			\item \textit{c} - number of classes
-			\item \textit{P} - Nearest Neighbor error rate
-		\end{itemize}
-	
 	\subsubsection{Hierarchical algorithm}
 	Hierarchical clustering is a method which aims to build a hierarchy of clusters. It is often presented as the one that offers better quality, but its use is limited due to quadratic time complexity \cite{k_means}. Hierarchical clustering goal is to produce a tree with single all-inclusive cluster as the root, that than divides into smaller, nested partitions with a single clusters at the bottom. Each of mid-points can be described as a combination of two clusters from lower level or as a part that was produced from splitting higher level. The output of such method can be visualized as a tree that is called dendogram (see Fig. \ref{hierarchical_dendogram}). This clustering offers two approaches, that share mentioned principles:
 	
@@ -369,8 +302,75 @@ Consider the same database ref{fp-alg} as presented in the Apriori algorithm exa
 	\end{center}
 	\end{figure}
 
-\subsection{Data mining - Documents classification}
-	\subsubsection{Support Vector Machine model}
+\subsection{Data mining - Documents classification} \label{soa-classification}
+	\subsubsection{K-Nearest Neighbors algorithm} \label{soa-knn}
+	This section focuses on important classification algorithm called K-Nearest Neighbors (kNN). It is simple and efficient to use, as it does not require any labeling for data processing \cite{knn}. KNN is an non parametric lazy learning algorithm, because it doesn't make any assumptions on distribution of information and it doesn't contain any training phase or this phase is very minimal \cite{knn2}.  
+	
+	In KNN algorithm some assumptions are made:
+	\begin{enumerate}
+		\item Each training dataset consists of vectors labeled by a class differentiator. 
+		\item Data is in feature/metric space, so it is a scalar or multidimensional vector. This assumption is necessary to be able to use a notion of distance \cite{knn2}.
+		\item It is necessary to specify a \textit{k} number which determines number of neighbors that have influence on classification. 
+	\end{enumerate}
+	
+	The algorithm of labeling a sample using kNN algorithm involves following steps:
+	\begin{itemize}
+		\item \textbf{Case 1, k=1}
+		
+		\begin{enumerate}
+			\item Let \textbf{A} be a point, which we want to label.
+			\item Find a point \textbf{B}, that is closest to \textbf{A} taking into account the distance between \textbf{A} and \textbf{B}.
+			\item Assign label of \textbf{B} to \textbf{A}
+			
+		\end{enumerate}
+		
+		\item \textbf{Case 2, k=k}
+		\begin{enumerate}
+			\item We want to find \textit{k} Nearest Neighbors and perform the majority voting.
+			\item Let assume that we have \textit{k} nearest neighbors of the point \textbf{A}, such as \textit{k=2n+1} and \textit{n} instances belong to class 1 - \textbf{C1} and \textit{n+1} instances belong to class 2 - \textbf{C2}.
+			\item We want to label \textbf{A} sample.
+			\item The sample \textbf{A} will be labeled as \textbf{C2}, as instances from this group form majority.
+		\end{enumerate}
+		All of the described steps are illustrated using figures \ref{knn1}, \ref{knn2}, \ref{knn3}.
+		We have two labeled groups \textbf{C1} and \textbf{C2}. 
+		
+		\begin{figure}[H]
+			\begin{center}
+				\includegraphics[width=0.5\linewidth]{images/knn1.png}
+				\caption{K-nearest neighbor algorithm, two labeled groups}
+				\label{knn1}
+			\end{center}
+		\end{figure}
+		We want to label a new sample \textbf{A}, so we find \textit{k} nearest neighbors (let \textit{k} equals 3).
+		\begin{figure}[H]
+			\begin{center}
+				\includegraphics[width=0.5\linewidth]{images/knn2.png}
+				\caption{K-nearest neighbor algorithm, finding nearest neighbors}
+				\label{knn2}
+			\end{center}
+		\end{figure}
+		As can be seen instances from group \textbf{C2} forms majority of nearest neighbors, so the sample \textbf{A} is labeled as \textbf{C2}.
+		\begin{figure}[H]
+			\begin{center}
+				\includegraphics[width=0.5\linewidth]{images/knn3.png}
+				\caption{K-nearest neighbor algorithm, labelling sample}
+				\label{knn3}
+			\end{center}
+		\end{figure}
+		
+		\item \textbf{Case 3, weightened kNN} - in this case each point has a weight which is  calculated using the distance to the sample, instead of giving all points weight equals 1. 
+	\end{itemize}
+	
+	Obviously this algorithm may result an error. However this statement holds only when a dataset is not big and the error turns out to be quite small, less than twice the Bayes error rate as described in \cite{duda-hart-classification}. One of the authors statements is to obtain a tight error bound to the Nearest Neighbor Rule:
+	\[P*\leqslant P\leqslant P*(2-\frac{c}{c-1}P*)\]
+	where:
+	\begin{itemize}
+		\item \textit{P*} - Bayes error rate
+		\item \textit{c} - number of classes
+		\item \textit{P} - Nearest Neighbor error rate
+	\end{itemize}
+	
+	\subsubsection{Support Vector Machine model} \label{soa-svm}
 	The Support Vector Machine algorithm is a discriminative classifier which uses hyperplane to separate new examples. The main goal of the algorithm is to find the optimal hyperplane, yet the question is which parameters define it. After analysing a plot illustrated in the figure \ref{svm-plot}, it becomes obvious that a line that passes too close to points may make classification be noise sensitive.  Taking it into consideration we can intuitively define a criterion of the best hyperplane: it should pass as far as possible from all points and then, samples that are closest to the hyperplane are called support vectors.
 		\begin{figure}[H]
 	\begin{center}
