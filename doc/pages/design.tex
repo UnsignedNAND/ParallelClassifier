@@ -13,7 +13,7 @@ The application will be created with the intent of providing a complete set of t
 	\item \textbf{algorithms performance tests and results} - all algorithms will be tested with various parameters and the results will be described.
 \end{itemize}
 
-Final solution should also indicate how complex is the computation part and how crucial it is to design a system that supports executing tasks in parallel, distributes workloads in efficient manner between available worker processes and makes a proper use of all available resources.
+Final solution should also indicate how complex the computation part is and how crucial it is to design a system that supports parallel tasks execution, distributes workloads in efficient manner between available worker processes and makes a proper use of all available resources.
 
 The project may become a useful tool not only as a base framework for data scientists, but also for writers whom it should aid assigning a proper label to the document.
 
@@ -89,18 +89,18 @@ In order to use the application the following software and hardware requirements
 In this section software and hardware requirements are described.
 
 \subsubsection{Hardware requirements}
-This application was tested on various hardware configuration and has proven to work reliable on even older machines. Although the following configuration is not a server-grade hardware, it allows to execute flow of the application without running out of available resources in most of the presented test cases. Consider it as a recommended minimal configuration.
+This application will be tested on various hardware configuration to prove that it can work reliable on even older machines. Although the following configuration is not a server-grade hardware, it may allow to execute flow of the application without running out of available resources in most of the presented test cases. It will be considered as a recommended minimal configuration.
 \begin{itemize}
-	\item Processor - recomended is at least a quad-core processor. Usage of technologies like Intel's HyperThreading is not advised and the number of spawned child processes should not exceed the number of physical cores. Application relies heavily on reads and writes to shared memory, thus limiting use of virtual cores (\cite{performance_ht}). Processor used during tests was an Intel i7 with 4 physical cores and 8 logical processors.
-	\item System memory - has the greatest impact on performance of the application. The more memory, the less caching mechanisms will be used. Caching uses hard drives as a backend for storing processed documents, which greatly affects overall performance and execution time. Machine with 16 GB DDR3 memory was used during tests.
-	\item Hard drives - speed of reads and writes to hard drives is a crucial factor during startup of application and in case of using cache. SSD drive should be considered in place of standard hard drive due to higher speeds of reads and writes and O(1) latency of access \cite{performance_hdd_ssd}. A SSD drive connected to PCI-e slot was used during tests.
+	\item Processor - at least a quad-core processor is recommended. Usage of technologies like Intel's HyperThreading is not advised and the number of spawned child processes should not exceed the number of physical cores. Application will rely heavily on reads and writes to shared memory, thus limiting use of virtual cores (\cite{performance_ht}). Processor used during tests will be Intel i7 with 4 physical cores and 8 logical processors.
+	\item System memory - probably will have the greatest impact on performance of the application. The more memory, the less caching mechanisms will be used. Caching uses hard drives as a backend for storing processed documents, which greatly affects overall performance and execution time. Machine with 16 GB DDR3 memory will be used during tests.
+	\item Hard drives - speed of reads and writes to hard drives is a crucial factor during startup of application and in case of using cache. SSD drive should be considered in place of standard hard drive due to higher speeds of reads and writes and O(1) latency of access \cite{performance_hdd_ssd}. A SSD drive connected to PCI-e slot will be used during tests.
 \end{itemize}
 
 
 \subsubsection{Software requirements}
-There are no specified requirements about the operating system installed on the device. Application should run on every modern operating system, being it either Linux, OS X or Windows. Tests were run on both Linux and OS X machines, however the Windows environment was never fully tested and thus is not recommended for running the application.
+There are no specified requirements about the operating system installed on the device. Application should run on every modern operating system, being it either Linux, OS X or Windows. Tests will be run on both Linux and OS X machines, however the Windows environment will be never fully tested and thus is not recommended for running the application.
 
-Taking software requirements into consideration, a Python interpreter must be installed on a machine along with a set of libraries. Python is an interpreted language that provides good performance, scalability features and possibility of adapting software on-the-fly without a need to recompile the code. All required libraries are listed in both section \ref{design-libraries} and in source code in \textit{source/requirements3.txt} file.
+Taking software requirements into consideration, a Python interpreter will have to be installed on a machine along with a set of libraries. Python is an interpreted language that provides good performance, scalability features and possibility of adapting software on-the-fly without a need to recompile the code. All required libraries are listed in both section \ref{design-libraries} and in source code in \textit{source/requirements3.txt} file.
  
  
 \section{Project of a system} \label{project}
@@ -137,29 +137,29 @@ The main idea of this model is presented in the figure \ref{client}.
  
  
 \subsection{Libraries} \label{design-libraries}
-This project was designed to be portable across different platforms and to have minimal dependencies. It uses Python platform and libraries that are freely available via pip, the Python package installer.
+This project is designed to be portable across different platforms and to have minimal dependencies. It will use Python platform and libraries that are freely available via pip, the Python package installer.
 
-Platform dependencies that must be installed by user:
+Platform dependencies that will have to be installed by user:
 \begin{itemize}
 	\item \textbf{Python 3.5.1} - the Python language interpreter.
 	\item\textbf{pip 8.1.2} - Python package installer.
 \end{itemize}
 
-Used libraries that available in default Python 3.5 installation and thus do not require additional steps to install:
+Libraries that are available in default Python 3.5 installation and thus will not require additional steps to install:
 \begin{itemize}
-	\item \textbf{multiprocessing} - used for parallelisation mechanisms. Contains basic shared memory data structeres and allows for usage of processes. Processes were chosen over threads because they are not blocked by Python's Global Interpreter Lock (GIL) and allow to execute tasks in parallel not only localy, but also over network.
-	\item \textbf{xml.sax} - used to access XML files using streams. Allows to open files that are to big to fit in memory.
+	\item \textbf{multiprocessing} - will be used for parallelisation mechanisms. Contains basic shared memory data structures and allows for usage of processes. Processes will be chosen over threads because they are not blocked by Python's Global Interpreter Lock (GIL) and allow to execute tasks in parallel not only locally, but also over network.
+	\item \textbf{xml.sax} - will be used to access XML files using streams. Allows to open files that are too big to fit in memory.
 \end{itemize}
 
 External Python libraries that can be installed using pip:
 \begin{itemize}
 	\item \textbf{nltk 3.2.1} - Natural Language ToolKit - is used for word stemming thanks to build-in WordNet
-	\item \textbf{SQLAlchemy 1.0.14} - library used for database queries. It is optional, as this project uses database as a cache only when requested by user. By default a sqlite database is used as a backend because it does not have any additional requirements and is very portable. While its performance may suffer as it does not offer any database management system, it is not the problem in project's implementation.
+	\item \textbf{SQLAlchemy 1.0.14} - library that will be used for database queries. It is optional, as this project uses database as a cache only when requested by user. By default a sqlite database will be used as a backend because it does not have any additional requirements and is very portable. While its performance may suffer as it does not offer any database management system, it is not the problem in project's implementation.
 \end{itemize}
 
 
 \subsection{Application release}
-Presented solution was developed as an open-source application under GPLv2 license and is freely available to everyone. Its both source code and documentation are available online at \href{https://github.com/macsz/parallel-wiki-classifier}{git repository\footnote{https://github.com/macsz/parallel-wiki-classifier} hosted on GitHub}.
+Presented solution will be developed as an open-source application under GPLv2 license and will be freely available to everyone. Its both source code and documentation will be available online at \href{https://github.com/macsz/parallel-wiki-classifier}{git repository\footnote{https://github.com/macsz/parallel-wiki-classifier} hosted on GitHub}.
 
 
 \section{Conclusion}
