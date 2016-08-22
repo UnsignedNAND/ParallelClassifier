@@ -1,10 +1,13 @@
-\chapter{System design}
-\label{des}
+\chapter{System design} \label{des}
 \section{Introduction}
-This chapter defines aim of the project and specifies potential users of the application. Secondly it describes functional, non functional, hardware, software and quality requirements. In next section, the project of the system is presented by UML and classes diagrams. Finally most important libraries used for document classification are defined. 
-
+This chapter defines aim of the project and specifies potential users of the application. Secondly, it breaks down requirements that were set for this project into separate sections - functional, non-functional, hardware, software and quality -  where they are described in detail. Next, the project of the system is presented by UML and classes diagrams. Finally, the most important libraries used for document classification framework are defined.
 
 \section{Aim of the project}
+TODO
+Main aim of this project is to develop a platform for automated text document classification. 
+
+Classificator should implement a dual-layer model. In first layer a kNN algorithm is used , general decision would be made that narrows set of potential membership classes.
+
 Main aim of this project is to develop platform for automated text document classification. Proposed solution should be capable of classificating text documents with a focus on parallel execution of algorithms.
 
 
@@ -15,8 +18,16 @@ It should also indicate how
 The project may become a useful tool used for 
 
 
+Celem pracy jest  budowa w środowisku równoległym narzędzia do kategoryzacji dokumentów tekstowych. Klasyfikator oparty zostanie na modelu warstwowym: w pierwszej warstwie dokonywana będzie ogólna decyzja zawężająca zbiór potencjalnych możliwych klas. Wykorzystany do tego zostanie prosty klasyfikator minimalno odległościowy kNN. Uszczegółowienie i poprawa precyzji wykonana zostanie z użyciem bardziej złożonego podejścia wektorów wspierających (SVM), dla którego jest już wykonana implementacja.  W realizacji położyć należy nacisk na rozwiązanie problemów wielkoskalowości danych, które mogą nie mieścić się w pamięci. Drugie zagadnienie – wydajne przeprowadzenie obliczeń uzyskane ma zostać przy wykorzystaniu dużej liczy jednostek obliczeniowych, dla których zbudowany zostanie algorytm efektywnego przydziału zadań.
+Maciej
+1.	Opracowanie architektury klasyfikatora 
+2.	Implementacja algorytmu minimalno odległościowego i podłączenie SVM.
+3.	Implementacja mechanizmu dystrybucji zadań 
+Ocena uzyskanych rezultatów w eksperymentach na klastrze
+
 
 \section{Potential users}
+TODO
 \label{users}
 
 The application will be dedicated mainly to 
@@ -25,9 +36,11 @@ On the other hand users who ........ will also be able to use this tool to
 
 
 \section{System requirements}
+TODO
 In this section requirements for
 
 \subsection{General requirements}
+TODO
 
 \begin{enumerate}
 
@@ -52,8 +65,7 @@ In future it can be expanded with ....... This fact indicates the prospectivenes
 \end{enumerate}
 
 \subsection{Functional requirements}
-
-
+TODO
 Diagram presented in the figure \ref{functional} shows general functional requirements available in the application. The aim of the diagram is to describe possible interactions between actors and functions offered by the application. Each oval shows a single use case within which different flows called scenarios may occur. Every use case characterizes possible system functionalities and defines steps that lead to the effect observable by the actor. A dependency marked as \textbf{extend} describes some additional behavior, which in some cases may be included into the base use case. 
 The base use case is the one which is pointed by the arrowhead of the connection. The extend use case continues the behavior of the base use case by inserting additional actions into the base sequence when the appropriate extension point is reached in the base use case and the extension condition is filled. An \textbf{include} dependency is a relationship which describes the inclusion of another use case responsible for different behavior. The including dependency is the one pointed by the arrowhead of the connection.
 
@@ -67,6 +79,7 @@ Descriptions of all of the use cases including their initial, alternative and re
 < tutaj tabelka>
     
 \subsection{Non functional requirements}
+TODO
 \textbf{Quality requirements}
 
 
@@ -84,13 +97,12 @@ In order to use the application the following software and hardware requirements
 \subsection{Hardware and software requirements}
 In this section software and hardware requirements are described.
 
-
 \subsubsection{Hardware requirements}
 This application was tested on various hardware configuration and has proven to work reliable on even older machines. Although the following configuration is not a server-grade hardware, it allows to execute flow of the application without running out of available resources in most of the presented test cases. Consider it as a recommended minimal configuration.
 \begin{itemize}
 	\item Processor - recomended is at least a quad-core processor. Usage of technologies like Intel's HyperThreading is not advised and the number of spawned child processes should not exceed the number of physical cores. Application relies heavily on reads and writes to shared memory, thus limiting use of virtual cores (\cite{performance_ht}). Processor used during tests was an Intel i7 with 4 physical cores and 8 logical processors.
 	\item System memory - has the greatest impact on performance of the application. The more memory, the less caching mechanisms will be used. Caching uses hard drives as a backend for storing processed documents, which greatly affects overall performance and execution time. Machine with 16 GB DDR3 memory was used during tests.
-	\item Hard drives - speed of reads and writes to hard drives is a crucial factor during startup of application and in case of using cache. SSD drive should be considered in place of standard hard drive due to higher speeds of reads and writes and linear latency of access. A SSD drive connected to PCI-e slot was used during tests. TODO cite https://goo.gl/VyZW7S str 381
+	\item Hard drives - speed of reads and writes to hard drives is a crucial factor during startup of application and in case of using cache. SSD drive should be considered in place of standard hard drive due to higher speeds of reads and writes and O(1) latency of access \cite{performance_hdd_ssd}. A SSD drive connected to PCI-e slot was used during tests.
 \end{itemize}
 
 
@@ -100,8 +112,7 @@ There are no specified requirements about the operating system installed on the 
 Taking software requirements into consideration, a Python interpreter must be installed on a machine along with a set of libraries. Python is an interpreted language that provides good performance, scalability features and possibility of adapting software on-the-fly without a need to recompile the code. All required libraries are listed in both section \ref{design-libraries} and in source code in \textit{source/requirements3.txt} file.
  
  
-\section{Project of a system}
-\label{project}
+\section{Project of a system} \label{project}
 This section provides the project of the described solution for......
 
  The project was presented by the diagrams employed in UML (Unified Modeling Language), a standard notation for the modeling of real-world objects and systems. 
@@ -113,16 +124,19 @@ The activity diagram shows the logic of workflows of step-wise actions. Rectangl
 
 
 \subsection{Sequence diagram of processing frames}
+TODO
 
 
 
 \subsection{Diagram of classes}
+TODO
 A diagram of classes (figure \ref{classes})is one of the most popular UML diagrams. Rectangles show classes, their attributes and methods. Association connections were used to present relations between entities. Classes communicates with each other by sending messages (by association connections) and as a result they are able to fill tasks presented on the dynamic diagrams, for example use case model \ref{tab:tableusecase}.
 
  
   
 
 \subsection{Architecture}
+TODO
 The whole application will be based on ....... model. It is a distributed application structure that partitions tasks between the ..........
 
 
@@ -136,16 +150,12 @@ This project was designed to be portable across different platforms and to have 
 
 Platform dependencies that must be installed by user:
 \begin{itemize}
-	\item \textbf{Python 3.5.1} - the Python language interpreter. Version 3.5 was chosen over 2.7 because of perfo
-	\item\textbf{pip 8.1.2} - Python package installer
+	\item \textbf{Python 3.5.1} - the Python language interpreter.
+	\item\textbf{pip 8.1.2} - Python package installer.
 \end{itemize}
 
 Used libraries that available in default Python 3.5 installation and thus do not require additional steps to install:
 \begin{itemize}
-	\item \textbf{argparse} - used to parse command line arguments passed to run file
-	\item \textbf{configparser} - used to parse configuration file. Configuration file is placed in source code main directory (source/wiki.conf).
-	\item \textbf{datetime, time, timeit} - used for logging time of events and for accurate performance time measurements
-	\item \textbf{logging} - used for application logging. Does not cause locks when executed in parallel.
 	\item \textbf{multiprocessing} - used for parallelisation mechanisms. Contains basic shared memory data structeres and allows for usage of processes. Processes were chosen over threads because they are not blocked by Python's Global Interpreter Lock (GIL) and allow to execute tasks in parallel not only localy, but also over network.
 	\item \textbf{xml.sax} - used to access XML files using streams. Allows to open files that are to big to fit in memory.
 \end{itemize}
@@ -158,12 +168,11 @@ External Python libraries that can be installed using pip:
 
 
 \subsection{Application release}
-Presented solution from the start was developed as an open-source application. Its source code is available online
-Presented solution along with documentation is available to browse and download at 
+Presented solution was developed as an open-source application under GPLv2 license and is freely available to everyone. Its both source code and documentation are available online at \href{https://github.com/macsz/parallel-wiki-classifier}{git repository\footnote{https://github.com/macsz/parallel-wiki-classifier} hosted on GitHub}.
 
 
 \section{Conclusion}
-This 
+TODO
 This chapter includes a complete description of the methodology used to prepare analysis of the requirements for the created application. The proposed algorithm takes advantage of the possibilities of new technologies to .......
 
 Moreover the project of the system was also described and presented taking into consideration all of the specified requirements.
