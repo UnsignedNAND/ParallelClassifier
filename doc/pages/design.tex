@@ -4,27 +4,20 @@ This chapter defines aim of the project and specifies potential users of the app
 
 \section{Aim of the project}
 TODO
-Main aim of this project is to develop a platform for automated text document classification. 
 
-Classificator should implement a dual-layer model. In first layer a kNN algorithm is used , general decision would be made that narrows set of potential membership classes.
+Main aim of this project is to develop platform for automated text document classification. Proposed solution will be capable of classificating text documents with a focus on parallel execution of algorithms. Classificator will implement a dual-layer model. In first layer a k-Nearest-Neighbors [\ref{soa-knn}] algorithm will be used for a general decision narrowing the set of possible membership classes. More detailed and precise classification decision will be made by second layer with Support Vector Machine [\ref{soa-svm}] algorithm.
 
-Main aim of this project is to develop platform for automated text document classification. Proposed solution should be capable of classificating text documents with a focus on parallel execution of algorithms.
+The application will be created with the intent of providing a complete set of tools for text document classification and documenting usability of various machine learning algorithms. This includes:
+\begin{itemize}
+	\item \textbf{feature extraction} - creating feature vectors for text documents, methods for reducing vectors dimensionality,
+	\item \textbf{clusterization} - finding groups of similar documents that would define clusters,
+	\item \textbf{classification} - defining position of new documents in cluster space and finding its best matching group membership
+	\item \textbf{algorithms performance tests and results} - all algorithms will be tested with various parameters and the results will be described.
+\end{itemize}
 
+Final solution should also indicate how complex is the computation part and how crucial it is to design a system that supports executing tasks in parallel, distributes workloads in efficient manner between available worker processes and makes a proper use of all available resources.
 
-The application will be created with the intent of 
-
-It should also indicate how 
-
-The project may become a useful tool used for 
-
-
-Celem pracy jest  budowa w środowisku równoległym narzędzia do kategoryzacji dokumentów tekstowych. Klasyfikator oparty zostanie na modelu warstwowym: w pierwszej warstwie dokonywana będzie ogólna decyzja zawężająca zbiór potencjalnych możliwych klas. Wykorzystany do tego zostanie prosty klasyfikator minimalno odległościowy kNN. Uszczegółowienie i poprawa precyzji wykonana zostanie z użyciem bardziej złożonego podejścia wektorów wspierających (SVM), dla którego jest już wykonana implementacja.  W realizacji położyć należy nacisk na rozwiązanie problemów wielkoskalowości danych, które mogą nie mieścić się w pamięci. Drugie zagadnienie – wydajne przeprowadzenie obliczeń uzyskane ma zostać przy wykorzystaniu dużej liczy jednostek obliczeniowych, dla których zbudowany zostanie algorytm efektywnego przydziału zadań.
-Maciej
-1.	Opracowanie architektury klasyfikatora 
-2.	Implementacja algorytmu minimalno odległościowego i podłączenie SVM.
-3.	Implementacja mechanizmu dystrybucji zadań 
-Ocena uzyskanych rezultatów w eksperymentach na klastrze
-
+The project may become a useful tool not only as a base framework for data scientists, but also for writers whom it should aid assigning a proper label to the document.
 
 \section{Potential users}
 TODO
