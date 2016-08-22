@@ -3,15 +3,13 @@
 This chapter defines aim of the project and specifies potential users of the application. Secondly, it breaks down requirements that were set for this project into separate sections - functional, non-functional, hardware, software and quality -  where they are described in detail. Next, the project of the system is presented by UML and classes diagrams. Finally, the most important libraries used for document classification framework are defined.
 
 \section{Aim of the project}
-TODO
-
 Main aim of this project is to develop platform for automated text document classification. Proposed solution will be capable of classificating text documents with a focus on parallel execution of algorithms. Classificator will implement a dual-layer model. In first layer a k-Nearest-Neighbors [\ref{soa-knn}] algorithm will be used for a general decision narrowing the set of possible membership classes. More detailed and precise classification decision will be made by second layer with Support Vector Machine [\ref{soa-svm}] algorithm.
 
 The application will be created with the intent of providing a complete set of tools for text document classification and documenting usability of various machine learning algorithms. This includes:
 \begin{itemize}
 	\item \textbf{feature extraction} - creating feature vectors for text documents, methods for reducing vectors dimensionality,
 	\item \textbf{clusterization} - finding groups of similar documents that would define clusters,
-	\item \textbf{classification} - defining position of new documents in cluster space and finding its best matching group membership
+	\item \textbf{classification} - defining position of new documents in cluster space and finding its best matching group membership,
 	\item \textbf{algorithms performance tests and results} - all algorithms will be tested with various parameters and the results will be described.
 \end{itemize}
 
