@@ -21,7 +21,7 @@ class Classification(multiprocessing.Process):
                 existing_doc = self.parsed_docs[doc_id]
                 distance = calc_distance(self.new_doc, existing_doc)
                 self.class_distances[doc_id] = distance
-            except IndexError:
+            except:
                 # there is no document with such ID, distance is -1
                 self.class_distances[doc_id] = -1
 
