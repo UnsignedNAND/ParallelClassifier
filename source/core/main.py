@@ -143,7 +143,7 @@ def cluster():
     global distances
     LOG.info('Starting clusterization using {0} processes'.format(process_num))
     manager = multiprocessing.Manager()
-    doc
+    doc_class = manager.dict()
 
     center_num = int(CONF['clusterization']['centers'])
     initial_centers = initialize_cluster_centers(
@@ -165,7 +165,8 @@ def cluster():
             shift=process_num,
             distances=distances,
             parsed_docs=parsed_docs,
-            largest_id=largest_id
+            largest_id=largest_id,
+            doc_class=doc_class
         )
         cluster_p.start()
         cluster_ps.append(cluster_p)
