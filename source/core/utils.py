@@ -70,8 +70,8 @@ def str_1d_as_2d(arr, size):
     return s
 
 
-def initialize_cluster_centers(center_num, start, end, docs_num, distances):
-    if docs_num < center_num:
+def initialize_cluster_centers(center_num, start, end, parsed_docs):
+    if len(parsed_docs) < center_num:
         msg = 'Trying to select more centers ({0})than documents' \
               '{1}.'.format(center_num, end - start)
         raise Exception(msg)
@@ -82,7 +82,7 @@ def initialize_cluster_centers(center_num, start, end, docs_num, distances):
             center_id = random.randint(start, end)
             if center_id in centers.keys():
                 continue
-            if distances[center_id] < 0:
+            if center_id not in parsed_docs.keys():
                 continue
             break
         cc = ClusterCenter()
