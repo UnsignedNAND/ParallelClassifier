@@ -19,7 +19,7 @@ CONF = get_conf()
 LOG = get_log()
 parsed_docs = {}
 largest_id = -1
-process_num = int(CONF['general']['processes'])
+PROCESSES = int(CONF['general']['processes'])
 distances = None
 class_distances = None
 tokens_idf = {}
@@ -33,7 +33,7 @@ def _receive_parsed_docs(queue_parsed_docs):
         doc = queue_parsed_docs.get()
         if not doc:
             processes_returned += 1
-            if processes_returned == process_num:
+            if processes_returned == PROCESSES:
                 break
         else:
             docs[doc.id] = doc
@@ -56,7 +56,7 @@ def parse():
     pipe_tokens_to_idf_parent, pipe_tokens_to_idf_child = multiprocessing.Pipe()
     pipes_tokens_to_processes_parent = []
     pipes_tokens_to_processes_child = []
-    for i in range(process_num):
+    for i in range(PROCESSES):
         pipe_tokens_to_processes_parent, pipe_tokens_to_processes_child = \
             multiprocessing.Pipe()
         pipes_tokens_to_processes_parent.append(pipe_tokens_to_processes_parent)
@@ -78,21 +78,21 @@ def parse():
         event=event,
         pipes_tokens_to_processes_child=pipes_tokens_to_processes_child,
         queue_parsed_docs=queue_parsed_docs,
-        process_num=process_num
+        process_num=PROCESSES
     )
     ps_idf = IDF(
         pipe_tokens_to_idf_parent=pipe_tokens_to_idf_parent,
         docs_num=int(CONF['general']['item_limit']),
         event=event,
         pipes_tokens_to_processes_parent=pipes_tokens_to_processes_parent,
-        process_num=process_num
+        process_num=PROCESSES
     )
 
     # read all the articles from XML and do TF-IDF
     ps_reader.start()
 
     LOG.info("Started processing documents using {0} processes".format(
-        process_num))
+        PROCESSES))
     for ps_parser in ps_parsers:
         ps_parser.start()
     ps_idf.start()
@@ -114,15 +114,15 @@ def parse():
 def distance():
     global distances
     LOG.info('Starting calculating distance using {0} processes'.format(
-        process_num)
+        PROCESSES)
     )
     distances = multiprocessing.Array('d', (largest_id+1)*(largest_id+1))
 
     dist_ps = []
-    for i in range(process_num):
+    for i in range(PROCESSES):
         dist_p = Distance(
             iteration_offset=i,
-            iteration_size=process_num,
+            iteration_size=PROCESSES,
             distances=distances,
             largest_id=largest_id,
             parsed_docs=parsed_docs
@@ -141,37 +141,48 @@ def distance():
 @timer
 def cluster():
     global distances
-    LOG.info('Starting clusterization using {0} processes'.format(process_num))
-    manager = multiprocessing.Manager()
-    doc_class = manager.dict()
+    LOG.info('Starting clusterization using {0} processes'.format(PROCESSES))
 
     center_num = int(CONF['clusterization']['centers'])
-    initial_centers = initialize_cluster_centers(
+    centers = initialize_cluster_centers(
         center_num=center_num,
         start=0,
         end=largest_id,
         parsed_docs=parsed_docs
     )
-    LOG.debug('Generated initial centers: {0}'.format(len(initial_centers)))
+    LOG.debug('Generated initial centers: {0}'.format(len(centers)))
     LOG.debug('Centers are documents with IDs: {0}'
-              .format(sorted([initial_centers[cid].center_id for cid
-                              in initial_centers.keys()])))
+              .format(sorted(list(centers.keys()))))
 
-    # create processes
     cluster_ps = []
-    for pid in range(process_num):
+    pipe_receive_results, pipe_send_results = multiprocessing.Pipe()
+
+    for pid in range(PROCESSES):
+        pipe_send_centers, pipe_receive_centers = multiprocessing.Pipe()
         cluster_p = Clusterization(
             offset=pid,
-            shift=process_num,
-            distances=distances,
+            shift=PROCESSES,
+            pipe_send_centers=pipe_send_centers,
+            pipe_receive_centers=pipe_receive_centers,
             parsed_docs=parsed_docs,
+            distances=distances,
             largest_id=largest_id,
-            doc_class=doc_class
+            pipe_send_results=pipe_send_results,
         )
         cluster_p.start()
+        cluster_p.pipe_send_centers.send(list(centers.keys()))
         cluster_ps.append(cluster_p)
 
+    not_finished = PROCESSES
+    while not_finished:
+        recv = pipe_receive_results.recv()
+        if not recv:
+            not_finished -= 1
+        else:
+            print(recv)
+
     for cluster_p in cluster_ps:
+        cluster_p.pipe_send_centers.send(None)
         cluster_p.join()
 
     # pipe_results_parent, pipe_results_child = multiprocessing.Pipe()
@@ -293,10 +304,10 @@ def classify():
             new_doc = _prepare_new_doc(doc)
             class_distances = multiprocessing.Array('d', (largest_id + 1))
             class_ps = []
-            for i in range(process_num):
+            for i in range(PROCESSES):
                 class_p = Classification(
                     iteration_offset=i,
-                    iteration_size=process_num,
+                    iteration_size=PROCESSES,
                     class_distances=class_distances,
                     largest_id=largest_id,
                     parsed_docs=parsed_docs,
