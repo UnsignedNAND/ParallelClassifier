@@ -28,6 +28,12 @@ arg_parser.add_argument(
     help='Forces log level to DEBUG'
 )
 arg_parser.add_argument(
+    '--no-debug',
+    default=False,
+    action='store_true',
+    help='Forces log level to INFO'
+)
+arg_parser.add_argument(
     '--clean',
     default=False,
     action='store_true',
@@ -68,6 +74,9 @@ args = arg_parser.parse_args()
 def process():
     if args.debug:
         LOG.setLevel(logging.DEBUG)
+
+    if args.no_debug:
+        LOG.setLevel(logging.INFO)
 
     if args.clean:
         Db.clean()

@@ -10,6 +10,7 @@ from core.process.parser import create_parsers
 from core.process.reader import Reader
 from core.utils import str_1d_as_2d, initialize_cluster_centers
 from data.db import Db, Models
+from models.cluster.cluster_center import ClusterCenter
 from models.page import Page
 from utils.config import get_conf
 from utils.log import get_log
@@ -141,6 +142,7 @@ def distance():
 @timer
 def cluster():
     global distances
+    global parsed_docs
     LOG.info('Starting clusterization using {0} processes'.format(PROCESSES))
 
     center_num = int(CONF['clusterization']['centers'])
@@ -150,6 +152,7 @@ def cluster():
         end=largest_id,
         parsed_docs=parsed_docs
     )
+    new_centers = {}
     LOG.debug('Generated initial centers: {0}'.format(len(centers)))
     LOG.debug('Centers are documents with IDs: {0}'
               .format(sorted(list(centers.keys()))))
@@ -170,12 +173,18 @@ def cluster():
             pipe_send_results=pipe_send_results,
         )
         cluster_p.start()
-        cluster_p.pipe_send_centers.send(list(centers.keys()))
         cluster_ps.append(cluster_p)
 
     iteration = 0
     iteration_limit = int(CONF['clusterization']['iterations_limit'])
+    changed = False
+    docs_num = 0
     while iteration < iteration_limit:
+        docs_num = 0
+        LOG.debug('Iteration: {0}/{1}'.format(iteration, iteration_limit))
+        for cluster_p in cluster_ps:
+            cluster_p.pipe_send_centers.send(list(centers.keys()))
+        new_centers = {}
         not_finished = PROCESSES
         while not_finished:
             recv = pipe_receive_results.recv()
@@ -186,98 +195,34 @@ def cluster():
                 did = recv['did']
                 dist = recv['dist']
                 centers[cid].add_doc(doc_id=did, distance=dist)
-
+                parsed_docs[did].center_id = cid
         for cid in centers:
-            print(centers[cid])
-        # if there was change - send new centers and move to another iter
+            docs_num += len(centers[cid].doc_ids)
+        for cid in centers:
+            new_cid = centers[cid].find_closest_doc_to_average()
+            if not centers[cid].center_changed:
+                new_cid = cid
+            new_center = ClusterCenter()
+            new_center.doc_ids = {}
+            new_center.pre_doc_ids = {}
+            new_center.center_id = new_cid
+            new_centers[new_cid] = new_center
+            if cid != new_cid:
+                changed = True
+
+        if not changed:
+            break
+        centers = new_centers
         iteration += 1
+
     LOG.debug('Finished after {0} iteration(s)'.format(iteration))
 
     for cluster_p in cluster_ps:
         cluster_p.pipe_send_centers.send(None)
         cluster_p.join()
-
-    # pipe_results_parent, pipe_results_child = multiprocessing.Pipe()
-    # cluster_ps = []
-    # pipes_centers = []
-    #
-    # LOG.debug('Starting with centers: {0}'.format(sorted(centers.keys())))
-    #
-    # for i in range(process_num):
-    #     pipe_centers_parent, pipe_centers_child = multiprocessing.Pipe()
-    #     pipes_centers.append((pipe_centers_parent, pipe_centers_child))
-    #     cluster_p = Clusterization(
-    #         pipe_results_child=pipe_results_child,
-    #         iteration_offset=i,
-    #         iteration_size=process_num,
-    #         distances=distances,
-    #         pipe_centers_child=pipe_centers_child,
-    #         largest_id=largest_id
-    #     )
-    #     cluster_p.start()
-    #     cluster_ps.append(cluster_p)
-    #
-    # changes = int(CONF['clusterization']['centers'])  # 1st ending condition
-    # iterations = 0
-    # while changes:
-    #     if int(CONF['clusterization']['iterations_limit']) <= iterations:
-    #         LOG.info('Clusterization hit iterations hard limit ({0})'.format(
-    #             CONF['clusterization']['iterations_limit']
-    #         ))
-    #         break
-    #     iterations += 1
-    #     LOG.debug('{0} Iteration {1} {2}'.format('-'*10, iterations, '-'*10))
-    #     changes = int(CONF['clusterization']['centers'])
-    #     not_finished = process_num
-    #     new_centers = {}
-    #     for (pipe_center_parent,_) in pipes_centers:
-    #         pipe_center_parent.send(centers)
-    #
-    #     while not_finished:
-    #         recv = pipe_results_parent.recv()
-    #         if not recv:
-    #             not_finished -= 1
-    #         else:
-    #             centers[recv['closest_center_id']].add_doc(
-    #                 doc_id=recv['doc_id'],
-    #                 distance=recv['distance']
-    #             )
-    #     new_centers = {}
-    #     for cid in centers:
-    #         center = centers[cid]
-    #         LOG.debug(str(center))
-    #         center.find_closest_doc_to_average()
-    #         if not center.center_changed:
-    #             changes -= 1
-    #         LOG.debug('{0} Closest to avg: {1} '.format(
-    #             center.center_changed,
-    #             center.center_id
-    #         ))
-    #         # moving documents assigned to this center to backup list so they
-    #         # do not get lost if this is the last iteration
-    #         center.pre_doc_ids = centers[cid].doc_ids
-    #         center.doc_ids = {}
-    #         new_centers[center.center_id] = center
-    #     centers = new_centers
-    #
-    # for cid in centers.keys():
-    #     center = centers[cid]
-    #     msg = '\nCenter: {1} [{0}]'.format(
-    #         center.center_id,
-    #         parsed_docs[center.center_id].title
-    #     )
-    #     for did in center.pre_doc_ids:
-    #         parsed_docs[did].center_id = center.center_id
-    #         msg += '\n{0} - {1}'.format(did, parsed_docs[did].title)
-    #     LOG.debug(msg)
-    #
-    # for (pipe_center_parent, _) in pipes_centers:
-    #     # send pills to processes
-    #     pipe_center_parent.send(None)
-    #
-    # for cluster_p in cluster_ps:
-    #     cluster_p.join()
-    # LOG.info('Finished clusterization in {0} iterations'.format(iterations))
+    print('Docs sum: ', docs_num)
+    print('parsed docs: ', len(parsed_docs))
+    print('centers:', len(centers))
 
 
 @timer
@@ -352,6 +297,9 @@ def classify():
             LOG.info('New doc ({0}) classified as belonging to {1} : {2}'.
                      format(new_doc.title, new_doc.center_id,
                      parsed_docs[new_doc.center_id].title))
+            print([parsed_docs[doc].title for doc in parsed_docs if
+                   parsed_docs[doc].center_id ==
+                   new_doc.center_id])
 
     else:
         LOG.info('No documents to classify')

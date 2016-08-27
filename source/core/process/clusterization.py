@@ -23,6 +23,10 @@ class Clusterization(multiprocessing.Process):
         self.centers = self.pipe_receive_centers.recv()
 
     def _closest_center_id_for_doc_id(self, did):
+        try:
+            test = self.parsed_docs[did]
+        except:
+            return None
         closest_cid = None
         closest_cid_distance = -100
         for cid in self.centers:
@@ -39,13 +43,18 @@ class Clusterization(multiprocessing.Process):
     def _find_closest_docs_to_center(self):
         did = self.offset
         while did < self.largest_id:
-            closest_cid, distance = self._closest_center_id_for_doc_id(did)
-            self.pipe_send_results.send({
-                'cid': closest_cid,
-                'did': did,
-                'dist': distance,
-            })
-            did += self.shift
+            try:
+                ret = self._closest_center_id_for_doc_id(did)
+                if ret:
+                    closest_cid, distance = ret
+                    self.pipe_send_results.send({
+                        'cid': closest_cid,
+                        'did': did,
+                        'dist': distance,
+                    })
+                did += self.shift
+            except Exception as ex:
+                print(ex)
         self.pipe_send_results.send(None)
 
     def run(self):
