@@ -22,7 +22,7 @@ class ClusterCenter(object):
     def add_doc(self, doc_id, distance):
         self.doc_ids[doc_id] = {
             'doc_id': doc_id,
-            'distance': distance,  # distance to the closest center
+            'distance': distance,  # distance to this center
         }
         self.avg_distance += (distance - self.avg_distance) / len(
             self.doc_ids)

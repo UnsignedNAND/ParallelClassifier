@@ -29,22 +29,21 @@ class Clusterization(multiprocessing.Process):
             cid_distance = self.distances[coord_2d_to_1d(cid, did,
                                                          self.largest_id)]
             if closest_cid_distance < cid_distance:
-                print('did {0} new closest cid {1} with {2}, old {3}'.format(
-                    did, cid, cid_distance, closest_cid_distance))
                 closest_cid = cid
                 closest_cid_distance = cid_distance
         if closest_cid is None:
             raise Exception('Error in finding closest '
                             'distance doc_id:{0}'.format(did))
-        return closest_cid
+        return closest_cid, closest_cid_distance
 
     def _find_closest_docs_to_center(self):
         did = self.offset
         while did < self.largest_id:
-            closest_cid = self._closest_center_id_for_doc_id(did)
+            closest_cid, distance = self._closest_center_id_for_doc_id(did)
             self.pipe_send_results.send({
                 'cid': closest_cid,
                 'did': did,
+                'dist': distance,
             })
             did += self.shift
         self.pipe_send_results.send(None)

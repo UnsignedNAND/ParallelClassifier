@@ -173,13 +173,25 @@ def cluster():
         cluster_p.pipe_send_centers.send(list(centers.keys()))
         cluster_ps.append(cluster_p)
 
-    not_finished = PROCESSES
-    while not_finished:
-        recv = pipe_receive_results.recv()
-        if not recv:
-            not_finished -= 1
-        else:
-            print(recv)
+    iteration = 0
+    iteration_limit = int(CONF['clusterization']['iterations_limit'])
+    while iteration < iteration_limit:
+        not_finished = PROCESSES
+        while not_finished:
+            recv = pipe_receive_results.recv()
+            if not recv:
+                not_finished -= 1
+            else:
+                cid = recv['cid']
+                did = recv['did']
+                dist = recv['dist']
+                centers[cid].add_doc(doc_id=did, distance=dist)
+
+        for cid in centers:
+            print(centers[cid])
+        # if there was change - send new centers and move to another iter
+        iteration += 1
+    LOG.debug('Finished after {0} iteration(s)'.format(iteration))
 
     for cluster_p in cluster_ps:
         cluster_p.pipe_send_centers.send(None)
