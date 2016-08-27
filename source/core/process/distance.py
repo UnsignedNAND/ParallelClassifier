@@ -45,7 +45,7 @@ class Distance(multiprocessing.Process):
             except:
                 # there is no document with such ID, fill it with -1
                 # distances
-                for col in range(row):
+                for col in range(row+1):
                     self.distances[
                         coord_2d_to_1d(col, row, (self.largest_id + 1))
                     ] = -1

@@ -4,48 +4,63 @@ from core.utils import coord_2d_to_1d
 
 
 class Clusterization(multiprocessing.Process):
-    centers = {}
 
-    def __init__(self, pipe_results_child, iteration_offset, iteration_size,
-                 distances, pipe_centers_child, largest_id):
-        self.iteration_offset = iteration_offset
-        self.iteration_size = iteration_size
-        self.distances = distances
-        self.pipe_results_child = pipe_results_child
-        self.pipe_centers_child = pipe_centers_child
-        self.largest_id = largest_id
+    def __init__(self, offset, shift, pipe_send_centers,
+                 pipe_receive_centers, parsed_docs, distances, largest_id,
+                 pipe_send_results):
         super(self.__class__, self).__init__()
+        self.centers = {}
+        self.offset = offset
+        self.shift = shift
+        self.pipe_send_centers = pipe_send_centers
+        self.pipe_receive_centers = pipe_receive_centers
+        self.parsed_docs = parsed_docs
+        self.distances = distances
+        self.largest_id = largest_id + 1
+        self.pipe_send_results = pipe_send_results
 
     def _receive_centers(self):
-        self.centers = self.pipe_centers_child.recv()
+        self.centers = self.pipe_receive_centers.recv()
+
+    def _closest_center_id_for_doc_id(self, did):
+        try:
+            test = self.parsed_docs[did]
+        except:
+            return None
+        closest_cid = None
+        closest_cid_distance = -100
+        for cid in self.centers:
+            cid_distance = self.distances[coord_2d_to_1d(cid, did,
+                                                         self.largest_id)]
+            if closest_cid_distance < cid_distance:
+                closest_cid = cid
+                closest_cid_distance = cid_distance
+        if closest_cid is None:
+            raise Exception('Error in finding closest '
+                            'distance doc_id:{0}'.format(did))
+        return closest_cid, closest_cid_distance
 
     def _find_closest_docs_to_center(self):
-        doc_id = self.iteration_offset
-        while doc_id < (self.largest_id + 1):
-            if self.distances[doc_id] >= 0:
-                closest_center = None
-                closest_center_distance = None
-                for center_id in self.centers:
-                    center_distance = self.distances[
-                        coord_2d_to_1d(center_id, doc_id, self.largest_id + 1)
-                    ]
-                    if closest_center_distance is None or \
-                                    closest_center_distance < center_distance:
-                        closest_center_distance = center_distance
-                        closest_center = center_id
-                self.pipe_results_child.send(
-                    {
-                        'doc_id': doc_id,
-                        'closest_center_id': closest_center,
-                        'distance': closest_center_distance,
-                    }
-                )
-            doc_id += self.iteration_size
-        self.pipe_results_child.send(None)
+        did = self.offset
+        while did < self.largest_id:
+            try:
+                ret = self._closest_center_id_for_doc_id(did)
+                if ret:
+                    closest_cid, distance = ret
+                    self.pipe_send_results.send({
+                        'cid': closest_cid,
+                        'did': did,
+                        'dist': distance,
+                    })
+                did += self.shift
+            except Exception as ex:
+                print(ex)
+        self.pipe_send_results.send(None)
 
     def run(self):
         while True:
             self._receive_centers()
             if not self.centers:
+                print(self.name, 'Received None')
                 break
             self._find_closest_docs_to_center()
