@@ -75,7 +75,33 @@ To present more detailed interactions, use cases from following categories were 
 Descriptions of all of the use cases including their initial, alternative and results were collected in the table \ref{tab:tableusecase}.
 \vspace{5em}
 
-<tutaj tabelka>
+\begin{longtable}{| p{2.5cm} | p{2.3cm} | p{2.2cm} | p{2cm} | p{2.5cm} |}
+\hline
+\textbf{Use case}       &\parbox[t]{5cm}{\textbf{Initial\\conditions}} &\textbf{Alternative conditions} &\parbox[t]{5cm}{\textbf{Results}} &\textbf{Description}\\\hline
+
+starts the application     &code of the application was downloaded/cloned  &any   &application is running   &a user starts application via CLI - command line interpreter/interfce \\\hline
+
+groups documents into clusters     &the code of the application is accessible to a user, the application was started, set of documents that will form clusters is available      &classifies new document   &documents from a given set are grouped into created groups based on their similarity   &a user starts the application and use option that gropus documents into specific number of clusters\\\hline
+
+selects the number of groups to create &the application was started, the user wants to group documents &any   &parameter that specifies number of groups is passed to the application by setting it with the application option &the user starts the application and use option that gropus documents followed by option that specifies number of clusters\\\hline
+
+selects centers of the groups         &the user chose option \textbf{group documents into clusters}, set of documents that will form clusters is available    &any   &centers of the groups are defined &the user starts the application, chooses an option to cluster documents, centers of groups are at first randomly selected and then in each iteration calulated as the average document in each cluster, this step is terminated when any center is changed\\\hline
+
+assigns documents  to group centers   &the user chose option \textbf{group documents into clusters}, set of documents that will form clusters is available, centers of the groups were chosen           &any   &each document is assigned to one cluster  &the user starts the application, chooses an option to cluster documents, centers of clusters are chosen and each document is assigned to the cluster to which its calculated distance is shortest \\\hline
+
+calculates  differences/distances between documents          &the user chose option \textbf{group documents into clusters}, centers of the groups were chosen    &any   &distance between each document and each center is calculated &the user starts the application, chooses an option to cluster documents, centers of clusters are chosen and distance between each center and each document is calculated as TUWSTAWJAKOCOBONIEWIEM!!!!!!!!!!!! based on extracted features \\\hline
+
+extracts features from documents &the user chose option \textbf{group documents into clusters}, set of documents that will form clusters is available  &any   &features for each document are calculated   &the user starts the application, chooses an option to cluster documents,  specific features for each document in each iteration are extracted\\\hline
+
+classifies new document     &the user chose option \textbf{classify new document}, a new document is available, clusters of other documents are available &groups documents into clusters &a new document is assigned to one of a given clusters &the user starts the application, chooses an option to classify a new document, source for available clusters and path to a new document via application options\\\hline
+
+insert a new document to the system   &the user chose option \textbf{classify new document}, a new document is available     &any  &a new document is added to the system   &the user starts the application, chooses an option to classify a new document and OPISZ!!!!\\\hline
+
+assigns a new document to existing group  &he user chose option \textbf{classify new document}, a new document is available, clusters of other documents are available      &any &a new document is classified    &the user starts the application, chooses an option to classify a new document and OPISZ!!!!\\\hline
+\caption{Use cases description}
+\label{tab:tableusecase}\\                                                                                
+\end{longtable}
+
     
 \subsection{Non-functional requirements}
 \subsubsection{Non-functional requirements}
