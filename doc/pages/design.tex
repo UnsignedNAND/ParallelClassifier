@@ -45,25 +45,29 @@ In this section requirements for this project are defined. It starts with placin
 	
 	\end{enumerate}
 
-\subsection{Functional requirements}
+\subsection{Functional requirements} \label{design-functional}
 TODO
+
+One of goals for this project was to create a platform that allows to run clusterization and classification algorithms in efficent way by providing methods to utilize modern multi-core or multi-processor systems. There are multiple factors that must be taken into account. First of them is mentioned multi-core or multi-processor systems - platforms with such hardware are capable of executing multiple tasks in parallel. In order to provide processors with tasks a task scheduling algorithms will be introduced for effective usage of available resources.  
+
 Diagram presented in the figure \ref{functional} shows general functional requirements available in the application. The aim of the diagram is to describe possible interactions between actors and functions offered by the application. Each oval shows a single use case within which different flows called scenarios may occur. Every use case characterizes possible system functionalities and defines steps that lead to the effect observable by the actor. A dependency marked as \textbf{extend} describes some additional behavior, which in some cases may be included into the base use case. 
 The base use case is the one which is pointed by the arrowhead of the connection. The extend use case continues the behavior of the base use case by inserting additional actions into the base sequence when the appropriate extension point is reached in the base use case and the extension condition is filled. An \textbf{include} dependency is a relationship which describes the inclusion of another use case responsible for different behavior. The including dependency is the one pointed by the arrowhead of the connection.
 
 
 To present more detailed interactions, use cases from following categories were extended and shown on separate diagrams.
+
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=1.0\linewidth]{images/diagrams/use-case/use-case-11.PNG}
-		\caption{Example of ROC curve, source \cite{roc-curve}}
+		\includegraphics[width=1.0\linewidth]{images/diagrams/use-case/use-case-22.PNG}
+		\caption{Use case 1. Clusterizing documents}
 		\label{design-use-case-1}
 	\end{center}
 \end{figure}
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=1.0\linewidth]{images/diagrams/use-case/use-case-22.PNG}
-		\caption{Example of ROC curve, source \cite{roc-curve}}
+		\includegraphics[width=1.0\linewidth]{images/diagrams/use-case/use-case-11.PNG}
+		\caption{Use case 2. Classifying new documents}
 		\label{design-use-case-2}
 	\end{center}
 \end{figure}
@@ -71,26 +75,17 @@ To present more detailed interactions, use cases from following categories were 
 Descriptions of all of the use cases including their initial, alternative and results were collected in the table \ref{tab:tableusecase}.
 \vspace{5em}
 
-< tutaj tabelka>
+<tutaj tabelka>
     
-\subsection{Non functional requirements}
-TODO
-\textbf{Quality requirements}
+\subsection{Non-functional requirements}
+\subsubsection{Non-functional requirements}
+Another goal for this project was to create a platform that allows to run methods mentioned above (\ref{design-functional}) in efficent way by providing means to utilize modern multi-core or multi-processor systems. There are multiple factors that must be taken into account. First of them is mentioned multi-core or multi-processor systems - platforms with such hardware are capable of executing multiple tasks in parallel. In order to provide processors with tasks a task scheduling algorithms will be introduced for effective usage of available resources. Second aspect is memory management. While using multiple threads and processes gives extra computing boost, overall performance is greatly affected by data passing methods. For every algorithm an appropriate approach will be chosen.
 
-
-\textbf{Ergonomy}
-\label{interfaceerg}
-
-
-\textbf{Restrictive requirements}
-
-A user of the application, will have to have basic skills of 
-
-
-In order to use the application the following software and hardware requirements will have to be filled.
+\subsubsection{Restrictive requirements}
+Most of the application's steps will be automated, but still may require additional configuration or attention from the user. Application will be written without graphical user interface and, as such, will require users to poses basic skills of using command line interface. 
 
 \subsection{Hardware and software requirements}
-In this section software and hardware requirements are described.
+In order to use the application the following software and hardware requirements will have to be filled.
 
 \subsubsection{Hardware requirements}
 This application will be tested on various hardware configuration to prove that it can work reliable on even older machines. Although the following configuration is not a server-grade hardware, it may allow to execute flow of the application without running out of available resources in most of the presented test cases. It will be considered as a recommended minimal configuration.
