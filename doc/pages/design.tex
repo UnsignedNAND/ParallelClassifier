@@ -56,6 +56,7 @@ The base use case is the one which is pointed by the arrowhead of the connection
 
 To present more detailed interactions, use cases from following categories were extended and shown on separate diagrams.
 
+TODO dodać system
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=1.0\linewidth]{images/diagrams/use-case/use-case-22.PNG}
@@ -154,14 +155,22 @@ A diagram of classes (figure \ref{classes})is one of the most popular UML diagra
   
 
 \subsection{Architecture}
-TODO
-The whole application will be based on ....... model. It is a distributed application structure that partitions tasks between the ..........
+Application will be based on master/slave model. It is a distributed application structure that allows for better resource management by partitioning tasks and data. In this approach, master process is responsible for partitioning data and scheduling tasks between worker processes called slaves. The main idea of this model is presented in the figure \ref{design-architecture}
 
+TODO zmienic obrazek
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=1.0\linewidth]{images/diagrams/use-case/use-case-11.PNG}
+		\caption{Main idea of the master-slave model}
+		\label{design-architecture}
+	\end{center}
+\end{figure}
 
-The main idea of this model is presented in the figure \ref{client}.
- 
- 
- 
+Master process is responsible for conducting whole workflow of application. It tracks progress of application's execution holding its state, decides when which methods should be executed, which data will be provided for given work and which of slave processes will be the one conducting the job. Master process holds state of the application and uses multiprocessing interfaces to communicate with workers.
+
+Slaves do not hold the state of application and their life span is limited to the time of execution of received method. After computing its part and sending results back to master, slave process is killed to free up resources it used.
+
+In case of this implementation it's the best to assume that master and slave processes are running on the same physical machine. Though it is possible to configure solution to work over the network, expect delays in communication to cause significant performance loss.
  
 \subsection{Libraries} \label{design-libraries}
 This project is designed to be portable across different platforms and to have minimal dependencies. It will use Python platform and libraries that are freely available via pip, the Python package installer.
