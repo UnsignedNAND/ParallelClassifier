@@ -61,6 +61,5 @@ class Clusterization(multiprocessing.Process):
         while True:
             self._receive_centers()
             if not self.centers:
-                print(self.name, 'Received None')
                 break
             self._find_closest_docs_to_center()

@@ -20,14 +20,7 @@ class IDF(multiprocessing.Process):
         self.process_num = process_num
         super(self.__class__, self).__init__()
 
-    def run(self):
-        session = None
-        token_counter = None
-        if str2bool(CONF['general']['save_to_db']):
-            Db.init()
-            session = Db.create_session()
-            token_counter = 0
-
+    def _receive_tokens(self):
         pills = 0
         while pills < self.process_num:
             msg = self._pipe_tokens_to_idf_parent.recv()
@@ -39,12 +32,26 @@ class IDF(multiprocessing.Process):
             else:
                 self._tokens[msg] = 1
 
+    def _calc_token_idf(self, token):
+        # IDF(token) = 1 + log_e(Total Number Of Documents / Number Of
+        # Documents with token in it)
+        token_idf = 1 + math.log(self._docs_num / self._tokens[token],
+                                 math.e)
+        self._tokens[token] = token_idf
+        return token_idf
+
+    def run(self):
+        session = None
+        token_counter = None
+        if str2bool(CONF['general']['save_to_db']):
+            Db.init()
+            session = Db.create_session()
+            token_counter = 0
+
+        self._receive_tokens()
+
         for token in self._tokens:
-            # IDF(token) = 1 + log_e(Total Number Of Documents / Number Of
-            # Documents with token in it)
-            token_idf = 1 + math.log(self._docs_num / self._tokens[token],
-                                     math.e)
-            self._tokens[token] = token_idf
+            token_idf = self._calc_token_idf(token)
 
             if str2bool(CONF['general']['save_to_db']):
                 token_counter += 1

@@ -11,26 +11,27 @@ class Parser(multiprocessing.Process):
             pipe_tokens_to_processes_child
         self._queue_parsed_docs = queue_parsed_docs
         super(self.__class__, self).__init__()
+        self.parsed_pages_num = 0
 
-    def run(self):
-        parsed_pages_num = 0
-        parsed_pages = []
-        while True:
-            page = self._queue_unparsed_docs.get()
-            if page is None:
-                # Just to be sure that other threads can also take a pill
-                self._queue_unparsed_docs.put(None)
-                self._pipe_tokens_to_idf_child.send(None)
-                print('Process {0} finished after processing {1} '
-                      'docs'.format(self.pid, parsed_pages_num))
-                break
-            page.create_tokens()
-            for token in page.tokens:
-                self._pipe_tokens_to_idf_child.send(token.stem)
-            page.content_clean()
-            parsed_pages_num += 1
-            parsed_pages.append(page)
+    def _process_page(self):
+        page = self._queue_unparsed_docs.get()
+        if page is None:
+            return None
+        page.create_tokens()
+        for token in page.tokens:
+            self._pipe_tokens_to_idf_child.send(token.stem)
+        page.content_clean()
+        self.parsed_pages_num += 1
+        return page
 
+    def _signal_end_processing(self):
+        # Just to be sure that other threads can also take a pill
+        self._queue_unparsed_docs.put(None)
+        self._pipe_tokens_to_idf_child.send(None)
+        print('Process {0} finished after processing {1} '
+              'docs'.format(self.pid, self.parsed_pages_num))
+
+    def _tfidf(self, parsed_pages):
         print('Process {0} waiting on IDF to finish...'.format(self.pid))
         self._event.wait()
         recv_tokens = self._pipe_tokens_to_processes_child.recv()
@@ -46,6 +47,19 @@ class Parser(multiprocessing.Process):
             self._queue_parsed_docs.put(page)
         # sending process-end pill
         self._queue_parsed_docs.put(None)
+
+    def run(self):
+        self.parsed_pages_num = 0
+        parsed_pages = []
+        while True:
+            page = self._process_page()
+            if page:
+                parsed_pages.append(page)
+            else:
+                self._signal_end_processing()
+                break
+
+        self._tfidf(parsed_pages)
 
 
 def create_parsers(queue_unparsed_documents,
