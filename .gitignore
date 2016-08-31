@@ -92,3 +92,6 @@ venv*
 
 # Temporary files
 *.swp
+
+# Enterprise Architect files
+*.ldb
