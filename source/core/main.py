@@ -8,7 +8,7 @@ from core.process.distance import Distance
 from core.process.idf import IDF
 from core.process.parser import create_parsers
 from core.process.reader import Reader
-from core.utils import str_1d_as_2d, initialize_cluster_centers
+from core.utils import Utils
 from data.db import Db, Models
 from models.cluster.cluster_center import ClusterCenter
 from models.page import Page
@@ -137,7 +137,8 @@ class Main(object):
         for dist_p in dist_ps:
             dist_p.join()
 
-        LOG.debug('Distances: \n' + str_1d_as_2d(distances, largest_id+1))
+        LOG.debug('Distances: \n' + Utils.str_1d_as_2d(distances,
+                                                       largest_id+1))
         LOG.info('Done calculating distance for {0} documents'.format(
             len(parsed_docs)))
 
@@ -146,10 +147,11 @@ class Main(object):
     def cluster(self):
         global distances
         global parsed_docs
-        LOG.info('Starting clusterization using {0} processes'.format(PROCESSES))
+        LOG.info('Starting clusterization using {0} processes'.format(
+            PROCESSES))
 
         center_num = int(CONF['clusterization']['centers'])
-        centers = initialize_cluster_centers(
+        centers = Utils.initialize_cluster_centers(
             center_num=center_num,
             start=0,
             end=largest_id,

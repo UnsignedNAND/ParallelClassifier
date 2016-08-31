@@ -1,6 +1,6 @@
 import multiprocessing
 
-from core.utils import coord_2d_to_1d
+from core.utils import Utils
 
 
 class Clusterization(multiprocessing.Process):
@@ -30,8 +30,8 @@ class Clusterization(multiprocessing.Process):
         closest_cid = None
         closest_cid_distance = -100
         for cid in self.centers:
-            cid_distance = self.distances[coord_2d_to_1d(cid, did,
-                                                         self.largest_id)]
+            cid_distance = self.distances[Utils.coord_2d_to_1d(cid, did,
+                                                               self.largest_id)]
             if closest_cid_distance < cid_distance:
                 closest_cid = cid
                 closest_cid_distance = cid_distance

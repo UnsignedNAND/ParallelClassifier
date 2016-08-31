@@ -1,6 +1,6 @@
 import multiprocessing
 
-from core.utils import calc_distance
+from core.utils import Utils
 
 
 class Classification(multiprocessing.Process):
@@ -19,7 +19,7 @@ class Classification(multiprocessing.Process):
         while doc_id < (self.largest_id + 1):
             try:
                 existing_doc = self.parsed_docs[doc_id]
-                distance = calc_distance(self.new_doc, existing_doc)
+                distance = Utils.calc_distance(self.new_doc, existing_doc)
                 self.class_distances[doc_id] = distance
             except:
                 # there is no document with such ID, distance is -1
