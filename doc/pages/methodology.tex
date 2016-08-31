@@ -299,6 +299,7 @@ Classification is process of assigning a label to new document. It is basing on 
 
 \subsubsection{k-Nearest-Neighbors}
 k-Nearest-Neighbors is a simple distance-based classification algorithm which gives information about class membership of the most similar (in nearest neighborhood) documents. Knowing that the majority of neighbors belong to certain class, it assumes that this document must be this class as well. Because of its simplicity its parallel implementation is not complex and looks very similar to the single-threaded one.
+
 \begin{enumerate}
 	\item \textbf{Extracting features from new document}\newline
 	First step is a repetition of document parsing that was made for all the documents that are already in the system. Because in this process only one document is taken into account, this part is not parallelised because all operations are atomic and run on a small set of words. In this step words in new document are stemmed and their statistic are counted. This allows to present new document in a form of features that is comparable with other documents that are already in the system.
@@ -316,6 +317,24 @@ k-Nearest-Neighbors is a simple distance-based classification algorithm which gi
 	
 \end{enumerate}
 \subsubsection{Support Vector Machine}
+In this implementation Support Vector Machine is a second step in classification. To enhance its performance first dataset is narrowed by finding the most relevant documents using kNN algorithm. SVMs are inherently two-class classifiers, so there are to approaches to consider when dealing with multi-class documents. First approach is called "one-versus-one" - it creates \(\frac{C (C-1)}{2}\) classifiers to do binary classification in pairs. Second one is "one-versus-all", in which \(C\) classifiers do binary classification in this-class versus all-others manner. The first approach was chosen for this implementation due to possibility to distribute workloads between processes.
+
+\begin{enumerate}
+		\item \textbf{Extracting features from new document}\newline
+		\textit{Optional. Executed only if document was not parsed before, for instance if kNN was not run.}
+		
+		First step is a repetition of document parsing that was made for all the documents that are already in the system. Because in this process only one document is taken into account, this part is not parallelised because all operations are atomic and run on a small set of words. In this step words in new document are stemmed and their statistic are counted. This allows to present new document in a form of features that is comparable with other documents that are already in the system.
+		
+		\item \textbf{Create \(\frac{C (C-1)}{2}\) classifiers}\newline
+		Create \(\frac{C (C-1)}{2}\) classifiers, where \(C\) is the number of classes in selected corpus. This results in creating a single classifier for each possible pair of classes. Add classifiers to processing queue.
+		
+		\item \textbf{Classification}\newline
+		Each of worker processes receives classifier from processing queue and runs classification. The result is sent back to master process which aggregates received results.
+		
+		\item \textbf{Assigning label to new document}\newline 
+		Master process counts aggregated results. New document is labeled with class that occurred most frequently.
+		
+\end{enumerate}
 
 \section{Conclusion}
 This chapter includes a complete description of the methodology used to prepare analysis of the requirements for created system. Parallelization of documents classification is the main scientific part of proposed solution. Providing algorithms for documents features extraction, clasterization and classification in the application based on parallel processing may lead to previously undiscovered system that allows to accelerate document classification significantly. 
