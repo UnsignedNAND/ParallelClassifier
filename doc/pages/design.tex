@@ -56,7 +56,6 @@ The base use case is the one which is pointed by the arrowhead of the connection
 
 To present more detailed interactions, use cases from following categories were extended and shown on separate diagrams.
 
-TODO dodać system
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=1.0\linewidth]{images/diagrams/use-case/clusterization.PNG}
@@ -136,10 +135,15 @@ This section provides the project of the described solution for......
  The project was presented by the diagrams employed in UML (Unified Modeling Language), a standard notation for the modeling of real-world objects and systems. 
  
 \subsection{Activity diagram of the performing test flow}
-TODO
-The activity diagram shows the logic of workflows of step-wise actions. Rectangles with rounded corners present sequences of activities. A rhombus represents a decision after which it is possible to choose one of the alternatives. A diagram in the figure \ref{activity} shows a sequence of actions needed to ......
+The activity diagram shows the logical flow of application in steps described in high-level abstraction. Performed sequence of activities are presented as a rectangle with rounded corners and decisions are depicted as rhombuses. The diagram in the figure \ref{design-activity} shows the sequence of actions that are required to complete whole workflow of implemented application. Flow initializes with starting the application, which first reads parameters stored in configuration file. Next application attempts to read data source and checks if there are ungrouped documents. In positive case application starts to process them and runs clusterization algorithm, otherwise it goes to next decision. If new document was indicated, application performs its classification.  Flow ends if all preceding decisions were 'No' or selected modules finilized their execution.
 
-........ is a starting point, ....... is a final point. 
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=1.0\linewidth]{images/diagrams/activity.PNG}
+		\caption{Activity diagram of the performing test flow}
+		\label{design-activity}
+	\end{center}
+\end{figure}
 
 
 \subsection{Sequence diagram of processing frames}
