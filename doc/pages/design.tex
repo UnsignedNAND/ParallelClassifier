@@ -141,7 +141,7 @@ The activity diagram shows the logical flow of application in steps described in
 	\begin{center}
 		\includegraphics[width=1.0\linewidth]{images/diagrams/activity.PNG}
 		\caption{Activity diagram of the performing test flow}
-		\label{design-activity}
+		\label{design-activity-diagram}
 	\end{center}
 \end{figure}
 
@@ -151,12 +151,75 @@ TODO
 
 
 
-\subsection{Diagram of classes}
-TODO
-A diagram of classes (figure \ref{classes})is one of the most popular UML diagrams. Rectangles show classes, their attributes and methods. Association connections were used to present relations between entities. Classes communicates with each other by sending messages (by association connections) and as a result they are able to fill tasks presented on the dynamic diagrams, for example use case model \ref{tab:tableusecase}.
+\subsection{Class diagram}
+Class diagram \ref{design-class-diagram} exposes implementation's structure. Blocks were used to present classes and their internal methods and fields. Classes connected with association line communicate with each other either by passing values as parameters in function calls or by sending message objects using process-safe pipe/queue implementation. 
 
- 
-  
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=1.0\linewidth]{images/diagrams/class.png}
+		\caption{Activity diagram of the performing test flow}
+		\label{design-class-diagram}
+	\end{center}
+\end{figure}
+
+Below is a short description of responsibilities of each class presented in diagram \ref{design-class-diagram}
+
+\begin{itemize}
+	\item \textbf{ParallelWikiClassifier}\newline
+	Object of this class is an entry point of application. Is responsible for parsing command line arguments passed to the application and starting main process.
+	
+	There is only one instance of this class running in single process.
+	
+	\item \textbf{core.Main}\newline
+	Class of main process of application. Instance of this object holds the state of application, reads configuration file, partitionates and passes data, manages worker processes and delegates tasks. 
+	
+	There is only one instance of this class running in single process.
+	
+	\item \textbf{core.Process.Reader}\newline
+	Process of this class responsible for handling data source related operations. Depending on configuration it either calls Parser instance for parsing XML file or connects to the database, from which it reads parsed documents. Cooperates with Parser and IDF processes, with whom it exchanges data using queues and pipes to deliver parsed documents in a form of feature matrix.
+	
+	There is only one instance of this class running in single process.
+	
+	\item \textbf{core.Process.Parser}\newline
+	Process of this class responsible for parsing documents. It tokenize documents and sends trimmed data to IDF process from which it awaits response with Inverse Document Frequencies of tokens to calculate TF-IDF. If all TF-IDF values for given document were received, Parser sends it's feature matrix back to Parser process to aggregate.
+	
+	There are multiple instances of this class which run in parallel as seperate processes.
+	
+	\item \textbf{core.Process.IDF}\newline
+	IDF values of tokens are calculated in process of this class. It works in two phases, between which transition is dependent on the state of Parser process. In first phase it aggregates all tokens received from Parser processes. Once Parser processes monit that all documents were prepared, IDF process calulates IDF values for all aggregated tokens sending each token back to Parser process after competition.
+	
+	There is only one instance of this class running in single process.
+	
+	\item \textbf{core.Process.Distance}\newline
+	Instance of this class is responsible to calculating distance between parsed documents. Processes of this class work on shared memory object that holds matrix of documents distances. Every process works on a single row of matrix, which represents distances between one document to every other. Upon completition it moves to next row that is not locked by other working processes.
+	
+	There are multiple instances of this class which run in parallel as seperate processes.
+	
+	\item \textbf{core.Process.Clusterization}\newline
+	Class of clusterization processes, which are responsible for finding documents that are closest to given center of group. Each process is given a subset of all documents, through which it iterates assigning documents to closest center. Clusterization processes communicate with master process which is responsible for aggregating results and sending new centers back to processes, if required.
+	
+	There are multiple instances of this class which run in parallel as seperate processes.
+	
+	\item \textbf{core.Process.Classification}\newline
+	Objects of Classification class are conducting both kNN and SVM classification algorithms.
+	
+	There are multiple instances of this class which run in parallel as seperate processes.
+	
+	\item \textbf{core.WikiContentHandler}\newline
+	This class enables reading dumps of Wikipedia database. Database dump is saved in a form of XML file which contains all articles in structured form. This class implements stream reader to deal with the size of XML files, which often span across multiple gigabytes of data. Object of this class is created if XML file was set as a source of documents in configuration file.
+	
+	\item \textbf{models.Page}\newline
+	For each document in the system there is a coresponding Page class object. It holds compressed information about documnt in a form of feature matrix.
+	
+	\item \textbf{models.Token}\newline
+	For each token in the system there is a coresponding Token class object. Each Token object holds statistics for a single stemmed word in the system.
+	
+	\item \textbf{models.cluster.ClusterCenter}\newline
+	Class that holds information about document which was chosen as cluster center in classification process. It holds a list of documents that were assigned to this group.
+	
+	\item \textbf{utils.PageLimitException}\newline
+	Special exception which is used if document limit was set in configuration file.
+\end{itemize}
 
 \subsection{Architecture}
 Application will be based on master/slave model. It is a distributed application structure that allows for better resource management by partitioning tasks and data. In this approach, master process is responsible for partitioning data and scheduling tasks between worker processes called slaves. The main idea of this model is presented in the figure \ref{design-architecture}
