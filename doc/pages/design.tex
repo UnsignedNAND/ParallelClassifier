@@ -133,7 +133,7 @@ Taking software requirements into consideration, a Python interpreter will have 
  
  
 \section{Project of a system} \label{project}
- This section described structure of implemented system. It describes its internals and flow of information as presented on included UML diagrams.
+ This section presents the structure of the implemented system. It describes the architecture and flow of information as presented on included UML diagrams.
  
 \subsection{Activity diagram of the performing test flow}
 The activity diagram shows the logical flow of application in steps described in high-level abstraction. Performed sequence of activities are presented as a rectangle with rounded corners and decisions are depicted as rhombuses. The diagram in the figure \ref{design-activity} shows the sequence of actions that are required to complete whole workflow of implemented application. Flow initializes with starting the application, which first reads parameters stored in configuration file. Next application attempts to read data source and checks if there are ungrouped documents. In positive case application starts to process them and runs clusterization algorithm, otherwise it goes to next decision. If new document was indicated, application performs its classification.  Flow ends if all preceding decisions were 'No' or selected modules finilized their execution.
@@ -160,7 +160,7 @@ A sequence diagram (figure \ref{design-sequence-diagram-full}) was used to prese
 \subsection{Class diagram}
 Class diagram \ref{design-class-diagram} exposes implementation's structure. Blocks were used to present classes and their internal methods and fields. Classes connected with association line communicate with each other either by passing values as parameters in function calls or by sending message objects using process-safe pipe/queue implementation. 
 
-For enlarged diagram, please refer to Appendix \ref{appendix-class}
+For the enlarged diagram, please refer to Appendix \ref{appendix-class}
 
 \begin{figure}[H]
 	\begin{center}
@@ -273,4 +273,4 @@ Presented solution will be developed as an open-source application under GPLv2 l
 
 
 \section{Conclusion}
-This chapter presents architecture used to implement algorithms described in previous chapter. It contains description and analysis of requirements for proposed solutions. The proposed architecture takes advantage of multi-process approach to provide efficient platform for documents clusterization and classification.
+This chapter presents the architecture used to implement algorithms described in the previous chapter. It contains description and analysis of requirements for proposed solution. The designed architecture takes advantage of multi-process approach to provide efficient platform for documents clusterization and classification.
