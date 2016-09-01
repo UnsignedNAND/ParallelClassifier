@@ -1,9 +1,9 @@
 \chapter{System design} \label{des}
 \section{Introduction}
-This chapter defines aim of the project and specifies potential users of the application. Secondly, it breaks down requirements that were set for this project into separate sections - functional, non-functional, hardware, software and quality -  where they are described in detail. Next, the project of the system is presented by UML and classes diagrams. Finally, the most important libraries used for document classification framework are defined.
+This chapter defines aim of the project and describes potential users of the application. Secondly, it divides requirements that were specified for this project into separate sections - functional, non-functional, hardware, software and quality -  where they are described in detail. Next, the project of the system is presented by UML and classes diagrams. Finally, the most important libraries used for document classification framework are defined.
 
 \section{Aim of the project}
-Main aim of this project is to develop platform for automated text document classification. Proposed solution will be capable of classificating text documents with a focus on parallel execution of algorithms. Classificator will implement a dual-layer model. In first layer a k-Nearest-Neighbors [\ref{soa-knn}] algorithm will be used for a general decision narrowing the set of possible membership classes. More detailed and precise classification decision will be made by second layer with Support Vector Machine [\ref{soa-svm}] algorithm.
+Main aim of this project is to develop a platform for automated text document classification. Proposed solution will be capable of classificating text documents with a focus on parallel execution of algorithms. Classificator will implement a dual-layer model. In first layer a k-Nearest-Neighbors [\ref{soa-knn}] algorithm will be used for a general decision narrowing the set of possible membership classes. More detailed and precise classification decision will be made by second layer with Support Vector Machine [\ref{soa-svm}] algorithm.
 
 The application will be created with the intent of providing a complete set of tools for text document classification and documenting usability of various machine learning algorithms. This includes:
 \begin{itemize}
@@ -13,17 +13,17 @@ The application will be created with the intent of providing a complete set of t
 	\item \textbf{algorithms performance tests and results} - all algorithms will be tested with various parameters and the results will be described.
 \end{itemize}
 
-Final solution should also indicate how complex the computation part is and how crucial it is to design a system that supports parallel tasks execution, distributes workloads in efficient manner between available worker processes and makes a proper use of all available resources.
+The final solution should also indicate how complex the computation part is and how crucial it is to design a system that supports parallel tasks execution, distributes workloads in efficient manner between available worker processes and makes a proper use of all available resources.
 
 The project may become a useful tool not only as a base framework for data scientists, but also for writers whom it should aid assigning a proper label to the document.
 
 \section{Potential users} \label{design-users}
-The application will be dedicated mainly to data scientists, for whom it could act as a base natural language processing and classification framework. Application's design will make it possible to add new modules and test the flow in high performance parallel environment.
+The application will be dedicated mainly to data scientists, for whom it could act as a base natural language processing and classification framework. Application design will make it possible to add new modules and test the flow in high performance parallel environment.
 
-On the other hand users like article writers and administrators of knowledge bases will also be able to use this tool. For writers it might serve as an advisor which will help to mark document with proper labels, removing the burden of having to know the context of other documents already in the database. For knowledge base administrators this framework might be convenient way keeping the database and documents grouped in a consistent way.
+On the other hand, users like article writers and administrators of knowledge bases will also be able to use this tool. For writers it might serve as an advisor which will help to mark document with proper labels, removing the burden of having to know the context of other documents already in the database. For knowledge base administrators this framework might be convenient way keeping the database and documents grouped in consistency.
 
 \section{Requirements}
-In this section requirements for this project are defined. It starts with placing application in today's business context, where examples of possible adaptations are described, and the prospect of tomorrow, which outlines the possible ways of evolution. Next, the non-functional and functional requirements are described along with the example of use cases. Next, it describes software and hardware requirements, outlining minimal configuration that must be met and recommending hardware parameters that would help increase overall applications performance. Finally, architecture and design are described in detail and illustrated with class, sequence and flow diagrams.
+In this section the requirements for the project are defined. It starts with placing application in today's business context, where examples of possible adaptations are described. Moreover, the prospect of future work, which outlines the possible ways of evolution is also presented. Next, the non-functional and functional requirements are described along with the example of use cases. Then, it describes software and hardware requirements, outlining minimal configuration that must be met and recommending hardware parameters that would help increase overall applications performance. Finally, architecture and design are described in detail and illustrated with class, sequence and flow diagrams.
 
 \subsection{General requirements}
 	
@@ -31,31 +31,31 @@ In this section requirements for this project are defined. It starts with placin
 	
 	\item \textbf{Business context}
 	
-	Application will be implemented with portability in mind. Everone will be able to use it by downloading and running localy, either on commodity hardware or server-grade workstations with multiple processors. This project will make management of knowledge databases more attractive in the context of:
+	Application will be implemented with portability in mind. Everone will be able to use it by downloading it and running localy, either on commodity hardware or server-grade workstations with multiple processors. This project will make management of knowledge databases more attractive in the context of:
 	
 	\begin{enumerate}
 		\item keeping database clean and well organized by sorting documents into seperate categories
 		\item providing means of assigning label to new document without forcing user to have knowledge of all documents context
 	\end{enumerate}
 	
-	Furthermore application will be available freely online, so everyone will be able to use it. Moreover, because of releasing it under GPLv2 license, one will be able to adapt framework to ever changing goals by being able to change code base, all algorithms and adding new modules. This release approach will make the application more available to all potential users, thus helping to increase its user-base.  
+	Furthermore, application will be available online, what provides faster access to it for a wide range of users. Moreover, because of releasing it under GPLv2 license, one will be able to adapt framework to ever changing goals by being able to change existing or add new modules. This release approach will make the application more available to all potential users, thus helping to increase its user-base.  
 	
 	\item \textbf{Prospectiveness}
 	
-	Application will be designed with object oriented principles, enabling it being part of a larger system by exposing different interfaces. In the future application could be adapted to users needs and play a part in bigger system. As the implementation itself is modular, it is possible to add, remove or rearrenge logic blocks inside of application. This indicates the prospectiveness of proposed system, its agile approach and possibility of including it as a part of another platform.
+	Application will be designed with object oriented principles, enabling it to be a part of a larger system by exposing different interfaces. In the future, application could be adapted to users' needs and be a part of a bigger system. As the implementation itself is modular, it is possible to add, remove or rearrenge logic blocks inside the application. This indicates the prospectiveness of proposed system, its agile approach and possibility of including it as a part of another platform.
 	
 	\end{enumerate}
 
 \subsection{System requirements}
 \subsubsection{Non-functional requirements}
-Another goal for this project was to create a platform that allows to run methods mentioned above (\ref{design-functional}) in efficent way by providing means to utilize modern multi-core or multi-processor systems. There are multiple factors that must be taken into account. First of them is mentioned multi-core or multi-processor systems - platforms with such hardware are capable of executing multiple tasks in parallel. In order to provide processors with tasks a task scheduling algorithms will be introduced for effective usage of available resources. Second aspect is memory management. While using multiple threads and processes gives extra computing boost, overall performance is greatly affected by data passing methods. For every algorithm an appropriate approach will be chosen.
+Another goal for this project was to create a platform that allows to run methods mentioned above (\ref{design-functional}) in efficent way by providing means for utilizing modern multi-core or multi-processor systems. There are multiple factors that must be taken into account. First of all, multi-core or multi-processor systems - platforms with such hardware are capable of executing multiple tasks in parallel. In order to provide processors with tasks, a task scheduling algorithms will be introduced for effective usage of available resources. Second aspect is memory management. While using multiple threads and processes, extra computing boost is given, but the overall performance may be greatly affected by data passing methods. For every algorithm an appropriate approach will be chosen.
 
 \subsubsection{Restrictive requirements}
-Most of the application's steps will be automated, but still may require additional configuration or attention from the user. Application will be written without graphical user interface and, as such, will require users to poses basic skills of using command line interface. 
+Most of the application steps will be automated, but still may require additional configuration or attention from the user. Application will be written without graphical user interface and, as such, will require users to poses basic skills of using command line interface. 
 
 
 \subsubsection{Functional requirements} \label{design-functional}
-One of goals for this project was to create a platform that allows to run clusterization and classification algorithms in efficent way by providing methods to utilize modern multi-core or multi-processor systems. There are multiple factors that must be taken into account. First of them is mentioned multi-core or multi-processor systems - platforms with such hardware are capable of executing multiple tasks in parallel. In order to provide processors with tasks a task scheduling algorithms will be introduced for effective usage of available resources.  
+One of goals for this project was to create a platform that allows to run clusterization and classification algorithms in efficent way.
 
 Diagrams presented in the figures \ref{design-use-case-1} and  \ref{design-use-case-2} show general functional requirements available in the application. 
 
@@ -82,7 +82,7 @@ To present more detailed interactions, use cases from following categories were 
 	\end{center}
 \end{figure}
  
-Descriptions of all of the use cases including their initial, alternative and results were collected in the table \ref{tab:tableusecase}.
+Descriptions of all of the use cases including their initial/alternative conditions and results were collected in the table \ref{tab:tableusecase}.
 \vspace{5em}
 
 \begin{longtable}{| p{2.5cm} | p{2.3cm} | p{2.2cm} | p{2cm} | p{2.5cm} |}
@@ -127,7 +127,7 @@ This application will be tested on various hardware configuration to prove that 
 
 
 \subsubsection{Software requirements}
-There are no specified requirements about the operating system installed on the device. Application should run on every modern operating system, being it either Linux, OS X or Windows. Tests will be run on both Linux and OS X machines, however the Windows environment will be never fully tested and thus is not recommended for running the application.
+There are no specified requirements about the operating system installed on the device. Application should run on every modern operating system, either Linux, OS X or Windows. Tests will be run on both Linux and OS X machines, however the Windows environment will be never fully tested and thus is not recommended for running the application.
 
 Taking software requirements into consideration, a Python interpreter will have to be installed on a machine along with a set of libraries. Python is an interpreted language that provides good performance, scalability features and possibility of adapting software on-the-fly without a need to recompile the code. All required libraries are listed in both section \ref{design-libraries} and in source code in \textit{source/requirements3.txt} file.
  
@@ -136,7 +136,7 @@ Taking software requirements into consideration, a Python interpreter will have 
  This section presents the structure of the implemented system. It describes the architecture and flow of information as presented on included UML diagrams.
  
 \subsection{Activity diagram of the performing test flow}
-The activity diagram shows the logical flow of application in steps described in high-level abstraction. Performed sequence of activities are presented as a rectangle with rounded corners and decisions are depicted as rhombuses. The diagram in the figure \ref{design-activity} shows the sequence of actions that are required to complete whole workflow of implemented application. Flow initializes with starting the application, which first reads parameters stored in configuration file. Next application attempts to read data source and checks if there are ungrouped documents. In positive case application starts to process them and runs clusterization algorithm, otherwise it goes to next decision. If new document was indicated, application performs its classification.  Flow ends if all preceding decisions were 'No' or selected modules finilized their execution.
+The activity diagram shows the logical flow of application in steps described in high-level abstraction. Performed sequence of activities are presented as a rectangle with rounded corners and decisions are depicted as rhombuses. The diagram in the figure \ref{design-activity} shows the sequence of actions that are required to complete whole workflow of implemented application. Flow initializes by starting the application, which first reads parameters stored in a configuration file. Next application attempts to read data source and checks if there are ungrouped documents. In positive case application starts to process them and runs clusterization algorithm, otherwise it goes to next decision. If new document was indicated, application performs the classification.  Flow ends if all preceding decisions were \'No\' or selected modules finilized their execution.
 
 \begin{figure}[H]
 	\begin{center}
@@ -158,28 +158,28 @@ A sequence diagram (figure \ref{design-sequence-diagram-full}) was used to prese
 \end{figure}
 
 \subsection{Class diagram}
-Class diagram \ref{design-class-diagram} exposes implementation's structure. Blocks were used to present classes and their internal methods and fields. Classes connected with association line communicate with each other either by passing values as parameters in function calls or by sending message objects using process-safe pipe/queue implementation. 
+Class diagram \ref{design-class-diagram} exposes implementation structure. Blocks were used to present classes and their internal methods and fields. Classes connected with association line communicate with each other either by passing values as parameters in function calls or by sending message objects using process-safe pipe/queue implementation. 
 
 For the enlarged diagram, please refer to Appendix \ref{appendix-class}
 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=1.0\linewidth]{images/diagrams/class.png}.
-		\caption{Activity diagram of the performing test flow}
+		\caption{Class diagram}
 		\label{design-class-diagram}
 	\end{center}
 \end{figure}
 
-Below is a short description of responsibilities of each class presented in diagram \ref{design-class-diagram}
+A short description of responsibilities of each class presented in diagram \ref{design-class-diagram} is shown below:
 
 \begin{itemize}
 	\item \textbf{ParallelWikiClassifier}\newline
-	Object of this class is an entry point of application. Is responsible for parsing command line arguments passed to the application and starting main process.
+	Object of this class is an entry point of the application. It is responsible for parsing command line arguments passed to the application and starting main process.
 	
 	There is only one instance of this class running in single process.
 	
 	\item \textbf{core.Main}\newline
-	Class of main process of application. Instance of this object holds the state of application, reads configuration file, partitionates and passes data, manages worker processes and delegates tasks. 
+	Class of the main process of the application. Instance of this object holds the state of the application, reads the configuration file, partitionates and passes data, manages worker processes and delegates tasks. 
 	
 	There is only one instance of this class running in single process.
 	
@@ -189,7 +189,7 @@ Below is a short description of responsibilities of each class presented in diag
 	There is only one instance of this class running in single process.
 	
 	\item \textbf{core.Process.Parser}\newline
-	Process of this class responsible for parsing documents. It tokenize documents and sends trimmed data to IDF process from which it awaits response with Inverse Document Frequencies of tokens to calculate TF-IDF. If all TF-IDF values for given document were received, Parser sends it's feature matrix back to Parser process to aggregate.
+	Process of this class responsible for parsing documents. It tokenize documents and sends trimmed data to IDF process from which it awaits response with Inverse Document Frequencies of tokens to calculate TF-IDF. If all TF-IDF values for given document were received, Parser sends its feature matrix back to Parser process to aggregate.
 	
 	There are multiple instances of this class which run in parallel as seperate processes.
 	
@@ -199,7 +199,7 @@ Below is a short description of responsibilities of each class presented in diag
 	There is only one instance of this class running in single process.
 	
 	\item \textbf{core.Process.Distance}\newline
-	Instance of this class is responsible to calculating distance between parsed documents. Processes of this class work on shared memory object that holds matrix of documents distances. Every process works on a single row of matrix, which represents distances between one document to every other. Upon completition it moves to next row that is not locked by other working processes.
+	Instance of this class is responsible to calculating a distance between parsed documents. Processes of this class work on shared memory object that holds matrix of documents distances. Every process works on a single row of matrix, which represents distances between one document to every other. Upon completition it moves to next row that is not locked by other working processes.
 	
 	There are multiple instances of this class which run in parallel as seperate processes.
 	
@@ -230,7 +230,7 @@ Below is a short description of responsibilities of each class presented in diag
 \end{itemize}
 
 \subsection{Architecture}
-Application will be based on master/slave model. It is a distributed application structure that allows for better resource management by partitioning tasks and data. In this approach, master process is responsible for partitioning data and scheduling tasks between worker processes called slaves. The main idea of this model is presented in the figure \ref{design-architecture}
+The application will be based on master/slave model. It is a distributed application structure that allows for better resource management by partitioning tasks and data. In this approach, master process is responsible for partitioning data and scheduling tasks between worker processes called slaves. The main idea of this model is presented in the figure \ref{design-architecture}
 
 \begin{figure}[H]
 	\begin{center}
@@ -240,7 +240,7 @@ Application will be based on master/slave model. It is a distributed application
 	\end{center}
 \end{figure}
 
-Master process is responsible for conducting whole workflow of application. It tracks progress of application's execution holding its state, decides when which methods should be executed, which data will be provided for given work and which of slave processes will be the one conducting the job. Master process holds state of the application and uses multiprocessing interfaces to communicate with workers.
+Master process is responsible for conducting whole workflow of application. It tracks progress of application execution holding its state, decides when specific methods should be executed, which data will be provided for a given work and which of slave processes will conduct the job. Master process holds state of the application and uses multiprocessing interfaces to communicate with workers.
 
 Slaves do not hold the state of application and their life span is limited to the time of execution of received method. After computing its part and sending results back to master, slave process is killed to free up resources it used.
 
