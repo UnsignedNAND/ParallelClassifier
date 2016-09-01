@@ -133,10 +133,7 @@ Taking software requirements into consideration, a Python interpreter will have 
  
  
 \section{Project of a system} \label{project}
-TODO
-This section provides the project of the described solution for......
-
- The project was presented by the diagrams employed in UML (Unified Modeling Language), a standard notation for the modeling of real-world objects and systems. 
+ This section described structure of implemented system. It describes its internals and flow of information as presented on included UML diagrams.
  
 \subsection{Activity diagram of the performing test flow}
 The activity diagram shows the logical flow of application in steps described in high-level abstraction. Performed sequence of activities are presented as a rectangle with rounded corners and decisions are depicted as rhombuses. The diagram in the figure \ref{design-activity} shows the sequence of actions that are required to complete whole workflow of implemented application. Flow initializes with starting the application, which first reads parameters stored in configuration file. Next application attempts to read data source and checks if there are ungrouped documents. In positive case application starts to process them and runs clusterization algorithm, otherwise it goes to next decision. If new document was indicated, application performs its classification.  Flow ends if all preceding decisions were 'No' or selected modules finilized their execution.
@@ -151,39 +148,23 @@ The activity diagram shows the logical flow of application in steps described in
 
 
 \subsection{Sequence diagram}
-
+A sequence diagram (figure \ref{design-sequence-diagram-full}) was used to present steps needed to perform a complete flow of application, including both clusterization and classification.
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=1.0\linewidth]{images/diagrams/seq1.PNG}
-		\caption{Sequence diagram, part 1}
-		\label{design-sequence-diagram1}
+		\includegraphics[width=1.0\linewidth]{images/diagrams/seq-full.png}
+		\caption{Sequence diagram}
+		\label{design-sequence-diagram-full}
 	\end{center}
 \end{figure}
-
-\begin{figure}[H]
-	\begin{center}
-		\includegraphics[width=1.0\linewidth]{images/diagrams/seq2.PNG}
-		\caption{Sequence diagram, part 2}
-		\label{design-sequence-diagram2}
-	\end{center}
-\end{figure}
-
-\begin{figure}[H]
-	\begin{center}
-		\includegraphics[width=1.0\linewidth]{images/diagrams/seq3.PNG}
-		\caption{Sequence diagram, part 3}
-		\label{design-sequence-diagram3}
-	\end{center}
-\end{figure}
-
-
 
 \subsection{Class diagram}
 Class diagram \ref{design-class-diagram} exposes implementation's structure. Blocks were used to present classes and their internal methods and fields. Classes connected with association line communicate with each other either by passing values as parameters in function calls or by sending message objects using process-safe pipe/queue implementation. 
 
+For enlarged diagram, please refer to Appendix \ref{appendix-class}
+
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=1.0\linewidth]{images/diagrams/class.png}
+		\includegraphics[width=1.0\linewidth]{images/diagrams/class.png}.
 		\caption{Activity diagram of the performing test flow}
 		\label{design-class-diagram}
 	\end{center}
@@ -251,7 +232,6 @@ Below is a short description of responsibilities of each class presented in diag
 \subsection{Architecture}
 Application will be based on master/slave model. It is a distributed application structure that allows for better resource management by partitioning tasks and data. In this approach, master process is responsible for partitioning data and scheduling tasks between worker processes called slaves. The main idea of this model is presented in the figure \ref{design-architecture}
 
-TODO zmienic obrazek
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=1.0\linewidth]{images/diagrams/architecture.png}
@@ -293,7 +273,4 @@ Presented solution will be developed as an open-source application under GPLv2 l
 
 
 \section{Conclusion}
-TODO
-This chapter includes a complete description of the methodology used to prepare analysis of the requirements for the created application. The proposed algorithm takes advantage of the possibilities of new technologies to .......
-
-Moreover the project of the system was also described and presented taking into consideration all of the specified requirements.
+This chapter presents architecture used to implement algorithms described in previous chapter. It contains description and analysis of requirements for proposed solutions. The proposed architecture takes advantage of multi-process approach to provide efficient platform for documents clusterization and classification.
