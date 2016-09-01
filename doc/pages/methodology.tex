@@ -44,11 +44,11 @@ For human beings, documents are an essential mean of both preserving and exchang
 This section summarizes methods that has been used or considered to be used for the best feature extraction that could possibly lead to more accurate clusterization and classification.
 
 \subsubsection{Tokenization}
-First step in feature extraction process is to tokenize document. Tokenization means that ordered sentences are turned into a collection of unordered words. During this step it is possible to reduce the overall weight of corpus by deleting stop words (def. \ref{stop_words}), all special signs and converting all characters to lower case - they do not carry any information that would be considered important during clusterization and classification.
+First step in feature extraction process is to tokenize document. Tokenization means that ordered sentences are turned into a collection of unordered words. During this step it is possible to reduce the overall weight of corpus by deleting stop words (def. \ref{stop_words}), all special signs and converting all characters to lower case - they do not carry any information that would be considered important during clusterization and classification.\\
 
  \begin{definition}[Stop words]
  	\label{stop_words}
- 	In documents analysis, stop words are words which are filtered out before or after processing of natural language text. They usually refer to the most common words in a specific language, so creating universal list of stop words is quite challenging.
+ 	In documents analysis, stop words are words which are filtered out before or after processing of natural language text. They usually refer to the most common words in a specific language, so creating universal list of stop words is quite challenging.\\
  \end{definition}
 
 
@@ -71,11 +71,11 @@ n-grams posses some advatnages over tokens. Tokens hold information about single
 As can be seen, resulted trigram is a contiguous sequence of 3 items. An n-gram model is a type of probabilistic language model for predicting the next item in text sequence. These models have recently gained a lot of popularity for using them in probability, communication theory, computational linguistics and data compression.
 
 \subsubsection{Stemming and lemmatization}
-Important step in feature extraction process is word stemming and lemmatization. They both allow for derived words that might be in inflectional forms (def. \ref{inflectional}) and sometimes derivationally related forms of a word to be brought to a common root (def. \ref{root}). 
+Important step in feature extraction process is word stemming and lemmatization. They both allow for derived words that might be in inflectional forms (def. \ref{inflectional}) and sometimes derivationally related forms of a word to be brought to a common root (def. \ref{root}). \\
 
  \begin{definition}[Inflectional form]
  	\label{inflectional}
-In grammar, inflection or inflexion is the modification of a word using a prefix, suffix or infix, or another internal modification such as a vowel change. The aim is to express various grammatical categories for example tense, case, voice, aspect, person, number, gender, and mood. 
+In grammar, inflection or inflexion is the modification of a word using a prefix, suffix or infix, or another internal modification such as a vowel change. The aim is to express various grammatical categories for example tense, case, voice, aspect, person, number, gender, and mood. \\
 \end{definition}
 
  \begin{definition}[Root word]
@@ -92,17 +92,19 @@ Some common root words, their meanings and words that are formed from this block
 	\item Demo -  people - democracy, demographic
 	\item Derma -  skin - dermatology, epidermis
 	\item Equi -  equal - equity
-	\item Semi -  half - semicircle 
+	\item Semi -  half - semicircle \\
 \end{itemize}
 \end{definition}
 
-Stemming is an approach based on different algorithms for calculating root of a given word. It consist of methods like lookup tables (def. \ref{lookup_table}), suffix (def. \ref{suffix}) and postfix (analogically) stripping algorithms. While this method is efficient, its accuracy suffers. Root might not always be a lexically correct form, but it still enables both counting occurrences of all forms of given word across the document and helps to reduce the overall weight of corpus.
+
+Stemming is an approach based on different algorithms for calculating root of a given word. It consist of methods like lookup tables (def. \ref{lookup_table}), suffix (def. \ref{suffix}) and postfix (analogically) stripping algorithms. While this method is efficient, its accuracy suffers. Root might not always be a lexically correct form, but it still enables both counting occurrences of all forms of given word across the document and helps to reduce the overall weight of corpus.\\
 
  \begin{definition}[Lookup table]
  	\label{lookup_table}
 In computer science, a lookup table is an array that allows to reduce runtime computation by using a simpler array indexing operation. Shortening of processing time can be significant, as retrieving a value from memory is often faster than undergoing an computation or input/output operation. The table can be precalculated and stored in static program storage, calculated during a program's initialization phase (memoization), or even stored in hardware.
-The advantages of the lookup table is that it is simple, fast, and can handle exceptions. The disadvantages include large size of a table and possibility of loosing some words. All inflected forms must be explicitly listed in the table and sometimes new or unfamiliar words are not handled, even if they are perfectly regular. 
+The advantages of the lookup table is that it is simple, fast, and can handle exceptions. The disadvantages include large size of a table and possibility of loosing some words. All inflected forms must be explicitly listed in the table and sometimes new or unfamiliar words are not handled, even if they are perfectly regular.\\ 
 \end{definition}
+
 
  \begin{definition}[Suffix stripping]
  	\label{suffix}
@@ -110,9 +112,10 @@ Suffix stripping algorithms rely on a smaller list of "rules" than a lookup tabl
 \begin{itemize}
 	\item if the word ends in 'ed', remove the 'ed'
 	\item if the word ends in 'ing', remove the 'ing'
-	\item if the word ends in 'ly', remove the 'ly'
+	\item if the word ends in 'ly', remove the 'ly'\\
 \end{itemize}
  \end{definition}
+
 
  On the other hand, stripping algorithms have been shown to have a poor performance when dealing with exceptional relations (for example 'ran' and 'run'). The results given by suffix stripping algorithms are limited to those which have well defined suffixes. This is a problem, as not all words have a well formulated set of rules. Lemmatisation (def. \ref{lemmatization}) attempts to improve upon this challenge.
 It is based on different dictionaries to find a root of a word. The difference between lemmatization and stemming is that a stemmer operates on a single word without any context and without knowledge about part of a speech. On the other hand, stemmers are easier to implement and this algorithm is usually faster.
@@ -124,17 +127,18 @@ For example:
 	\item Depending on a context, the word meeting can be either the root of a noun or a form of a verb. For example 'in our last meeting' and 'they are meeting tomorrow'. In this case lemmatisation can select the appropriate lemma depending on the context, while stemming can't.
 \end{itemize}
 
-The most common dictionary used in lemmatization process is WordNet.
+The most common dictionary used in lemmatization process is WordNet.\\
 
  \begin{definition}[Lemmatization]
  	\label{lemmatization}
-In linguistics, a lemmatization is the process of grouping together the various inflected word forms so they can be analysed as a single item. In other words, it is a process of determining the lemma (def. \ref{lemma}) for a given word.
+In linguistics, a lemmatization is the process of grouping together the various inflected word forms so they can be analysed as a single item. In other words, it is a process of determining the lemma (def. \ref{lemma}) for a given word.\\
  \end{definition}
  
   \begin{definition}[Lemma]
   	\label{lemma}
-  A lemma is the canonical form, dictionary form, or citation form of a word. For example the verb 'to walk' may be presented as walk, walked, walks, walking. The base form walk, which might be looked up in a dictionary, is called the lemma. The combination of the base form with the part of speech is called the lexeme. Another example include run, runs, ran and running are forms of the same lexeme, with run as the lemma. 
+  A lemma is the canonical form, dictionary form, or citation form of a word. For example the verb 'to walk' may be presented as walk, walked, walks, walking. The base form walk, which might be looked up in a dictionary, is called the lemma. The combination of the base form with the part of speech is called the lexeme. Another example include run, runs, ran and running are forms of the same lexeme, with run as the lemma. \\
   \end{definition}
+  
  
 \subsubsection{Term Frequency and Inverse Document Index}
 In order to define document's topic it is essential to find relevant keywords. To achieve this, TF-IDF term weighting algorithm can be utilized. It is a numerical statistic method which reflects how important is a given word to a document in corpus. Value calculated by this method increases proportionally to the number of times a given word appears in a document, but is reduced by the frequency of the word in corpus. This approach allows words that are important for one document and appear frequently in it but rarely in corpus to score higher than ones that appear frequently in whole corpus.
@@ -252,18 +256,19 @@ In proposed solution this metric could be used to define a level of similarity b
 	\end{tabular}
 \end{table}
 
+
  \begin{definition}[Dot product] \label{def_dot_product}
  	Dot product indicates the length of projection of one vector onto another in n-dimensional vector space. Returned value is a scalar number. Dot product of two vectors \(A\) and \(B\) can be defined as following:
- 	\[A \cdot B = \sum_{n=1}^{n} A_i B_i = A_1 B_1 + A_2 B_2 + \cdots + A_n B_n \]
+ 	\[A \cdot B = \sum_{n=1}^{n} A_i B_i = A_1 B_1 + A_2 B_2 + \cdots + A_n B_n \]\\
  \end{definition}
  
  \begin{definition}[Euclidean norm] \label{def_euclidean_norm}
  	Norm is a function that measures length of given vector in n-dimensional vector space. 
- 	\[ ||X|| = \sqrt{\sum_{i=1}^{n}x_i^2} = \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2} \]
+ 	\[ ||X|| = \sqrt{\sum_{i=1}^{n}x_i^2} = \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2} \]\\
  \end{definition}
 
 \subsection{Clusterization}
-Once documents are in a form of vectors it is possible to prepare data clusters. For this, one of the most frequenlty used unsupervised methods is the K-means algorithm. It has linear time complexity in relevance to the number of documents and it is possible to run it concurrently on multiple threads. 
+Once documents are in a form of vectors it is possible to prepare data clusters. For this, one of the mostd frequenlty used unsupervised methods is the K-means algorithm. It has linear time complexity in relevance to the number of documents and it is possible to run it concurrently on multiple threads. 
 
 First step in K-means is to select K documents that will function as centers of groups. Most often these centers are selected randomly, which makes each run of K-means a bit different.
 Knowing the distances between each pair of documents, we divide them into K groups. Each group is a set of documents with the distances closest to center of each group. Once groups are created, new centers are selected by looking for a document that is closest to the calculated average of document distances in its cluster. We repeat these steps until centers are still - during iteration new centers are the same as previous ones. 

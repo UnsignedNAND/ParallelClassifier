@@ -22,7 +22,7 @@ The application will be dedicated mainly to data scientists, for whom it could a
 
 On the other hand users like article writers and administrators of knowledge bases will also be able to use this tool. For writers it might serve as an advisor which will help to mark document with proper labels, removing the burden of having to know the context of other documents already in the database. For knowledge base administrators this framework might be convenient way keeping the database and documents grouped in a consistent way.
 
-\section{System requirements}
+\section{Requirements}
 In this section requirements for this project are defined. It starts with placing application in today's business context, where examples of possible adaptations are described, and the prospect of tomorrow, which outlines the possible ways of evolution. Next, the non-functional and functional requirements are described along with the example of use cases. Next, it describes software and hardware requirements, outlining minimal configuration that must be met and recommending hardware parameters that would help increase overall applications performance. Finally, architecture and design are described in detail and illustrated with class, sequence and flow diagrams.
 
 \subsection{General requirements}
@@ -30,6 +30,7 @@ In this section requirements for this project are defined. It starts with placin
 	\begin{enumerate}
 	
 	\item \textbf{Business context}
+	
 	Application will be implemented with portability in mind. Everone will be able to use it by downloading and running localy, either on commodity hardware or server-grade workstations with multiple processors. This project will make management of knowledge databases more attractive in the context of:
 	
 	\begin{enumerate}
@@ -37,7 +38,7 @@ In this section requirements for this project are defined. It starts with placin
 		\item providing means of assigning label to new document without forcing user to have knowledge of all documents context
 	\end{enumerate}
 	
-	Furthermore application will be available freely online, so everyone will be able to use it. Furthermore, because of releasing it under GPLv2 license, one will be able to adapt framework to ever changing goals by being able to change code base, all algorithms and adding new modules. This release approach will make the application more available to all potential users, thus helping to increase its user-base.  
+	Furthermore application will be available freely online, so everyone will be able to use it. Moreover, because of releasing it under GPLv2 license, one will be able to adapt framework to ever changing goals by being able to change code base, all algorithms and adding new modules. This release approach will make the application more available to all potential users, thus helping to increase its user-base.  
 	
 	\item \textbf{Prospectiveness}
 	
@@ -45,13 +46,22 @@ In this section requirements for this project are defined. It starts with placin
 	
 	\end{enumerate}
 
-\subsection{Functional requirements} \label{design-functional}
-TODO
+\subsection{System requirements}
+\subsubsection{Non-functional requirements}
+Another goal for this project was to create a platform that allows to run methods mentioned above (\ref{design-functional}) in efficent way by providing means to utilize modern multi-core or multi-processor systems. There are multiple factors that must be taken into account. First of them is mentioned multi-core or multi-processor systems - platforms with such hardware are capable of executing multiple tasks in parallel. In order to provide processors with tasks a task scheduling algorithms will be introduced for effective usage of available resources. Second aspect is memory management. While using multiple threads and processes gives extra computing boost, overall performance is greatly affected by data passing methods. For every algorithm an appropriate approach will be chosen.
 
+\subsubsection{Restrictive requirements}
+Most of the application's steps will be automated, but still may require additional configuration or attention from the user. Application will be written without graphical user interface and, as such, will require users to poses basic skills of using command line interface. 
+
+
+\subsubsection{Functional requirements} \label{design-functional}
 One of goals for this project was to create a platform that allows to run clusterization and classification algorithms in efficent way by providing methods to utilize modern multi-core or multi-processor systems. There are multiple factors that must be taken into account. First of them is mentioned multi-core or multi-processor systems - platforms with such hardware are capable of executing multiple tasks in parallel. In order to provide processors with tasks a task scheduling algorithms will be introduced for effective usage of available resources.  
 
-Diagram presented in the figure \ref{functional} shows general functional requirements available in the application. The aim of the diagram is to describe possible interactions between actors and functions offered by the application. Each oval shows a single use case within which different flows called scenarios may occur. Every use case characterizes possible system functionalities and defines steps that lead to the effect observable by the actor. A dependency marked as \textbf{extend} describes some additional behavior, which in some cases may be included into the base use case. 
-The base use case is the one which is pointed by the arrowhead of the connection. The extend use case continues the behavior of the base use case by inserting additional actions into the base sequence when the appropriate extension point is reached in the base use case and the extension condition is filled. An \textbf{include} dependency is a relationship which describes the inclusion of another use case responsible for different behavior. The including dependency is the one pointed by the arrowhead of the connection.
+Diagrams presented in the figures \ref{design-use-case-1} and  \ref{design-use-case-2} show general functional requirements available in the application. 
+
+These diagrams were used to present possible interactions between users and functions offered by the system.
+Each oval shape on the diagram is a single use case within which different flows called scenarios may occur. Each use case shows system functionalities together with initial requirements and steps that lead to the result observable by the actor. There are also two dependencies \textbf{include} and \textbf{extend}. A dependency \textbf{extend} describes additional feature, which in some cases (when the specific extension point is reached and the extension requirement is filled) may appear in the base sequence. 
+An \textbf{include} dependency describes the inclusion of another use case into base sequence. This use case is responsible for different behavior. 
 
 
 To present more detailed interactions, use cases from following categories were extended and shown on separate diagrams.
@@ -103,12 +113,6 @@ assigns a new document to existing group  &he user chose option \textbf{classify
 \end{longtable}
 
     
-\subsection{Non-functional requirements}
-\subsubsection{Non-functional requirements}
-Another goal for this project was to create a platform that allows to run methods mentioned above (\ref{design-functional}) in efficent way by providing means to utilize modern multi-core or multi-processor systems. There are multiple factors that must be taken into account. First of them is mentioned multi-core or multi-processor systems - platforms with such hardware are capable of executing multiple tasks in parallel. In order to provide processors with tasks a task scheduling algorithms will be introduced for effective usage of available resources. Second aspect is memory management. While using multiple threads and processes gives extra computing boost, overall performance is greatly affected by data passing methods. For every algorithm an appropriate approach will be chosen.
-
-\subsubsection{Restrictive requirements}
-Most of the application's steps will be automated, but still may require additional configuration or attention from the user. Application will be written without graphical user interface and, as such, will require users to poses basic skills of using command line interface. 
 
 \subsection{Hardware and software requirements}
 In order to use the application the following software and hardware requirements will have to be filled.
