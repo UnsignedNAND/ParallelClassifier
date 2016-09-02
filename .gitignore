@@ -67,6 +67,7 @@ target/
 *.lot
 *.synctex.gz
 *.toc
+doc/*.lol
 
 # Vagrant
 .vagrant/
