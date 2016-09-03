@@ -384,7 +384,77 @@ def _closest_center_id_for_doc_id(self, did):
 \end{lstlisting}
 
 \subsection{Classification - kNN}
-TODO
+
+\begin{lstlisting}[language=Python, caption={Main.classify() - Main process method for conducting kNN classification}, label={lst:main:classify}]
+def classify(self):
+    Db.init()
+    session = Db.create_session()
+    docs = session.query(Models.Doc).filter(
+        Models.Doc.id == int(CONF['classification']['new_doc_start_id'])
+    )
+    if docs.count():
+        for doc in docs:
+            new_doc = self._prepare_new_doc(doc)
+            class_distances = multiprocessing.Array('d', (largest_id + 1))
+            class_ps = []
+            for i in range(PROCESSES):
+                class_p = Classification(
+                    iteration_offset=i,
+                    iteration_size=PROCESSES,
+                    class_distances=class_distances,
+                    largest_id=largest_id,
+                    parsed_docs=parsed_docs,
+                    new_doc=new_doc,
+                )
+                class_p.start()
+                class_ps.append(class_p)
+
+            for class_p in class_ps:
+                class_p.join()
+
+            id_dist = []
+            for i in range(largest_id + 1):
+                try:
+                    item = {
+                        'id': i,
+                        'distance': class_distances[i],
+                        'class': parsed_docs[i].center_id
+                    }
+                    id_dist.append(item)
+                except KeyError:
+                    pass
+
+            # finding most frequent center in close neighborhood
+            id_dist.sort(key=lambda x: x['distance'], reverse=True)
+            k_id_dist = id_dist[:int(CONF['classification']['k'])]
+            classes = [c['class'] for c in k_id_dist]
+            counted_classes = Counter(classes)
+            new_doc.center_id, _ = counted_classes.most_common(1)[0]
+            LOG.info('New doc ({0}) classified as belonging to {1} : {2}'.
+                     format(new_doc.title, new_doc.center_id,
+                     parsed_docs[new_doc.center_id].title))
+            print([parsed_docs[doc].title for doc in parsed_docs if
+                   parsed_docs[doc].center_id ==
+                   new_doc.center_id])
+
+    else:
+        LOG.info('No documents to classify')
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption={Classification.run() - Classification class process main method}, label={lst:classification:run}]
+def run(self):
+    doc_id = self.iteration_offset
+    while doc_id < (self.largest_id + 1):
+        try:
+            existing_doc = self.parsed_docs[doc_id]
+            distance = Utils.calc_distance(self.new_doc, existing_doc)
+            self.class_distances[doc_id] = distance
+        except:
+            # there is no document with such ID, distance is -1
+            self.class_distances[doc_id] = -1
+
+        doc_id += self.iteration_size
+\end{lstlisting}
 
 \subsection{Classification - SVM}
 TODO
