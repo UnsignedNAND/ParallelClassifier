@@ -1,16 +1,21 @@
 \chapter{Implementation} \label{implementation}
 
 \section{Introduction}
-Presented solution uses master-slave architecture in order to provide scalable platform with means of parallel task execution. This chapter describes its code implementation for all of the algorithms and methods used in text document classification process.
+The presented solution uses a master-slave architecture in order to provide a scalable platform with means of parallel task execution. This chapter describes a code implementation for all of the algorithms and methods used in text document clusterization and classification process.
 
 
 \section{Implementation}
 \subsection{Preparing documents}
-First major step in whole application is to prepare documents for further processing. This includes loading documents from the source, converting them into feature matrix, reducing dimmensionality and finally measuring their similarity.
+The first major step of the designed application is to prepare documents for further processing. This task includes loading documents from the source, converting them into feature matrix, reducing dimmensionality and finally measuring similarity between two documents.
 
 \subsubsection{Reading and parsing documents}
 
-Whole task is orchestreted by \textit{parse()} method of main process. It creates all the processes involved in this work - a Reader process, multiple Parser processes and a single IDF process. It also initializes all communication channels for child processes to exchange information - queue, pipe and event objects are used.
+Whole task is orchestreted by the \textit{parse()} method of the main process. It creates all processes involved in reading and parsing documents:
+\begin{itemize}
+\item a Reader process, 
+\item multiple Parser processes, 
+\item a single IDF process.
+\end{itemize}  It also initializes communication channels for child processes that are used to exchange information - queue, pipe and event objects are utilized.
 
 \begin{lstlisting}[language=Python, caption={Main.parse() - Main process method for conducting document parsing}, label={lst:main:parse}]
 def parse(self):
@@ -79,7 +84,11 @@ def parse(self):
         ps_parser.join()
 \end{lstlisting}
 
-First step of presented workflow is loading documents into the system. This implementation allows it to be done in two alternative ways - either parse database dump represented in a form of large XML file or load them from prepared database. Number of ways can be easily expanded as their functions are self-contained and the only returned product are the documents. To allow for unblocked workflow, this task is conducted by Reader class in a single, seperate process. Main method of Reader class is presented on listing \ref{lst:reader:run}.
+The first step of the presented workflow is connected with loading documents into a system. This implementation allows for it in two alternative ways:
+\begin{itemize}
+\item parse database dump represented in a form of a large XML file 
+\item load them from the prepared database.
+\end{itemize}  The number of solutions for loading documents can be easily expanded as their functions are self-contained and the only output are the documents. As long as any algorithm provides documents in a proper form as its output, it can be used in this step. To prevent workflow from blocking, this task is conducted by the Reader class in a single, seperate process. Main method of the Reader class is presented on listing \ref{lst:reader:run}.
 
 
 \begin{lstlisting}[language=Python, caption={Reader.run() - Reader class process main method}, label={lst:reader:run}]
@@ -91,7 +100,7 @@ def run(self):
         self._read_from_file()
 \end{lstlisting}
 
-Loading from database (listing \ref{lst:reader:db}) is the most basic and straight forward one. This method consist from making connection to database and reading data found in Doc table into Page class instance, that would serve as a container for a single document throughout the whole flow of application. Created Page objects are put into queue for further processing.
+Loading documents from a database (listing \ref{lst:reader:db}) is the most basic and straight forward solution. This method consist of making a connection to a database and reading data found in \textbf{Doc} table into the Page class instance, that would serve as a container for a single document throughout the whole  application lifecycle. The created Page objects are put into queue for further processing.
 
 \begin{lstlisting}[language=Python, caption={Reader.\_read\_from\_db() - reading docs from database}, label={lst:reader:db}]
 def _read_from_db(self):
@@ -109,7 +118,7 @@ def _read_from_db(self):
 	self._q_unparsed_docs.put(None)
 \end{lstlisting}
 
-Second approach (listing \ref{lst:reader:xml}) includes loading documents from database dump in a form of XML file. This approach is more complicated, as it includes reading from a file that most often can not be fit into computers memory - size of XML containing articles from Wikipedia often span across multiple gigabytes of data. Knowing that this file can not be read in a standard way, another approach was proposed. Python's XML.SAX module allows to treat XML file as a stream of data and parse it using own handlers. For this purpose a WikiContentHandler class was designed and implemented. After reading each article it converts them into Page class objects and puts it into the queue for further processing.
+The second approach (listing \ref{lst:reader:xml}) includes loading documents from a database dump in a form of an XML file. This approach is more complicated, as it includes reading data from a file that most often can not be fit into computers memory - size of XML containing articles from the Wikipedia often span across multiple gigabytes of data. Knowing that this file can not be read in a standard way, another approach was proposed. Python's XML.SAX module allows to treat an XML file as a stream of data and parse it using own handlers. For this purpose the WikiContentHandler class was designed and implemented. After reading each article it converts them into the Page class objects and puts them into the queue for further processing.
 
 \begin{lstlisting}[language=Python, caption={Reader.\_read\_from\_file() - reading documents from XML file}, label={lst:reader:xml}]
 def _read_from_file(self):
@@ -130,11 +139,13 @@ def _read_from_file(self):
         self._q_unparsed_docs.put(None)
 \end{lstlisting} \label{impl-reader-xml}
 
-Both cases end with putting None value to the queue. It is a signal for other processes listening on the queue that all documents were read from source and put to the queue.
+Both cases are finished with putting None value to the queue. It is a signal for other processes listening on the queue that all documents were read from source and put to the queue.
 
-Next step is parsing loaded documents. Since Reader process is sending documents for processing one by one from the very begining of reading data source, a self-contained instances of Parser class are started in seperate processes along with it. For better efficency multiple processes of Parser class are created. \\
+In the next step the loaded documents are parsed. Since the Reader process is sending documents for processing one by one from the very begining of reading data source, a self-contained instances of the Parser class are started in seperate processes along with it. For better efficency multiple processes of the Parser class are created. \\
 
-Parser process logic is executed inside \textit{run()} method presented in listing \ref{lst:parser:run}. It runs a loop until \textit{\_process\_page()} method (listing \ref{lst:parser:process}) returns None value, which is send by Reader class object once all documents were read. If parsed document was received it is added to the list of documents parsed by this process. In other case the \textit{\_signal\_end\_processing()} method is called to notify all other processes that all documents in this process were parsed. Once list contains all documents that were assigned to this process, a \_tfidf() (listing \ref{lst:parser:tfidf}) method is called.
+Parser process logic is executed inside \textit{run()} method presented in listing \ref{lst:parser:run}. It runs a loop until \textit{\_process\_page()} method (listing \ref{lst:parser:process}) returns None value, which is send by the Reader class object once all documents were read. If parsed document is received, it will be added to the list of documents parsed by this process.
+
+ In other case the \textit{\_signal\_end\_processing()} method is called to notify all other processes that all documents in this process were parsed. Once list contains all documents that were assigned to this process, a \_tfidf() (listing \ref{lst:parser:tfidf}) method is called.
 
 \begin{lstlisting}[language=Python, caption={Parser.run() - Parser class process main method}, label={lst:parser:run}]
 def run(self):
@@ -151,7 +162,7 @@ def run(self):
     self._tfidf(parsed_pages)
 \end{lstlisting}
 
-Parser.\_process\_page() presented in listing \ref{lst:parser:process} is called for every single object send from Reader process using queue. It is responsible for receiving and processing documents it receives. If document is received, its text is tokenized and lemmatized, and for each token a TF value is calculated in \textit{Page.create\_tokens()} method. All created tokens are send to IDF process (IDF process is responsible for counting IDF value for each token, which then will be used to calculate TF-IDF values), where they are aggregated and counted. Reader process sends None object after all documents were loaded from source, in which case the None value is returned as well to notify calling method that processing work is finished.
+The Parser.\_process\_page() presented in listing \ref{lst:parser:process} is called for every single object send from the Reader process using queue. It is responsible for receiving and processing received documents. If document is received, its text is tokenized and lemmatized, and for each token a TF value is calculated in \textit{Page.create\_tokens()} method. All created tokens are send to the IDF process (IDF process is responsible for counting IDF value for each token, which then will be used to calculate TF-IDF values), where they are aggregated and counted. The Reader process sends None object after all documents were loaded from source, in which case the None value is returned to notify calling method that processing work was finished.
 
 \begin{lstlisting}[language=Python, caption={Parser.\_process\_page() - Processing of unparsed document}, label={lst:parser:process}]
 def _process_page(self):
@@ -166,7 +177,7 @@ def _process_page(self):
     return page
 \end{lstlisting}
 
-Once list in \textit{Parser.run()} (listing \ref{lst:parser:run}) contains all documents that were assigned to this process, a \_tfidf() (listing \ref{lst:parser:tfidf}) method is called. First, a lock in a form of multiprocessing event is checked. If event is set to low state its \textit{wait()} method causes calling process to stop and wait until event is set to high state. Once lock is raised, process starts receiving pairs of token and IDF values, which allows to calculate a TF-IDF value for every token in the document and create a feature matrix. Parsed document is send to main process as soon as all values are calculated for it..
+Once list in \textit{Parser.run()} (listing \ref{lst:parser:run}) contains all documents that were assigned to this process, a \_tfidf() (listing \ref{lst:parser:tfidf}) method is called. First, a lock in a form of multiprocessing event is checked. If event is set to low state its \textit{wait()} method causes calling process to stop and wait until event is set to high state. Once lock is raised, process starts receiving pairs of token and IDF values, which allows to calculate a TF-IDF value for every token in the document and create a feature matrix. Parsed document is sent to the main process as soon as all values are calculated for it.
 
 \begin{lstlisting}[language=Python, caption={Parser.\_tfidf() - calculating TD-IDF values for tokens in documents}, label={lst:parser:tfidf}]
 def _tfidf(self, parsed_pages):
@@ -188,7 +199,7 @@ def _tfidf(self, parsed_pages):
 \end{lstlisting}
 
 \subsubsection{Calculating distances}
-Calculating distances, or the similarity between documents, is a crucial pre-requirement for clusterization and classification. It is conducted after all documents have been parsed and the feature matrixes are available. As a result the matrix of distanes is created, where row and column numbers corresponds to document's IDs. For better efficiency multiple processes can be assigned to this task.
+Calculating distances, or the similarity between documents, is a crucial pre-requirement for clusterization and classification. It is conducted after all documents have been parsed and the feature matrixes are available. As a result, the matrix of distances is created, where row and column numbers corresponds to document IDs. For better efficiency multiple processes can be assigned to this task.
 
 Task orchestration is conducted in \textit{Main.distance()} method presented in listing \ref{lst:main:distance}. It spawns desired number of Distance class processes that will calculate distances for assigned portion of work. All processes have access to shared memory object of multiprocessing.Array class. It is an array implementation that allows to share data with read and write permissions between processes. As long as every process performs write operations on seperate cells of array, there is no performance degredation.
 
@@ -213,7 +224,7 @@ def distance(self):
         dist_p.join()
 \end{lstlisting}
 
-Internal operations of single process during document similarity calculations are presented in listing \ref{lst:distance:run}. Every process starts with a row which ID is equal to process ID. Upon completition of a single row, counter is increased by the number of processes working on this task. Because distance is a commutative property it is calculated onlye once for a pair of documents X and Y and is inserted at once under X:Y and Y:X location in the matrix. 
+Internal operations of single process during document similarity calculations are presented in listing \ref{lst:distance:run}. Every process starts with a row which ID is equal to process ID. Upon completition of a single row, counter is increased by the number of processes working on this task. Because distance is a commutative property it is calculated only once for a pair of documents X and Y and is inserted at once under X:Y and Y:X location in the matrix. 
 
 \begin{lstlisting}[language=Python, caption={Distance.run() - Distance class process main method}, label={lst:distance:run}]
 def run(self):
@@ -242,13 +253,13 @@ def run(self):
 
 \subsection{Clusterization}
 
-This implementation of k-means clustering algorithm presented in listing \ref{lst:main:cluster} is a continuus cooperation between master and slave processes. Master process is responsible for initializing communication channels, for scheduling workloads to slave processes and also for aggregating work done by slaves, assigning documents to groups, and to reschedule all work and send new group centers to slave processes.
+The implementation of k-means clustering algorithm presented in listing \ref{lst:main:cluster} is a continuous cooperation between master and slave processes. Master process is responsible for initializing communication channels, for scheduling workloads to slave processes and also for aggregating work done by slaves, assigning documents to groups, rescheduling all work and sending new group centers to slave processes.
 
-First initial centers must be generated. It is done in \textit{Utils.initialize\_cluster\_centers()} method, which returns a set of randomly selected documents that will act as a initial cluster centers. The number of centers to use during clusterization process can be predefined by changing \textit{clusterization/centers} value in configuration file. Centers are instance of \textit{ClusterCenter} class, that holds informations like groups central document ID and the list of all documents that were assigned to this center.
+At first, initial centers must be generated. It is done in \textit{Utils.initialize\_cluster\_centers()} method, which returns a set of randomly selected documents that will act as initial cluster centers. The number of centers used during clusterization process can be predefined by changing \textit{clusterization/centers} value in the configuration file. Centers are instances of \textit{ClusterCenter} class, that holds different pieces of information like groups central document ID and the list of all documents that were assigned to this center.
 
-Centers are send to slave processes for finding the closest center for documents. Once slave processes send back results, master process aggregates all results and attempts to find more appropriate centers in each of clusters by finding document with distance value closest to the average of distances in whole cluster. 
+All centers are sent to slave processes in order to find the closest center for given documents. Once slave processes send back results, master process aggregates all results and attempts to define more appropriate center in each cluster by looking for a document with distance value closest to the average of distances in whole cluster. 
 
-Whole process is being repeated until one of conditions is met: either there was no change at the end of iteration or the iterations number is over the limit. Default value of iterations limit is \textit{100}, but can be changed in configuration file.
+Whole process is repeated until one of conditions is met: either there was no change at the end of iteration or the iterations number is over the limit. Default value of iterations limit is \textit{100}, but it can be changed in the configuration file.
 
 \begin{lstlisting}[language=Python, caption={Main.cluster() - Main process method for conducting clustering}, label={lst:main:cluster}]
 def cluster(self):
@@ -340,7 +351,7 @@ def run(self):
         self._find_closest_docs_to_center()
 \end{lstlisting}
 
-\textit{\_find\_closest\_docs\_to\_center()} presented in listing \ref{st:clusterization:closest} iterates through all documents that were send to process and sends back a dictionary with information about document's ID, its closest center and the distance between these two. Closest center and distance is calculated in \textit{\_closest\_center\_id\_for\_doc\_id()} method in listing \ref{lst:clusterization:centerdoc}.
+\textit{\_find\_closest\_docs\_to\_center()} presented in listing \ref{st:clusterization:closest} iterates through all documents that were sent to process and responds with a dictionary that contains information about document ID, its closest center and the distance between these two. Closest center and distance is calculated in \textit{\_closest\_center\_id\_for\_doc\_id()} method in listing \ref{lst:clusterization:centerdoc}.
 
 \begin{lstlisting}[language=Python, caption={Clusterization.\_find\_closest\_docs\_to\_center() - Finding closest center for a document during clusterization, part 1}, label={lst:clusterization:closest}]
 def _find_closest_docs_to_center(self):
@@ -361,7 +372,7 @@ def _find_closest_docs_to_center(self):
     self.pipe_send_results.send(None)
 \end{lstlisting}
 
-Last method used in documelt clusterization is \textit{ \_closest\_center\_id\_for\_doc\_id()} method presented in listing \ref{lst:clusterization:centerdoc}. It takes a single document and compares distances between it and all cluster centers. Because distance is a function of similarity in this implementation, center with highest value is selected.
+Last method used in document clusterization is \textit{ \_closest\_center\_id\_for\_doc\_id()} method presented in listing \ref{lst:clusterization:centerdoc}. It takes a single document and compares distances between it and all cluster centers. Because distance is a function of similarity in this implementation, center with highest value is selected.
 
 \begin{lstlisting}[language=Python, caption={Clusterization.\_closest\_center\_id\_for\_doc\_id() - Finding closest center for a document during clusterization, part 2}, label={lst:clusterization:centerdoc}]
 def _closest_center_id_for_doc_id(self, did):
