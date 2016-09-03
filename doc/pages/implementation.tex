@@ -242,7 +242,13 @@ def run(self):
 
 \subsection{Clusterization}
 
-This implementation of k-means clustering algorithm is a continuus cooperation between master and slave processes. Master process is responsible for initializing communication channels, for scheduling workloads to slave processes and also for aggregating work done by slaves, assigning documents to groups, and to reschedule all work and send new group centers to slave processes. 
+This implementation of k-means clustering algorithm presented in listing \ref{lst:main:cluster} is a continuus cooperation between master and slave processes. Master process is responsible for initializing communication channels, for scheduling workloads to slave processes and also for aggregating work done by slaves, assigning documents to groups, and to reschedule all work and send new group centers to slave processes.
+
+First initial centers must be generated. It is done in \textit{Utils.initialize\_cluster\_centers()} method, which returns a set of randomly selected documents that will act as a initial cluster centers. The number of centers to use during clusterization process can be predefined by changing \textit{clusterization/centers} value in configuration file. Centers are instance of \textit{ClusterCenter} class, that holds informations like groups central document ID and the list of all documents that were assigned to this center.
+
+Centers are send to slave processes for finding the closest center for documents. Once slave processes send back results, master process aggregates all results and attempts to find more appropriate centers in each of clusters by finding document with distance value closest to the average of distances in whole cluster. 
+
+Whole process is being repeated until one of conditions is met: either there was no change at the end of iteration or the iterations number is over the limit. Default value of iterations limit is \textit{100}, but can be changed in configuration file.
 
 \begin{lstlisting}[language=Python, caption={Main.cluster() - Main process method for conducting clustering}, label={lst:main:cluster}]
 def cluster(self):
@@ -323,6 +329,8 @@ def cluster(self):
     print('centers:', len(centers))
 \end{lstlisting}
 
+Clusterization class process conducts search for closest documents. It awaits for master process to send a set of selected cluster centers. Each k-means iteration is calculated within a single iteration in each process in \textit{\_find\_closest\_docs\_to\_center()} method presented in listing \ref{lst:clusterization:closest}. Each process awaits for master process to send new centers (\textit{\_receive\_centers()} method) and then it starts computation presented in \ref{lst:clusterization:closest}.
+
 \begin{lstlisting}[language=Python, caption={Clusterization.run() - Clusterization class process main method}, label={lst:clusterization:run}]
 def run(self):
     while True:
@@ -331,6 +339,8 @@ def run(self):
             break
         self._find_closest_docs_to_center()
 \end{lstlisting}
+
+\textit{\_find\_closest\_docs\_to\_center()} presented in listing \ref{st:clusterization:closest} iterates through all documents that were send to process and sends back a dictionary with information about document's ID, its closest center and the distance between these two. Closest center and distance is calculated in \textit{\_closest\_center\_id\_for\_doc\_id()} method in listing \ref{lst:clusterization:centerdoc}.
 
 \begin{lstlisting}[language=Python, caption={Clusterization.\_find\_closest\_docs\_to\_center() - Finding closest center for a document during clusterization, part 1}, label={lst:clusterization:closest}]
 def _find_closest_docs_to_center(self):
@@ -351,7 +361,9 @@ def _find_closest_docs_to_center(self):
     self.pipe_send_results.send(None)
 \end{lstlisting}
 
-\begin{lstlisting}[language=Python, caption={Clusterization.\_closest\_center\_id\_for\_doc\_id() - Finding closest center for a document during clusterization, part 2}, label={lst:clusterization:run}]
+Last method used in documelt clusterization is \textit{ \_closest\_center\_id\_for\_doc\_id()} method presented in listing \ref{lst:clusterization:centerdoc}. It takes a single document and compares distances between it and all cluster centers. Because distance is a function of similarity in this implementation, center with highest value is selected.
+
+\begin{lstlisting}[language=Python, caption={Clusterization.\_closest\_center\_id\_for\_doc\_id() - Finding closest center for a document during clusterization, part 2}, label={lst:clusterization:centerdoc}]
 def _closest_center_id_for_doc_id(self, did):
     try:
         test = self.parsed_docs[did]
