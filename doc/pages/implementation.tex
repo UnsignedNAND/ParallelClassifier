@@ -5,312 +5,371 @@ Presented solution uses master-slave architecture in order to provide scalable p
 
 
 \section{Implementation}
-
 \subsection{Preparing documents}
+First major step in whole application is to prepare documents for further processing. This includes loading documents from the source, converting them into feature matrix, reducing dimmensionality and finally measuring their similarity.
 
-\subsubsection{Main process}
-\begin{lstlisting}[language=Python, caption=Main process]
+\subsubsection{Reading and parsing documents}
+
+Whole task is orchestreted by \textit{parse()} method of main process. It creates all the processes involved in this work - a Reader process, multiple Parser processes and a single IDF process. It also initializes all communication channels for child processes to exchange information - queue, pipe and event objects are used.
+
+\begin{lstlisting}[language=Python, caption={Main.parse() - Main process method for conducting document parsing}, label={lst:main:parse}]
 def parse(self):
     global parsed_docs
     global largest_id
     global tokens_idf
-    
+
     # initialize communication
-    
+
     queue_unparsed_docs = multiprocessing.Queue()
     queue_parsed_docs = multiprocessing.Queue()
     pipe_tokens_to_idf_parent, pipe_tokens_to_idf_child = multiprocessing.Pipe()
     pipes_tokens_to_processes_parent = []
     pipes_tokens_to_processes_child = []
-
     for i in range(PROCESSES):
-	    pipe_tokens_to_processes_parent, pipe_tokens_to_processes_child = multiprocessing.Pipe()
-	    pipes_tokens_to_processes_parent.append(pipe_tokens_to_processes_parent)
-	    pipes_tokens_to_processes_child.append(pipe_tokens_to_processes_child)
-    
+        pipe_tokens_to_processes_parent, pipe_tokens_to_processes_child = \
+            multiprocessing.Pipe()
+        pipes_tokens_to_processes_parent.append(pipe_tokens_to_processes_parent)
+        pipes_tokens_to_processes_child.append(pipe_tokens_to_processes_child)
+
     # additional pipe to transfer IDF values from IDF process to master
     pipe_idf_master_parent, pipe_idf_master_child = multiprocessing.Pipe()
     pipes_tokens_to_processes_parent.append(pipe_idf_master_parent)
-    
+
     event = multiprocessing.Event()
     event.clear()
-    
+
     # set up processes
-    
+
     ps_reader = Reader(q_unparsed_docs=queue_unparsed_docs)
     ps_parsers = create_parsers(
-	    queue_unparsed_documents=queue_unparsed_docs,
-	    pipe_tokens_to_idf_child=pipe_tokens_to_idf_child,
-	    event=event,
-	    pipes_tokens_to_processes_child=pipes_tokens_to_processes_child,
-	    queue_parsed_docs=queue_parsed_docs,
-	    process_num=PROCESSES
+        queue_unparsed_documents=queue_unparsed_docs,
+        pipe_tokens_to_idf_child=pipe_tokens_to_idf_child,
+        event=event,
+        pipes_tokens_to_processes_child=pipes_tokens_to_processes_child,
+        queue_parsed_docs=queue_parsed_docs,
+        process_num=PROCESSES
     )
     ps_idf = IDF(
-	    pipe_tokens_to_idf_parent=pipe_tokens_to_idf_parent,
-	    docs_num=int(CONF['general']['item_limit']),
-	    event=event,
-	    pipes_tokens_to_processes_parent=pipes_tokens_to_processes_parent,
-	    process_num=PROCESSES
+        pipe_tokens_to_idf_parent=pipe_tokens_to_idf_parent,
+        docs_num=int(CONF['general']['item_limit']),
+        event=event,
+        pipes_tokens_to_processes_parent=pipes_tokens_to_processes_parent,
+        process_num=PROCESSES
     )
-    
+
     # read all the articles from XML and do TF-IDF
     ps_reader.start()
-    
-    LOG.info("Started processing documents using {0} processes".format(PROCESSES))
+
+    LOG.info("Started processing documents using {0} processes".format(
+        PROCESSES))
     for ps_parser in ps_parsers:
-	    ps_parser.start()
+        ps_parser.start()
     ps_idf.start()
-    
+
     # receive tokens IDF values from IDF process
     tokens_idf = pipe_idf_master_child.recv()
-    
+
     ps_reader.join()
     ps_idf.join()
-    
+
     # processes will not end until all the data is not received
     parsed_docs = self._receive_parsed_docs(queue_parsed_docs)
-    
+
     for ps_parser in ps_parsers:
-	    ps_parser.join()
+        ps_parser.join()
 \end{lstlisting}
 
-\subsubsection{Reading documents from source}
-\begin{lstlisting}[language=Python, caption=Reader class]
+First step of presented workflow is loading documents into the system. This implementation allows it to be done in two alternative ways - either parse database dump represented in a form of large XML file or load them from prepared database. Number of ways can be easily expanded as their functions are self-contained and the only returned product are the documents. To allow for unblocked workflow, this task is conducted by Reader class in a single, seperate process. Main method of Reader class is presented on listing \ref{lst:reader:run}.
 
 
-class Reader(multiprocessing.Process):
-	def __init__(self, q_unparsed_docs):
-		self._q_unparsed_docs = q_unparsed_docs
-		super(self.__class__, self).__init__()
-
-	def _read_from_file(self):
-		wiki_handler = WikiContentHandler(self._q_unparsed_docs)
-		sax_parser = xml.sax.make_parser()
-		sax_parser.setContentHandler(wiki_handler)
-
-		try:
-			data_source = open('../data/wiki_dump.xml')
-			sax_parser.parse(data_source)
-			LOG.info('Parsed {0} items'.format(wiki_handler.items_saved))
-	except PageLimitException as page_limit_exception:
-		LOG.info(page_limit_exception)
-	except KeyboardInterrupt:
-		exit()
-	finally:
-		# A pill for other threads
-		self._q_unparsed_docs.put(None)
-
-	def _read_from_db(self):
-		Db.init()
-		session = Db.create_session()
-		pages = session.query(Models.Doc).all()
-
-		for page in pages:
-			p = Page()
-			p.id = page.id
-			p.title = page.title
-			p.content = page.text
-			self._q_unparsed_docs.put(p)
-		self._q_unparsed_docs.put(None)	
-
-	def run(self):
-		if str2bool(CONF['general']['load_from_db']):
-			LOG.info('Loading from DB')
-			self._read_from_db()
-		else:
-			self._read_from_file()
+\begin{lstlisting}[language=Python, caption={Reader.run() - Reader class process main method}, label={lst:reader:run}]
+def run(self):
+    if str2bool(CONF['general']['load_from_db']):
+        LOG.info('Loading from DB')
+        self._read_from_db()
+    else:
+        self._read_from_file()
 \end{lstlisting}
 
-\begin{lstlisting}[language=Python, caption=XML parser]
-class WikiContentHandler(xml.sax.ContentHandler):
-    def __init__(self, q_unparsed_documents):
-        self._path = []
-        self._text = None
-        self._title = None
-        self._redirect = None
-        self._items_limit = int(CONF['general']['item_limit'])
-        self._classification_items_limit = int(
-            CONF['classification']['item_limit'])
-        self.items_saved = 0
-        self._documents_saved = 0
-        self._redirects_saved = 0
-        self._q_unparsed_documents = q_unparsed_documents
+Loading from database (listing \ref{lst:reader:db}) is the most basic and straight forward one. This method consist from making connection to database and reading data found in Doc table into Page class instance, that would serve as a container for a single document throughout the whole flow of application. Created Page objects are put into queue for further processing.
 
-        if str2bool(CONF['general']['save_to_db']):
-            Db.init()
-            Db.clean()  # database has to be cleaned every time to ensure
-            # that IDs are unique
-            self.session = Db.create_session()
+\begin{lstlisting}[language=Python, caption={Reader.\_read\_from\_db() - reading docs from database}, label={lst:reader:db}]
+def _read_from_db(self):
+	Db.init()
+	session = Db.create_session()
+	pages = session.query(Models.Doc).all()
+	
+	for page in pages:
+		p = Page()
+		p.id = page.id
+		p.title = page.title
+		p.content = page.text
+	self._q_unparsed_docs.put(p)
+	# A pill for other threads
+	self._q_unparsed_docs.put(None)
+\end{lstlisting}
 
-    def startElement(self, name, attributes):
-        if name == "page":
-            assert self._path == []
-            self._text = None
-            self._title = None
-            self._redirect = None
-        elif name == "title":
-            assert self._path == ["page"]
-            assert self._title is None
-            self._title = ""
-        elif name == "redirect":
-            assert self._path == ["page"]
-            assert self._redirect is None
-            self._redirect = attributes['title']
-        elif name == "text":
-            assert self._path == ["page"]
-            assert self._text is None
-            self._text = ""
+Second approach (listing \ref{lst:reader:xml}) includes loading documents from database dump in a form of XML file. This approach is more complicated, as it includes reading from a file that most often can not be fit into computers memory - size of XML containing articles from Wikipedia often span across multiple gigabytes of data. Knowing that this file can not be read in a standard way, another approach was proposed. Python's XML.SAX module allows to treat XML file as a stream of data and parse it using own handlers. For this purpose a WikiContentHandler class was designed and implemented. After reading each article it converts them into Page class objects and puts it into the queue for further processing.
+
+\begin{lstlisting}[language=Python, caption={Reader.\_read\_from\_file() - reading documents from XML file}, label={lst:reader:xml}]
+def _read_from_file(self):
+    wiki_handler = WikiContentHandler(self._q_unparsed_docs)
+    sax_parser = xml.sax.make_parser()
+    sax_parser.setContentHandler(wiki_handler)
+
+    try:
+        data_source = open('../data/wiki_dump.xml')
+        sax_parser.parse(data_source)
+        LOG.info('Parsed {0} items'.format(wiki_handler.items_saved))
+    except PageLimitException as page_limit_exception:
+        LOG.info(page_limit_exception)
+    except KeyboardInterrupt:
+        exit()
+    finally:
+        # A pill for other threads
+        self._q_unparsed_docs.put(None)
+\end{lstlisting} \label{impl-reader-xml}
+
+Both cases end with putting None value to the queue. It is a signal for other processes listening on the queue that all documents were read from source and put to the queue.
+
+Next step is parsing loaded documents. Since Reader process is sending documents for processing one by one from the very begining of reading data source, a self-contained instances of Parser class are started in seperate processes along with it. For better efficency multiple processes of Parser class are created. \\
+
+Parser process logic is executed inside \textit{run()} method presented in listing \ref{lst:parser:run}. It runs a loop until \textit{\_process\_page()} method (listing \ref{lst:parser:process}) returns None value, which is send by Reader class object once all documents were read. If parsed document was received it is added to the list of documents parsed by this process. In other case the \textit{\_signal\_end\_processing()} method is called to notify all other processes that all documents in this process were parsed. Once list contains all documents that were assigned to this process, a \_tfidf() (listing \ref{lst:parser:tfidf}) method is called.
+
+\begin{lstlisting}[language=Python, caption={Parser.run() - Parser class process main method}, label={lst:parser:run}]
+def run(self):
+    self.parsed_pages_num = 0
+    parsed_pages = []
+    while True:
+        page = self._process_page()
+        if page:
+            parsed_pages.append(page)
         else:
-            assert len(self._path) == 0 or self._path[-1] == "page"
-            return
+            self._signal_end_processing()
+            break
 
-        self._path.append(name)
-
-    def endElement(self, name):
-        if len(self._path) > 0 and name == self._path[-1]:
-            del self._path[-1]
-        if name == "text":
-            # We have the complete article: write it to db
-            if not self._redirect:
-                # Page
-                page = Page()
-                # reading is run in a single thread, so we can generate an
-                # unique ID here
-                page.id = self.items_saved
-                page.content = self._text
-                page.title = self._title
-                self._q_unparsed_documents.put(page)
-
-                if str2bool(CONF['general']['save_to_db']):
-                    page = Models.Doc()
-                    page.id = page.id = self.items_saved
-                    page.text = self._text
-                    page.title = self._title
-                    self.session.add(page)
-            else:
-                pass
-                # TODO do redirects carry any relevant information?
-            self._monitor_progress()
-
-    def _monitor_progress(self):
-        self.items_saved += 1
-        if not self._redirect:
-            self._documents_saved += 1
-        else:
-            self._redirects_saved += 1
-
-        if str2bool(CONF['general']['save_to_db']):
-            if self.items_saved % 10:
-                self.session.commit()
-
-        if self.items_saved % (int(math.ceil(self._items_limit/10)) if int(
-                math.ceil(self._items_limit/10)) > 0 else 1) == 0:
-            LOG.debug('[{0:6.2f} %] Parsed {1} / {2} items'.format(
-                self.items_saved / float(self._items_limit) * 100,
-                self.items_saved, self._items_limit),
-            )
-        if self._items_limit and self.items_saved >= self._items_limit:
-            if str2bool(CONF['general']['save_to_db']):
-                self.session.commit()
-            raise PageLimitException('Parser hit items limit ({0}), '
-                                     'Parsed pages: {1}, '
-                                     'Parsed redirects {2}'.format(
-                                         self._items_limit,
-                                         self._documents_saved,
-                                         self._redirects_saved
-                                         )
-                                     )
-
-    def characters(self, content):
-        assert content is not None and len(content) > 0
-        if len(self._path) == 0:
-            return
-
-        if self._path[-1] == "title":
-            self._title += content
-        elif self._path[-1] == "text":
-            assert self._title is not None
-            self._text += content
+    self._tfidf(parsed_pages)
 \end{lstlisting}
 
-\subsubsection{Calculating tokens TF-IDF values }
-\begin{lstlisting}[language=Python, caption=IDF process]
-import math
-import multiprocessing
+Parser.\_process\_page() presented in listing \ref{lst:parser:process} is called for every single object send from Reader process using queue. It is responsible for receiving and processing documents it receives. If document is received, its text is tokenized and lemmatized, and for each token a TF value is calculated in \textit{Page.create\_tokens()} method. All created tokens are send to IDF process (IDF process is responsible for counting IDF value for each token, which then will be used to calculate TF-IDF values), where they are aggregated and counted. Reader process sends None object after all documents were loaded from source, in which case the None value is returned as well to notify calling method that processing work is finished.
 
-from data.db import Db, Models
-from utils.config import get_conf
-from utils.general import str2bool
+\begin{lstlisting}[language=Python, caption={Parser.\_process\_page() - Processing of unparsed document}, label={lst:parser:process}]
+def _process_page(self):
+    page = self._queue_unparsed_docs.get()
+    if page is None:
+        return None
+    page.create_tokens()
+    for token in page.tokens:
+        self._pipe_tokens_to_idf_child.send(token.stem)
+    page.content_clean()
+    self.parsed_pages_num += 1
+    return page
+\end{lstlisting}
 
-CONF = get_conf()
+Once list in \textit{Parser.run()} (listing \ref{lst:parser:run}) contains all documents that were assigned to this process, a \_tfidf() (listing \ref{lst:parser:tfidf}) method is called. First, a lock in a form of multiprocessing event is checked. If event is set to low state its \textit{wait()} method causes calling process to stop and wait until event is set to high state. Once lock is raised, process starts receiving pairs of token and IDF values, which allows to calculate a TF-IDF value for every token in the document and create a feature matrix. Parsed document is send to main process as soon as all values are calculated for it..
 
+\begin{lstlisting}[language=Python, caption={Parser.\_tfidf() - calculating TD-IDF values for tokens in documents}, label={lst:parser:tfidf}]
+def _tfidf(self, parsed_pages):
+    print('Process {0} waiting on IDF to finish...'.format(self.pid))
+    self._event.wait()
+    recv_tokens = self._pipe_tokens_to_processes_child.recv()
+    print('Process {0} received {1} tokens from IDF'.format(
+        self.pid, len(recv_tokens)))
+    for page in parsed_pages:
+        for token in page.tokens:
+            try:
+                token.idf = recv_tokens[token.stem]
+                page.tfidf[token.stem] = token.calc_tf_idf()
+            except KeyError as ke:
+                print('error', token)
+        self._queue_parsed_docs.put(page)
+    # sending process-end pill
+    self._queue_parsed_docs.put(None)
+\end{lstlisting}
 
-class IDF(multiprocessing.Process):
-    def __init__(self, pipe_tokens_to_idf_parent, docs_num, event,
-                 pipes_tokens_to_processes_parent, process_num):
-        self._pipe_tokens_to_idf_parent = pipe_tokens_to_idf_parent
-        self._docs_num = docs_num  # total number of documents
-        self._event = event
-        self._tokens = {}
-        self._pipes_tokens_to_processes_parent = \
-            pipes_tokens_to_processes_parent
-        self.process_num = process_num
-        super(self.__class__, self).__init__()
+\subsubsection{Calculating distances}
+Calculating distances, or the similarity between documents, is a crucial pre-requirement for clusterization and classification. It is conducted after all documents have been parsed and the feature matrixes are available. As a result the matrix of distanes is created, where row and column numbers corresponds to document's IDs. For better efficiency multiple processes can be assigned to this task.
 
-    def _receive_tokens(self):
-        pills = 0
-        while pills < self.process_num:
-            msg = self._pipe_tokens_to_idf_parent.recv()
-            if msg is None:
-                pills += 1
-                continue
-            if msg in self._tokens.keys():
-                self._tokens[msg] += 1
-            else:
-                self._tokens[msg] = 1
+Task orchestration is conducted in \textit{Main.distance()} method presented in listing \ref{lst:main:distance}. It spawns desired number of Distance class processes that will calculate distances for assigned portion of work. All processes have access to shared memory object of multiprocessing.Array class. It is an array implementation that allows to share data with read and write permissions between processes. As long as every process performs write operations on seperate cells of array, there is no performance degredation.
 
-    def _calc_token_idf(self, token):
-        # IDF(token) = 1 + log_e(Total Number Of Documents / Number Of
-        # Documents with token in it)
-        token_idf = 1 + math.log(self._docs_num / self._tokens[token],
-                                 math.e)
-        self._tokens[token] = token_idf
-        return token_idf
+\begin{lstlisting}[language=Python, caption={Main.distance() - Main process method for conducting distance calculations}, label={lst:main:distance}]
+def distance(self):
+    global distances
+    distances = multiprocessing.Array('d', (largest_id+1)*(largest_id+1))
 
-    def run(self):
-        session = None
-        token_counter = None
-        if str2bool(CONF['general']['save_to_db']):
-            Db.init()
-            session = Db.create_session()
-            token_counter = 0
+    dist_ps = []
+    for i in range(PROCESSES):
+        dist_p = Distance(
+            iteration_offset=i,
+            iteration_size=PROCESSES,
+            distances=distances,
+            largest_id=largest_id,
+            parsed_docs=parsed_docs
+        )
+        dist_p.start()
+        dist_ps.append(dist_p)
 
-        self._receive_tokens()
+    for dist_p in dist_ps:
+        dist_p.join()
+\end{lstlisting}
 
-        for token in self._tokens:
-            token_idf = self._calc_token_idf(token)
+Internal operations of single process during document similarity calculations are presented in listing \ref{lst:distance:run}. Every process starts with a row which ID is equal to process ID. Upon completition of a single row, counter is increased by the number of processes working on this task. Because distance is a commutative property it is calculated onlye once for a pair of documents X and Y and is inserted at once under X:Y and Y:X location in the matrix. 
 
-            if str2bool(CONF['general']['save_to_db']):
-                token_counter += 1
-                t = Models.Token()
-                t.stem = token
-                t.idf = token_idf
-                session.add(t)
-
-                if token_counter % 50 == 0:
-                    session.commit()
-        if str2bool(CONF['general']['save_to_db']):
-            session.commit()
-        self._event.set()
-        for pipe in self._pipes_tokens_to_processes_parent:
-            pipe.send(self._tokens)
-        print('IDF sent {0} tokens'.format(len(self._tokens)))
-
+\begin{lstlisting}[language=Python, caption={Distance.run() - Distance class process main method}, label={lst:distance:run}]
+def run(self):
+    row = self.iteration_offset
+    while row < (self.largest_id + 1):
+        try:
+            doc1 = self.parsed_docs[row]
+            self.distances[Utils.coord_2d_to_1d(row, row, (self.largest_id + 1))] = 1.0
+            for col in range(row):
+                distance = 0.0
+                try:
+                    doc2 = self.parsed_docs[col]
+                    distance = Utils.calc_distance(doc1, doc2)
+                except:
+                    distance = -2
+                self.distances[Utils.coord_2d_to_1d(col, row, (self.largest_id + 1))] = distance
+                self.distances[Utils.coord_2d_to_1d(row, col, (self.largest_id + 1))] = distance
+        except:
+            # there is no document with such ID, fill it with -1
+            # distances
+            for col in range(row+1):
+                self.distances[Utils.coord_2d_to_1d(col, row, (self.largest_id + 1))] = -1
+                self.distances[Utils.coord_2d_to_1d(row, col, (self.largest_id + 1))] = -1
+        row += self.iteration_size
 \end{lstlisting}
 
 \subsection{Clusterization}
-TODO
+
+This implementation of k-means clustering algorithm is a continuus cooperation between master and slave processes. Master process is responsible for initializing communication channels, for scheduling workloads to slave processes and also for aggregating work done by slaves, assigning documents to groups, and to reschedule all work and send new group centers to slave processes. 
+
+\begin{lstlisting}[language=Python, caption={Main.cluster() - Main process method for conducting clustering}, label={lst:main:cluster}]
+def cluster(self):
+    global distances
+    global parsed_docs
+
+    center_num = int(CONF['clusterization']['centers'])
+    centers = Utils.initialize_cluster_centers(
+        center_num=center_num,
+        start=0,
+        end=largest_id,
+        parsed_docs=parsed_docs
+    )
+    new_centers = {}
+
+    cluster_ps = []
+    pipe_receive_results, pipe_send_results = multiprocessing.Pipe()
+
+    for pid in range(PROCESSES):
+        pipe_send_centers, pipe_receive_centers = multiprocessing.Pipe()
+        cluster_p = Clusterization(
+            offset=pid,
+            shift=PROCESSES,
+            pipe_send_centers=pipe_send_centers,
+            pipe_receive_centers=pipe_receive_centers,
+            parsed_docs=parsed_docs,
+            distances=distances,
+            largest_id=largest_id,
+            pipe_send_results=pipe_send_results,
+        )
+        cluster_p.start()
+        cluster_ps.append(cluster_p)
+
+    iteration = 0
+    iteration_limit = int(CONF['clusterization']['iterations_limit'])
+    changed = False
+    docs_num = 0
+    while iteration < iteration_limit:
+        docs_num = 0
+        for cluster_p in cluster_ps:
+            cluster_p.pipe_send_centers.send(list(centers.keys()))
+        new_centers = {}
+        not_finished = PROCESSES
+        while not_finished:
+            recv = pipe_receive_results.recv()
+            if not recv:
+                not_finished -= 1
+            else:
+                cid = recv['cid']
+                did = recv['did']
+                dist = recv['dist']
+                centers[cid].add_doc(doc_id=did, distance=dist)
+                parsed_docs[did].center_id = cid
+        for cid in centers:
+            docs_num += len(centers[cid].doc_ids)
+        for cid in centers:
+            new_cid = centers[cid].find_closest_doc_to_average()
+            if not centers[cid].center_changed:
+                new_cid = cid
+            new_center = ClusterCenter()
+            new_center.doc_ids = {}
+            new_center.pre_doc_ids = {}
+            new_center.center_id = new_cid
+            new_centers[new_cid] = new_center
+            if cid != new_cid:
+                changed = True
+
+        if not changed:
+            break
+        centers = new_centers
+        iteration += 1
+
+    for cluster_p in cluster_ps:
+        cluster_p.pipe_send_centers.send(None)
+        cluster_p.join()
+    print('Docs sum: ', docs_num)
+    print('parsed docs: ', len(parsed_docs))
+    print('centers:', len(centers))
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption={Clusterization.run() - Clusterization class process main method}, label={lst:clusterization:run}]
+def run(self):
+    while True:
+        self._receive_centers()
+        if not self.centers:
+            break
+        self._find_closest_docs_to_center()
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption={Clusterization.\_find\_closest\_docs\_to\_center() - Finding closest center for a document during clusterization, part 1}, label={lst:clusterization:closest}]
+def _find_closest_docs_to_center(self):
+    did = self.offset
+    while did < self.largest_id:
+        try:
+            ret = self._closest_center_id_for_doc_id(did)
+            if ret:
+                closest_cid, distance = ret
+                self.pipe_send_results.send({
+                    'cid': closest_cid,
+                    'did': did,
+                    'dist': distance,
+                })
+            did += self.shift
+        except Exception as ex:
+            print(ex)
+    self.pipe_send_results.send(None)
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption={Clusterization.\_closest\_center\_id\_for\_doc\_id() - Finding closest center for a document during clusterization, part 2}, label={lst:clusterization:run}]
+def _closest_center_id_for_doc_id(self, did):
+    try:
+        test = self.parsed_docs[did]
+    except:
+        return None
+    closest_cid = None
+    closest_cid_distance = -100
+    for cid in self.centers:
+        cid_distance = self.distances[Utils.coord_2d_to_1d(cid, did,
+                                                           self.largest_id)]
+        if closest_cid_distance < cid_distance:
+            closest_cid = cid
+            closest_cid_distance = cid_distance
+    if closest_cid is None:
+        raise Exception('Error in finding closest '
+                        'distance doc_id:{0}'.format(did))
+    return closest_cid, closest_cid_distance
+\end{lstlisting}
 
 \subsection{Classification - kNN}
 TODO
