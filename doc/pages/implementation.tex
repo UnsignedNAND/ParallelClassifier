@@ -251,7 +251,7 @@ def run(self):
         row += self.iteration_size
 \end{lstlisting}
 
-\subsection{Clusterization}
+\subsection{Clusterization} \label{impl:clusterization}
 
 The implementation of k-means clustering algorithm presented in listing \ref{lst:main:cluster} is a continuous cooperation between master and slave processes. Master process is responsible for initializing communication channels, for scheduling workloads to slave processes and also for aggregating work done by slaves, assigning documents to groups, rescheduling all work and sending new group centers to slave processes.
 
@@ -394,7 +394,18 @@ def _closest_center_id_for_doc_id(self, did):
     return closest_cid, closest_cid_distance
 \end{lstlisting}
 
-\subsection{Classification - kNN}
+\subsection{Classification}
+
+Classification is run in the final phase of application. It consist of two parts - kNN and SVM. First one is used for general decision that narrows the possible class memberships on which the second one will work on, giving more precise decision.
+
+\subsubsection{kNN}
+kNN's classification is run in parallel in seperate processes. Main process is responsible for initializing communication, launching processes and dividing work between them. It bases on informations provided by clusterization phase described in detail in section \ref{impl:clusterization}.
+
+kNN goal is to find \textit{k} nearest number for selected doument. \textit{k} number is customizable and can be changed in configuration file under \textit{classification/k} key. Document can be pointed out in configuration file as well by assigning it's ID to \textit{classification/new\_doc\_start\_id} key. In current implementation documents for classification can be only read from database.
+
+New document, before being classified, must be prepared in the same way as documents before distance calculations were parsed. It is done in \textit{\_prepare\_new\_doc()} method presented in listing \ref{lst:classification:newdoc}.
+
+Next, each of worker processes (listing \ref{lst:classification:run}) receives a sub set of existing documents to calculate distances between them and the new document. Resulst are sent back to the main process, were thay are aggregated and the \textit{k} closest ones are selected. Label for new document is created basing on the most frequent membership in documents in the selected group.
 
 \begin{lstlisting}[language=Python, caption={Main.classify() - Main process method for conducting kNN classification}, label={lst:main:classify}]
 def classify(self):
@@ -452,6 +463,27 @@ def classify(self):
         LOG.info('No documents to classify')
 \end{lstlisting}
 
+To be able to find closest neighbors to new document, it must be prepared. It is done in \textit{\_prepare\_new\_doc()} presented in listing \ref{lst:classification:newdoc}. Document is transformed into Page class object and its feature matrix is created. For each token a TF-IDF must be calculated. TF value is calculated for a single document, so no further action was required. In the case of IDF it was necessary to look up token's IDF value in existing structures, as by rule this value is releated to word frequency in whole corpus.
+
+\begin{lstlisting}[language=Python, caption={prepare\_new\_doc() - Method used in classification for parsing new document}, label={lst:classification:newdoc}]
+def _prepare_new_doc(self, doc):
+    page = Page()
+    page.title = doc.title
+    page.content = doc.text
+    page.create_tokens()
+    # import tokens IDF values from already classified documents
+    for page_token in page.tokens:
+        try:
+            page_token.idf = tokens_idf[page_token.stem]
+        except KeyError:
+            # token did not appear in previous documents
+            page_token.idf = 1 + math.log((len(parsed_docs) + 1) / 1.0,
+                                          math.e)
+        finally:
+            page.calc_tokens_tfidf()
+    return page
+\end{lstlisting}
+
 \begin{lstlisting}[language=Python, caption={Classification.run() - Classification class process main method}, label={lst:classification:run}]
 def run(self):
     doc_id = self.iteration_offset
@@ -466,6 +498,3 @@ def run(self):
 
         doc_id += self.iteration_size
 \end{lstlisting}
-
-\subsection{Classification - SVM}
-TODO
