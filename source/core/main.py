@@ -12,6 +12,7 @@ from core.utils import Utils
 from data.db import Db, Models
 from models.cluster.cluster_center import ClusterCenter
 from models.page import Page
+from sklearn import svm
 from utils.config import get_conf
 from utils.log import get_log
 from utils.timer import timer
@@ -316,16 +317,37 @@ class Main(object):
 
     @timer
     def classify_svm(self):
-        d_tokens = {}
-        document_classes = []
-        tokens = []
+        document_classes = {}
+        tokens = {}
         matrix = []
         for did in self.k_closest:
             doc = parsed_docs[did['id']]
-            document_classes.append(doc.center_id)
+            document_classes[doc.center_id] = 1
             print(doc.title, doc.center_id)
+
+            # create key-vector for feature matrix
             for token in parsed_docs[did['id']].tokens:
-                d_tokens[token.stem] = 1
-        tokens = d_tokens.keys()
+                tokens[token.stem] = 1
+
+        if not len(document_classes) == 2:
+            print('classes is not 2', len(document_classes))
+            exit()
+        document_classes = list(document_classes.keys())
+        tokens = list(tokens.keys())
+
         for did in self.k_closest:
             doc = parsed_docs[did['id']]
+            doc_feature = []
+            for token in tokens:
+                feature_value = 0.0
+                try:
+                    feature_value = doc.tfidf[token]
+                except:
+                    pass
+                doc_feature.append(feature_value)
+            matrix.append((doc_feature))
+
+        clf = svm.SVC(kernel='linear', C=1.0)
+        clf.fit(matrix, document_classes)
+
+        print(clf.predict(matrix[0]))
