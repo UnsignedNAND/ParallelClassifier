@@ -1,3 +1,4 @@
+import itertools
 import math
 import multiprocessing
 
@@ -8,6 +9,7 @@ from core.process.distance import Distance
 from core.process.idf import IDF
 from core.process.parser import create_parsers
 from core.process.reader import Reader
+from core.process.svm import SVM
 from core.utils import Utils
 from data.db import Db, Models
 from models.cluster.cluster_center import ClusterCenter
@@ -29,6 +31,7 @@ tokens_idf = {}
 
 class Main(object):
     k_closest = None
+    k_classes = None
 
 
     def __init__(self):
@@ -299,11 +302,12 @@ class Main(object):
                 id_dist.sort(key=lambda x: x['distance'], reverse=True)
                 k_closest = id_dist[:int(CONF['classification']['k'])]
                 self.k_closest = k_closest
+                classes = [c['class'] for c in k_closest]
+                counted_classes = Counter(classes)
+                self.k_classes = counted_classes
 
                 #########
 
-                classes = [c['class'] for c in k_closest]
-                counted_classes = Counter(classes)
                 new_doc.center_id, _ = counted_classes.most_common(1)[0]
                 LOG.info('New doc ({0}) classified as belonging to {1} : {2}'.
                          format(new_doc.title, new_doc.center_id,
@@ -317,37 +321,86 @@ class Main(object):
 
     @timer
     def classify_svm(self):
-        document_classes = {}
-        tokens = {}
-        matrix = []
-        for did in self.k_closest:
-            doc = parsed_docs[did['id']]
-            document_classes[doc.center_id] = 1
-            print(doc.title, doc.center_id)
+        print(self.k_classes)
+        if len(self.k_classes) < 2:
+            LOG.info('There is only one possible class, not need to run SVM')
+            return
 
-            # create key-vector for feature matrix
-            for token in parsed_docs[did['id']].tokens:
-                tokens[token.stem] = 1
+        # extract token names for existing documents
+        # extract token names for new document
+        # combine them in single list
+        # create feature vector for every document
+        #   {
+        #      did
+        #      class
+        #      feature vector
+        #   }
 
-        if not len(document_classes) == 2:
-            print('classes is not 2', len(document_classes))
-            exit()
-        document_classes = list(document_classes.keys())
-        tokens = list(tokens.keys())
+        results = {}
+        pair_queue = multiprocessing.Queue()
+        result_queue = multiprocessing.Queue()
 
-        for did in self.k_closest:
-            doc = parsed_docs[did['id']]
-            doc_feature = []
-            for token in tokens:
-                feature_value = 0.0
-                try:
-                    feature_value = doc.tfidf[token]
-                except:
-                    pass
-                doc_feature.append(feature_value)
-            matrix.append((doc_feature))
+        svm_ps = []
+        for pid in range(PROCESSES):
+            svm_p = SVM(pair_queue, result_queue)
+            svm_p.start()
+            svm_ps.append(svm_p)
 
-        clf = svm.SVC(kernel='linear', C=1.0)
-        clf.fit(matrix, document_classes)
+        # generate n(n-1)/2 class pairs
+        combinations = itertools.combinations(self.k_classes, 2)
 
-        print(clf.predict(matrix[0]))
+        for pair in combinations:
+            LOG.debug('Sending class pair: {0}'.format(pair))
+            pair_queue.put(pair)
+
+        for i in range(PROCESSES):
+            pair_queue.put(None)
+
+        not_finished = PROCESSES
+        while not_finished:
+            res = result_queue.get()
+            if not res:
+                not_finished -= 1
+                continue
+            results[res['result']] = res
+
+        LOG.info('Finished ciassification')
+        print(results)
+
+        for svm_p in svm_ps:
+            svm_p.join()
+
+        # document_classes = {}
+        # tokens = {}
+        # matrix = []
+        # for did in self.k_closest:
+        #     doc = parsed_docs[did['id']]
+        #     document_classes[doc.center_id] = 1
+        #     print(doc.title, doc.center_id)
+        #
+        #     # create key-vector for feature matrix
+        #     for token in parsed_docs[did['id']].tokens:
+        #         tokens[token.stem] = 1
+        #
+        # if not len(document_classes) == 2:
+        #     print('classes is not 2', len(document_classes))
+        #     exit()
+        # document_classes = list(document_classes.keys())
+        # tokens = list(tokens.keys())
+        #
+        # for did in self.k_closest:
+        #     doc = parsed_docs[did['id']]
+        #     doc_feature = []
+        #     for token in tokens:
+        #         feature_value = 0.0
+        #         try:
+        #             feature_value = doc.tfidf[token]
+        #         except:
+        #             pass
+        #         doc_feature.append(feature_value)
+        #     matrix.append((doc_feature))
+        #
+        # clf = svm.SVC(kernel='linear', C=1.0)
+        # clf.fit(matrix, document_classes)
+        #
+        # print(clf.predict(matrix[0]))
