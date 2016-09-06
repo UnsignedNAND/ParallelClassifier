@@ -8,6 +8,7 @@ from core.main import Main
 from utils.log import get_log
 from utils.timer import timer
 
+
 class ParallelWikiClassifier(object):
     args = None
 
@@ -73,6 +74,13 @@ class ParallelWikiClassifier(object):
             help='Classificate new documents using kNN algorithm'
         )
 
+        arg_parser.add_argument(
+            '--svm',
+            default=False,
+            action='store_true',
+            help='Classificate new documents using SVM algorithm'
+        )
+
         self.args = arg_parser.parse_args()
 
 
@@ -100,6 +108,9 @@ class ParallelWikiClassifier(object):
 
         if self.args.classify:
             main.classify()
+
+        if self.args.svm:
+            main.classify_svm()
 
 if __name__ == '__main__':
     main = ParallelWikiClassifier()

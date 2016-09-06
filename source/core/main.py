@@ -25,7 +25,11 @@ distances = None
 class_distances = None
 tokens_idf = {}
 
+
 class Main(object):
+    k_closest = None
+
+
     def __init__(self):
         pass
 
@@ -45,7 +49,6 @@ class Main(object):
                     largest_id = doc.id
         LOG.debug('Received {0} parsed docs.'.format(len(docs)))
         return docs
-
 
     @timer
     def parse(self):
@@ -113,7 +116,6 @@ class Main(object):
         for ps_parser in ps_parsers:
             ps_parser.join()
 
-
     @timer
     def distance(self):
         global distances
@@ -141,7 +143,6 @@ class Main(object):
                                                        largest_id+1))
         LOG.info('Done calculating distance for {0} documents'.format(
             len(parsed_docs)))
-
 
     @timer
     def cluster(self):
@@ -229,7 +230,6 @@ class Main(object):
         print('parsed docs: ', len(parsed_docs))
         print('centers:', len(centers))
 
-
     @timer
     def _prepare_new_doc(self, doc):
         page = Page()
@@ -251,7 +251,6 @@ class Main(object):
             finally:
                 page.calc_tokens_tfidf()
         return page
-
 
     @timer
     def classify(self):
@@ -286,8 +285,10 @@ class Main(object):
                     try:
                         item = {
                             'id': i,
-                            'distance': class_distances[i],
-                            'class': parsed_docs[i].center_id
+                            'distance': class_distances[i],  # distance
+                            # between new doc and doc with ID=i
+                            'class': parsed_docs[i].center_id  # class of
+                            # 'i' doc
                         }
                         id_dist.append(item)
                     except KeyError:
@@ -295,8 +296,12 @@ class Main(object):
 
                 # finding most frequent center in close neighborhood
                 id_dist.sort(key=lambda x: x['distance'], reverse=True)
-                k_id_dist = id_dist[:int(CONF['classification']['k'])]
-                classes = [c['class'] for c in k_id_dist]
+                k_closest = id_dist[:int(CONF['classification']['k'])]
+                self.k_closest = k_closest
+
+                #########
+
+                classes = [c['class'] for c in k_closest]
                 counted_classes = Counter(classes)
                 new_doc.center_id, _ = counted_classes.most_common(1)[0]
                 LOG.info('New doc ({0}) classified as belonging to {1} : {2}'.
@@ -308,3 +313,19 @@ class Main(object):
 
         else:
             LOG.info('No documents to classify')
+
+    @timer
+    def classify_svm(self):
+        d_tokens = {}
+        document_classes = []
+        tokens = []
+        matrix = []
+        for did in self.k_closest:
+            doc = parsed_docs[did['id']]
+            document_classes.append(doc.center_id)
+            print(doc.title, doc.center_id)
+            for token in parsed_docs[did['id']].tokens:
+                d_tokens[token.stem] = 1
+        tokens = d_tokens.keys()
+        for did in self.k_closest:
+            doc = parsed_docs[did['id']]
