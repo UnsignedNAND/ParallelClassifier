@@ -9,12 +9,11 @@ from core.process.distance import Distance
 from core.process.idf import IDF
 from core.process.parser import create_parsers
 from core.process.reader import Reader
-from core.process.svm import SVM
+from core.process.svm import SVM, create_feature_matrix
 from core.utils import Utils
 from data.db import Db, Models
 from models.cluster.cluster_center import ClusterCenter
 from models.page import Page
-from sklearn import svm
 from utils.config import get_conf
 from utils.log import get_log
 from utils.timer import timer
@@ -32,6 +31,7 @@ tokens_idf = {}
 class Main(object):
     k_closest = None
     k_classes = None
+    new_doc = None
 
 
     def __init__(self):
@@ -266,7 +266,7 @@ class Main(object):
         if docs.count():
             for doc in docs:
                 LOG.info('Classifying "{0}"'.format(doc.title))
-                new_doc = self._prepare_new_doc(doc)
+                self.new_doc = self._prepare_new_doc(doc)
                 class_distances = multiprocessing.Array('d', (largest_id + 1))
                 class_ps = []
                 for i in range(PROCESSES):
@@ -276,7 +276,7 @@ class Main(object):
                         class_distances=class_distances,
                         largest_id=largest_id,
                         parsed_docs=parsed_docs,
-                        new_doc=new_doc,
+                        new_doc=self.new_doc,
                     )
                     class_p.start()
                     class_ps.append(class_p)
@@ -308,41 +308,43 @@ class Main(object):
 
                 #########
 
-                new_doc.center_id, _ = counted_classes.most_common(1)[0]
+                self.new_doc.center_id, _ = counted_classes.most_common(1)[0]
                 LOG.info('New doc ({0}) classified as belonging to {1} : {2}'.
-                         format(new_doc.title, new_doc.center_id,
-                         parsed_docs[new_doc.center_id].title))
+                         format(self.new_doc.title, self.new_doc.center_id,
+                         parsed_docs[self.new_doc.center_id].title))
                 print([parsed_docs[doc].title for doc in parsed_docs if
-                       parsed_docs[doc].center_id ==
-                       new_doc.center_id])
+                       parsed_docs[doc].center_id == self.new_doc.center_id])
 
         else:
             LOG.info('No documents to classify')
 
     @timer
     def classify_svm(self):
-        print(self.k_classes)
         if len(self.k_classes) < 2:
             LOG.info('There is only one possible class, not need to run SVM')
             return
 
-        # extract token names for existing documents
-        # extract token names for new document
-        # combine them in single list
-        # create feature vector for every document
-        #   {
-        #      did
-        #      class
-        #      feature vector
-        #   }
+        LOG.debug('Document classes for SVM: {0}'.format(self.k_classes))
 
-        results = {}
+        ### Gather all documents, grouped into classes
+        classes_doc = {}
+        for class_id in self.k_classes:
+            # select *ALL* documents that belong to classes indicated by kNN
+            docs_id_in_class = [parsed_docs[doc_id].id for doc_id in
+                             parsed_docs if
+                             parsed_docs[doc_id].center_id == class_id]
+            classes_doc[class_id] = docs_id_in_class
+
         pair_queue = multiprocessing.Queue()
         result_queue = multiprocessing.Queue()
-
+        results = {}
         svm_ps = []
         for pid in range(PROCESSES):
-            svm_p = SVM(pair_queue, result_queue)
+            svm_p = SVM(
+                pair_queue=pair_queue,
+                result_queue=result_queue,
+                classes_doc=classes_doc,
+            )
             svm_p.start()
             svm_ps.append(svm_p)
 
@@ -364,11 +366,29 @@ class Main(object):
                 continue
             results[res['result']] = res
 
+        for svm_p in svm_ps:
+            svm_p.join()
+
         LOG.info('Finished ciassification')
         print(results)
 
-        for svm_p in svm_ps:
-            svm_p.join()
+        #
+        # results = {}
+        # pair_queue = multiprocessing.Queue()
+        # result_queue = multiprocessing.Queue()
+        #
+        # svm_ps = []
+        # for pid in range(PROCESSES):
+        #     svm_p = SVM(
+        #         pair_queue=pair_queue,
+        #         result_queue=result_queue,
+        #         feature_matrix=feature_matrix,
+        #     )
+        #     svm_p.start()
+        #     svm_ps.append(svm_p)
+        #
+
+        #########################
 
         # document_classes = {}
         # tokens = {}
