@@ -9,7 +9,7 @@ from core.process.distance import Distance
 from core.process.idf import IDF
 from core.process.parser import create_parsers
 from core.process.reader import Reader
-from core.process.svm import SVM, create_feature_matrix
+from core.process.svm import SVM
 from core.utils import Utils
 from data.db import Db, Models
 from models.cluster.cluster_center import ClusterCenter
@@ -32,6 +32,7 @@ class Main(object):
     k_closest = None
     k_classes = None
     new_doc = None
+    knn_result = None
 
 
     def __init__(self):
@@ -314,6 +315,7 @@ class Main(object):
                          parsed_docs[self.new_doc.center_id].title))
                 print([parsed_docs[doc].title for doc in parsed_docs if
                        parsed_docs[doc].center_id == self.new_doc.center_id])
+                self.knn_result = parsed_docs[self.new_doc.center_id].title
 
         else:
             LOG.info('No documents to classify')
@@ -344,6 +346,8 @@ class Main(object):
                 pair_queue=pair_queue,
                 result_queue=result_queue,
                 classes_doc=classes_doc,
+                parsed_docs=parsed_docs,
+                new_doc=self.new_doc
             )
             svm_p.start()
             svm_ps.append(svm_p)
@@ -364,63 +368,19 @@ class Main(object):
             if not res:
                 not_finished -= 1
                 continue
-            results[res['result']] = res
+            try:
+                results[res['result']] += 1
+            except:
+                results[res['result']] = 1
+
+        import operator
+        class_id, _ = sorted(results.items(), key=operator.itemgetter(1))[-1]
+        print(class_id)
+        print('DUPA SVM', parsed_docs[class_id].title)
+        print('DUPA KNN', self.knn_result)
 
         for svm_p in svm_ps:
             svm_p.join()
 
         LOG.info('Finished ciassification')
         print(results)
-
-        #
-        # results = {}
-        # pair_queue = multiprocessing.Queue()
-        # result_queue = multiprocessing.Queue()
-        #
-        # svm_ps = []
-        # for pid in range(PROCESSES):
-        #     svm_p = SVM(
-        #         pair_queue=pair_queue,
-        #         result_queue=result_queue,
-        #         feature_matrix=feature_matrix,
-        #     )
-        #     svm_p.start()
-        #     svm_ps.append(svm_p)
-        #
-
-        #########################
-
-        # document_classes = {}
-        # tokens = {}
-        # matrix = []
-        # for did in self.k_closest:
-        #     doc = parsed_docs[did['id']]
-        #     document_classes[doc.center_id] = 1
-        #     print(doc.title, doc.center_id)
-        #
-        #     # create key-vector for feature matrix
-        #     for token in parsed_docs[did['id']].tokens:
-        #         tokens[token.stem] = 1
-        #
-        # if not len(document_classes) == 2:
-        #     print('classes is not 2', len(document_classes))
-        #     exit()
-        # document_classes = list(document_classes.keys())
-        # tokens = list(tokens.keys())
-        #
-        # for did in self.k_closest:
-        #     doc = parsed_docs[did['id']]
-        #     doc_feature = []
-        #     for token in tokens:
-        #         feature_value = 0.0
-        #         try:
-        #             feature_value = doc.tfidf[token]
-        #         except:
-        #             pass
-        #         doc_feature.append(feature_value)
-        #     matrix.append((doc_feature))
-        #
-        # clf = svm.SVC(kernel='linear', C=1.0)
-        # clf.fit(matrix, document_classes)
-        #
-        # print(clf.predict(matrix[0]))
