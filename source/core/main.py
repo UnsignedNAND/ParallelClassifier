@@ -1,5 +1,7 @@
+import itertools
 import math
 import multiprocessing
+import operator
 
 from collections import Counter
 from core.process.classification import Classification
@@ -8,6 +10,7 @@ from core.process.distance import Distance
 from core.process.idf import IDF
 from core.process.parser import create_parsers
 from core.process.reader import Reader
+from core.process.svm import SVM
 from core.utils import Utils
 from data.db import Db, Models
 from models.cluster.cluster_center import ClusterCenter
@@ -25,7 +28,13 @@ distances = None
 class_distances = None
 tokens_idf = {}
 
+
 class Main(object):
+    k_closest = None
+    k_classes = None
+    new_doc = None
+    knn_result = None
+
     def __init__(self):
         pass
 
@@ -45,7 +54,6 @@ class Main(object):
                     largest_id = doc.id
         LOG.debug('Received {0} parsed docs.'.format(len(docs)))
         return docs
-
 
     @timer
     def parse(self):
@@ -113,7 +121,6 @@ class Main(object):
         for ps_parser in ps_parsers:
             ps_parser.join()
 
-
     @timer
     def distance(self):
         global distances
@@ -141,7 +148,6 @@ class Main(object):
                                                        largest_id+1))
         LOG.info('Done calculating distance for {0} documents'.format(
             len(parsed_docs)))
-
 
     @timer
     def cluster(self):
@@ -229,7 +235,6 @@ class Main(object):
         print('parsed docs: ', len(parsed_docs))
         print('centers:', len(centers))
 
-
     @timer
     def _prepare_new_doc(self, doc):
         page = Page()
@@ -252,7 +257,6 @@ class Main(object):
                 page.calc_tokens_tfidf()
         return page
 
-
     @timer
     def classify(self):
         Db.init()
@@ -263,7 +267,7 @@ class Main(object):
         if docs.count():
             for doc in docs:
                 LOG.info('Classifying "{0}"'.format(doc.title))
-                new_doc = self._prepare_new_doc(doc)
+                self.new_doc = self._prepare_new_doc(doc)
                 class_distances = multiprocessing.Array('d', (largest_id + 1))
                 class_ps = []
                 for i in range(PROCESSES):
@@ -273,7 +277,7 @@ class Main(object):
                         class_distances=class_distances,
                         largest_id=largest_id,
                         parsed_docs=parsed_docs,
-                        new_doc=new_doc,
+                        new_doc=self.new_doc,
                     )
                     class_p.start()
                     class_ps.append(class_p)
@@ -286,8 +290,10 @@ class Main(object):
                     try:
                         item = {
                             'id': i,
-                            'distance': class_distances[i],
-                            'class': parsed_docs[i].center_id
+                            'distance': class_distances[i],  # distance
+                            # between new doc and doc with ID=i
+                            'class': parsed_docs[i].center_id  # class of
+                            # 'i' doc
                         }
                         id_dist.append(item)
                     except KeyError:
@@ -295,16 +301,90 @@ class Main(object):
 
                 # finding most frequent center in close neighborhood
                 id_dist.sort(key=lambda x: x['distance'], reverse=True)
-                k_id_dist = id_dist[:int(CONF['classification']['k'])]
-                classes = [c['class'] for c in k_id_dist]
+                k_closest = id_dist[:int(CONF['classification']['k'])]
+                self.k_closest = k_closest
+                classes = [c['class'] for c in k_closest]
                 counted_classes = Counter(classes)
-                new_doc.center_id, _ = counted_classes.most_common(1)[0]
+                self.k_classes = counted_classes
+
+                #########
+
+                self.new_doc.center_id, _ = counted_classes.most_common(1)[0]
                 LOG.info('New doc ({0}) classified as belonging to {1} : {2}'.
-                         format(new_doc.title, new_doc.center_id,
-                         parsed_docs[new_doc.center_id].title))
-                print([parsed_docs[doc].title for doc in parsed_docs if
-                       parsed_docs[doc].center_id ==
-                       new_doc.center_id])
+                         format(self.new_doc.title, self.new_doc.center_id,
+                         parsed_docs[self.new_doc.center_id].title))
+                self.knn_result = parsed_docs[self.new_doc.center_id]
+                LOG.info('KNN group id: {0} ({1})'.format(
+                    self.knn_result.id, self.knn_result.title))
+                LOG.info([parsed_docs[doc].title for doc in parsed_docs if
+                          parsed_docs[
+                              doc].center_id == self.new_doc.center_id])
 
         else:
             LOG.info('No documents to classify')
+
+    @timer
+    def classify_svm(self):
+        if len(self.k_classes) < 2:
+            LOG.info('There is only one possible class, not need to run SVM')
+            return
+
+        LOG.debug('Document classes for SVM: {0}'.format(self.k_classes))
+
+        ### Gather all documents, grouped into classes
+        classes_doc = {}
+        for class_id in self.k_classes:
+            # select *ALL* documents that belong to classes indicated by kNN
+            docs_id_in_class = [parsed_docs[doc_id].id for doc_id in
+                             parsed_docs if
+                             parsed_docs[doc_id].center_id == class_id]
+            classes_doc[class_id] = docs_id_in_class
+
+        pair_queue = multiprocessing.Queue()
+        result_queue = multiprocessing.Queue()
+        results = {}
+        svm_ps = []
+        for pid in range(PROCESSES):
+            svm_p = SVM(
+                pair_queue=pair_queue,
+                result_queue=result_queue,
+                classes_doc=classes_doc,
+                parsed_docs=parsed_docs,
+                new_doc=self.new_doc
+            )
+            svm_p.start()
+            svm_ps.append(svm_p)
+
+        # generate n(n-1)/2 class pairs
+        combinations = itertools.combinations(self.k_classes, 2)
+
+        for pair in combinations:
+            LOG.debug('Sending class pair: {0}'.format(pair))
+            pair_queue.put(pair)
+
+        for i in range(PROCESSES):
+            pair_queue.put(None)
+
+        not_finished = PROCESSES
+        while not_finished:
+            res = result_queue.get()
+            if not res:
+                not_finished -= 1
+                continue
+            LOG.debug('Received SVM pair: {0} {1} with result {2}'.format(
+                res['class1'], res['class2'], res['result']))
+            try:
+                results[res['result']] += 1
+            except:
+                results[res['result']] = 1
+
+        class_id, _ = sorted(results.items(), key=operator.itemgetter(1))[-1]
+        LOG.info('SVM group id: {0} ({1})'.format(
+            class_id,
+            parsed_docs[class_id].title),
+        )
+
+        for svm_p in svm_ps:
+            svm_p.join()
+
+        LOG.info('Finished ciassification')

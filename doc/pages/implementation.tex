@@ -498,3 +498,151 @@ def run(self):
 
         doc_id += self.iteration_size
 \end{lstlisting}
+
+\subsubsection{SVM}
+In this implementation the SVM algorithm works on a narrowed corpus that was selected during the kNN classification phase. According to presented methodology (\ref{methodology:svm}) the \textit{one-versus-one} approach was chosen to be incorporated in this system. The function (\ref{lst:main:svm}) is run in the main process of application and is responsible for data partitioning and scheduling tasks between worker processes. It generates all possible combinations of pairs of classes and assigns documents to chosen classes creating a task that is then put to the queue. Once worker process has finished working on a task, it sends back results to master process to aggregate. After receiving all results, main process choses the most frequent result as a label for the new document.
+
+\begin{lstlisting}[language=Python, caption={Main.classify\_svm() - Main process method for conducting SVM classification}, label={lst:main:svm}]
+def classify_svm(self):
+    if len(self.k_classes) < 2:
+        LOG.info('There is only one possible class, not need to run SVM')
+        return
+
+    LOG.debug('Document classes for SVM: {0}'.format(self.k_classes))
+
+    ### Gather all documents, grouped into classes
+    classes_doc = {}
+    for class_id in self.k_classes:
+        # select *ALL* documents that belong to classes indicated by kNN
+        docs_id_in_class = [parsed_docs[doc_id].id for doc_id in
+                         parsed_docs if
+                         parsed_docs[doc_id].center_id == class_id]
+        classes_doc[class_id] = docs_id_in_class
+
+    pair_queue = multiprocessing.Queue()
+    result_queue = multiprocessing.Queue()
+    results = {}
+    svm_ps = []
+    for pid in range(PROCESSES):
+        svm_p = SVM(
+            pair_queue=pair_queue,
+            result_queue=result_queue,
+            classes_doc=classes_doc,
+            parsed_docs=parsed_docs,
+            new_doc=self.new_doc
+        )
+        svm_p.start()
+        svm_ps.append(svm_p)
+
+    # generate n(n-1)/2 class pairs
+    combinations = itertools.combinations(self.k_classes, 2)
+
+    for pair in combinations:
+        LOG.debug('Sending class pair: {0}'.format(pair))
+        pair_queue.put(pair)
+
+    for i in range(PROCESSES):
+        pair_queue.put(None)
+
+    not_finished = PROCESSES
+    while not_finished:
+        res = result_queue.get()
+        if not res:
+            not_finished -= 1
+            continue
+        LOG.debug('Received SVM pair: {0} {1} with result {2}'.format(
+            res['class1'], res['class2'], res['result']))
+        try:
+            results[res['result']] += 1
+        except:
+            results[res['result']] = 1
+
+    class_id, _ = sorted(results.items(), key=operator.itemgetter(1))[-1]
+    LOG.info('SVM group id: {0} ({1})'.format(
+        class_id,
+        parsed_docs[class_id].title),
+    )
+
+    for svm_p in svm_ps:
+        svm_p.join()
+
+    LOG.info('Finished ciassification')
+\end{lstlisting}
+
+Method presented on listing \ref{lst:svm:run} is the main entry point for every worker process. It invokes \textit{\_svm\_pair()} (\ref{lst:svm:recv}) function as long as \textit{\_recv()} (\ref{lst:svm:svm}) returns value different than None.
+
+\begin{lstlisting}[language=Python, caption={SVM.run() - SVM class process main method}, label={lst:svm:run}]
+def run(self):
+    while self._recv():
+        self._svm_pair()
+\end{lstlisting}
+
+\textit{\_recv()} method (\ref{lst:svm:recv}) conducts receiving tasks for given worker thread as long as there is any object in the task queue. In this case, the None value is returned.
+
+\begin{lstlisting}[language=Python, caption={SVM.\_recv() - SVM class process main method}, label={lst:svm:recv}]
+def _recv(self):
+    val = self.pair_queue.get()
+    if not val:
+        self.result_queue.put(None)
+        return None
+    self.current_pair = val
+    return val
+\end{lstlisting}
+
+Method presented in the listing \ref{lst:svm:svm} represents the main logic of parallelized SVM algorithm execution.  Worker processes are given a pair of classes. Basing on linear kernel, SVM will classify the new document to one of them. Classification begins with creating a feature matrix that includes features gathered from existing documents that belong to one of two classes and the new document. Once matrix is prepared, SVM classifier is trained on old documents, which eventually allows new document to be classified. Most matching class is selected and the decision is sent back to master process for further evaluation.
+
+\begin{lstlisting}[language=Python, caption={SVM.\_svm\_pair() - SVM class process main method}, label={lst:svm:svm}]
+def _svm_pair(self):
+    class1, class2 = self.current_pair
+
+    class1_docs = self.classes_doc[class1]
+    class2_docs = self.classes_doc[class2]
+    all_docs = []
+    all_docs.extend(class1_docs)
+    all_docs.extend(class2_docs)
+
+    tokens_template = {}
+    class_distribution = []
+    # create template for existing documents
+    for doc_id in all_docs:
+        doc = self.parsed_docs[doc_id]
+        class_distribution.append(doc.center_id)
+        for token in doc.tokens:
+            tokens_template[token.stem] = 1
+
+    for token in self.new_doc.tokens:
+        tokens_template[token.stem] = 1
+    tokens_template = list(tokens_template.keys())
+
+    feature_matrix = []
+    for doc_id in all_docs:
+        feature_vector = []
+        doc = self.parsed_docs[doc_id]
+        for token in tokens_template:
+            try:
+                feature_value = doc.tfidf[token]
+            except:
+                feature_value = 0.0
+            feature_vector.append(feature_value)
+        feature_matrix.append(feature_vector)
+
+    new_feature_vector = []
+    for token in tokens_template:
+        try:
+            feature_value = self.new_doc.tfidf[token]
+        except:
+            feature_value = 0.0
+        new_feature_vector.append(feature_value)
+
+    class_distribution = [class1]*len(class1_docs)+[class2]*len(class2_docs)
+    clf = svm.SVC(kernel='linear', C=1.0)
+    clf.fit(feature_matrix, class_distribution)
+    result = clf.predict(new_feature_vector)
+
+    # send results
+    self.result_queue.put({
+        'class1': class1,
+        'class2': class2,
+        'result': result[0]
+    })
+\end{lstlisting}
