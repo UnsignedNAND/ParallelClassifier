@@ -76,7 +76,5 @@ class SVM(multiprocessing.Process):
         })
 
     def run(self):
-        print(self.pid, 'started')
         while self._recv():
             self._svm_pair()
-        print(self.pid, 'finished')

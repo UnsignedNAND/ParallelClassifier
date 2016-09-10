@@ -35,7 +35,6 @@ class Main(object):
     new_doc = None
     knn_result = None
 
-
     def __init__(self):
         pass
 
