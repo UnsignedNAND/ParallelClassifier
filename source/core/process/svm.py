@@ -23,7 +23,6 @@ class SVM(multiprocessing.Process):
 
     def _svm_pair(self):
         class1, class2 = self.current_pair
-        print('DUPA', class1, class2)
 
         class1_docs = self.classes_doc[class1]
         class2_docs = self.classes_doc[class2]

@@ -1,6 +1,7 @@
 import itertools
 import math
 import multiprocessing
+import operator
 
 from collections import Counter
 from core.process.classification import Classification
@@ -313,9 +314,12 @@ class Main(object):
                 LOG.info('New doc ({0}) classified as belonging to {1} : {2}'.
                          format(self.new_doc.title, self.new_doc.center_id,
                          parsed_docs[self.new_doc.center_id].title))
-                print([parsed_docs[doc].title for doc in parsed_docs if
-                       parsed_docs[doc].center_id == self.new_doc.center_id])
-                self.knn_result = parsed_docs[self.new_doc.center_id].title
+                self.knn_result = parsed_docs[self.new_doc.center_id]
+                LOG.info('KNN group id: {0} ({1})'.format(
+                    self.knn_result.id, self.knn_result.title))
+                LOG.info([parsed_docs[doc].title for doc in parsed_docs if
+                          parsed_docs[
+                              doc].center_id == self.new_doc.center_id])
 
         else:
             LOG.info('No documents to classify')
@@ -368,19 +372,20 @@ class Main(object):
             if not res:
                 not_finished -= 1
                 continue
+            LOG.debug('Received SVM pair: {0} {1} with result {2}'.format(
+                res['class1'], res['class2'], res['result']))
             try:
                 results[res['result']] += 1
             except:
                 results[res['result']] = 1
 
-        import operator
         class_id, _ = sorted(results.items(), key=operator.itemgetter(1))[-1]
-        print(class_id)
-        print('DUPA SVM', parsed_docs[class_id].title)
-        print('DUPA KNN', self.knn_result)
+        LOG.info('SVM group id: {0} ({1})'.format(
+            class_id,
+            parsed_docs[class_id].title),
+        )
 
         for svm_p in svm_ps:
             svm_p.join()
 
         LOG.info('Finished ciassification')
-        print(results)
