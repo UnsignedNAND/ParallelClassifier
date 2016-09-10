@@ -321,8 +321,8 @@ k-Nearest-Neighbors is a simple distance-based classification algorithm which gi
 	For final \textit{kNN} result documents selected in previous step are checked for their class membership. Class that contains the most documents is chosen as a label for new document.
 	
 \end{enumerate}
-\subsubsection{Support Vector Machine}
-In this implementation Support Vector Machine is a second step in classification. To enhance its performance first dataset is narrowed by finding the most relevant documents using kNN algorithm. SVMs are inherently two-class classifiers, so there are to approaches to consider when dealing with multi-class documents. First approach is called "one-versus-one" - it creates \(\frac{C (C-1)}{2}\) classifiers to do binary classification in pairs. Second one is "one-versus-all", in which \(C\) classifiers do binary classification in this-class versus all-others manner. The first approach was chosen for this implementation due to possibility to distribute workloads between processes.
+\subsubsection{Support Vector Machine} \label{methodology:svm}
+In this implementation Support Vector Machine is a second step in classification. To enhance its performance first dataset is narrowed by finding the most relevant documents using kNN algorithm. SVMs are inherently two-class classifiers, so there are to approaches to be considered when dealing with multi-class documents. First approach is called "one-versus-one" - it creates \(\frac{C (C-1)}{2}\) classifiers to do binary classification in pairs. Second one is "one-versus-all", in which \(C\) classifiers do binary classification in this-class versus all-others manner. The first approach was chosen for this implementation due to possibility to distribute workloads between processes.
 
 \begin{enumerate}
 		\item \textbf{Extracting features from new document}\newline
@@ -331,10 +331,10 @@ In this implementation Support Vector Machine is a second step in classification
 		First step is a repetition of document parsing that was made for all the documents that are already in the system. Because in this process only one document is taken into account, this part is not parallelised because all operations are atomic and run on a small set of words. In this step words in new document are stemmed and their statistic are counted. This allows to present new document in a form of features that is comparable with other documents that are already in the system.
 		
 		\item \textbf{Create \(\frac{C (C-1)}{2}\) classifiers}\newline
-		Create \(\frac{C (C-1)}{2}\) classifiers, where \(C\) is the number of classes in selected corpus. This results in creating a single classifier for each possible pair of classes. Add classifiers to processing queue.
+		Create \(\frac{C (C-1)}{2}\) classifiers, where \(C\) is the number of classes in corpus indicated by kNN. This results in creating a single classifier for each possible pair of classes. Add classifiers to processing queue.
 		
 		\item \textbf{Classification}\newline
-		Each of worker processes receives classifier from processing queue and runs classification. The result is sent back to master process which aggregates received results.
+		Each of worker processes receives pair of classes from processing queue and runs classification. The result is sent back to master process which aggregates received results.
 		
 		\item \textbf{Assigning label to new document}\newline 
 		Master process counts aggregated results. New document is labeled with class that occurred most frequently.
