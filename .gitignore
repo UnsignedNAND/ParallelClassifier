@@ -96,3 +96,6 @@ venv*
 
 # Enterprise Architect files
 *.ldb
+
+# SQLite database
+*.db
