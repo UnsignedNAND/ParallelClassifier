@@ -5,8 +5,9 @@ import logging
 
 from data.db import Db
 from core.main import Main
+from utils.config import get_conf
 from utils.log import get_log
-from utils.timer import timer
+from utils.timer import timer, time_records
 
 
 class ParallelWikiClassifier(object):
@@ -115,3 +116,8 @@ class ParallelWikiClassifier(object):
 if __name__ == '__main__':
     main = ParallelWikiClassifier()
     main.process()
+    print('TIME_FOR', '*'*10, 'TIMES', '*'*10)
+    print('TIME_FOR', 'proc', get_conf()['general']['processes'])
+    print('TIME_FOR', 'item', get_conf()['general']['item_limit'])
+    for fun_name, fun_time in time_records:
+        print('TIME_FOR', fun_name, int((fun_time*1000))/1000)

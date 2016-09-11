@@ -1,6 +1,7 @@
 import timeit
 import logging
 
+time_records = []
 
 def timer(func):
     def func_wrapper(*args, **kwargs):
@@ -12,6 +13,9 @@ def timer(func):
         LOG.info('Function \'{0}\' took {1:5.3} s to finish'.format(
             func.__name__,
             time_elapsed)
+        )
+        time_records.append(
+            (func.__name__, time_elapsed)
         )
         return func_return
 
