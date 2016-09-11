@@ -387,4 +387,4 @@ class Main(object):
         for svm_p in svm_ps:
             svm_p.join()
 
-        LOG.info('Finished ciassification')
+        LOG.info('Finished classification')
