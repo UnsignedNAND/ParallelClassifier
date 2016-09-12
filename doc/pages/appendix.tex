@@ -28,5 +28,9 @@ git clone git@github.com:macsz/parallel-wiki-classifier.git
 \begin{lstlisting}[language=Bash, numbers=none]
 pip install -r source/requirements.txt
 \end{lstlisting}
+\item Install dictionaries for lemmatization and stop words removal:
+\begin{lstlisting}[language=Bash, numbers=none]
+python -c "import nltk; nltk.download('stopwords'); nltk.download('wordnet')"
+\end{lstlisting}
 \end{enumerate}
 \section{Usage}
