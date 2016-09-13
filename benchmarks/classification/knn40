@@ -1,0 +1,722 @@
+[clusterization]
+centers = 300
+iterations_limit = 50
+
+[classification]
+new_doc_start_id = 0
+number = 111
+k = 40
+
+
+title April
+knn label May
+svm label May
+docs sharing KNN label ['April', 'August', 'December', 'Ethnic group', 'June', 'July', 'March', 'May', 'November', 'October', 'September']
+docs sharing SVM label ['April', 'August', 'December', 'Ethnic group', 'June', 'July', 'March', 'May', 'November', 'October', 'September']
+********************
+title August
+knn label May
+svm label May
+docs sharing KNN label ['April', 'August', 'December', 'Ethnic group', 'June', 'July', 'March', 'May', 'November', 'October', 'September']
+docs sharing SVM label ['April', 'August', 'December', 'Ethnic group', 'June', 'July', 'March', 'May', 'November', 'October', 'September']
+********************
+title Art
+knn label Death
+svm label Italy
+docs sharing KNN label ['Death', 'Execution', 'Human body', 'Soul']
+docs sharing SVM label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+********************
+title A
+knn label English
+svm label English
+docs sharing KNN label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Air
+knn label Hydrogen
+svm label Universe
+docs sharing KNN label ['Hydrogen', 'Helium', 'Nitrogen', 'Argon', 'Oxygen']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Wikipedia:Administrators
+knn label Wikipedia:Blocks and bans
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Autonomous communities of Spain
+knn label Capital
+svm label English
+docs sharing KNN label ['Autonomous communities of Spain', 'Beijing', 'Embassy', 'Financial capital', 'Provinces and territories of Canada', 'Social capital', 'Capital city', 'Capital']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Alan Turing
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Alanis Morissette
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Adobe Illustrator
+knn label Computer science
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Andouille
+knn label Sausage
+svm label May
+docs sharing KNN label ['Andouille', 'Black pudding', 'Breakfast sausage', 'Chorizo', 'Sausage']
+docs sharing SVM label ['April', 'August', 'December', 'Ethnic group', 'June', 'July', 'March', 'May', 'November', 'October', 'September']
+********************
+title Farming
+knn label Seed
+svm label Continent
+docs sharing KNN label ['Berry', 'Botany', 'Fruit', 'Plant', 'Seed']
+docs sharing SVM label ['Continent', 'North America', 'Uranus', 'Antarctica', 'South America', 'Eurasia', 'Oceania']
+********************
+title Arithmetic
+knn label Infinity
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['Circle', 'Infinity', 'Mathematics', 'Number', 'Pi', 'Zero']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Addition
+knn label Infinity
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['Circle', 'Infinity', 'Mathematics', 'Number', 'Pi', 'Zero']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Australia
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title American English
+knn label English
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Aquaculture
+knn label Mainland China
+svm label May
+docs sharing KNN label ['China', 'Political divisions of China', "People's Republic of China", 'Political problems of China', 'Taiwan', 'Republic of China', 'Mainland China']
+docs sharing SVM label ['April', 'August', 'December', 'Ethnic group', 'June', 'July', 'March', 'May', 'November', 'October', 'September']
+********************
+title Abbreviation
+knn label English
+svm label English
+docs sharing KNN label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Angel
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Ad hominem
+knn label English
+svm label English
+docs sharing KNN label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Native American
+knn label 1950s
+svm label English
+docs sharing KNN label ['1920s', '1925', '1930s', '1940s', '1950s', '1960s', '1970s', '1990s', '2000s', '1969']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Apple
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Abrahamic religion
+knn label Creator
+svm label Universe
+docs sharing KNN label ['Abrahamic religion', 'Creator', 'God', 'Theology']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Algebra
+knn label Infinity
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['Circle', 'Infinity', 'Mathematics', 'Number', 'Pi', 'Zero']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Atom
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Astronomy
+knn label Universe
+svm label Universe
+docs sharing KNN label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Architecture
+knn label Italy
+svm label Italy
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+********************
+title Anatomy
+knn label Death
+svm label Computer science
+docs sharing KNN label ['Death', 'Execution', 'Human body', 'Soul']
+docs sharing SVM label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+********************
+title Asteroid
+knn label Universe
+svm label Universe
+docs sharing KNN label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Afghanistan
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Angola
+knn label Italy
+svm label English
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Argentina
+knn label Italy
+svm label English
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Austria
+knn label Italy
+svm label English
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Armenia
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Archaeology
+knn label Law
+svm label Capitalization
+docs sharing KNN label ['Constitution', 'Government', 'Law', 'Politics', 'Society', 'Social contract']
+docs sharing SVM label ['Capitalization', 'Grammar', 'Noun', 'Orthography', 'Proper noun', 'Wikipedia:Spelling', 'Plural']
+********************
+title Application
+knn label Computer science
+svm label Computer science
+docs sharing KNN label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+docs sharing SVM label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+********************
+title Animal
+knn label Developmental biology
+svm label Continent
+docs sharing KNN label ['Cytology', 'Life', 'Developmental biology', 'Blood']
+docs sharing SVM label ['Continent', 'North America', 'Uranus', 'Antarctica', 'South America', 'Eurasia', 'Oceania']
+********************
+title Acceleration
+knn label Infinity
+svm label Universe
+docs sharing KNN label ['Circle', 'Infinity', 'Mathematics', 'Number', 'Pi', 'Zero']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Wikipedia:Basic English alphabetical wordlist
+knn label Wikipedia:Basic English ordered wordlist
+svm label Capital
+docs sharing KNN label ['Wikipedia:Basic English alphabetical wordlist', 'Wikipedia:Basic English international wordlist', 'Health', 'Wikipedia:List of 1000 basic words', 'Wikipedia:Basic English ordered wordlist', 'Wikipedia:List of common misspellings']
+docs sharing SVM label ['Autonomous communities of Spain', 'Beijing', 'Embassy', 'Financial capital', 'Provinces and territories of Canada', 'Social capital', 'Capital city', 'Capital']
+********************
+title Wikipedia:Basic English international wordlist
+knn label English
+svm label Universe
+docs sharing KNN label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Black pudding
+knn label Sausage
+svm label Universe
+docs sharing KNN label ['Andouille', 'Black pudding', 'Breakfast sausage', 'Chorizo', 'Sausage']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Boot device
+knn label Computer science
+svm label English
+docs sharing KNN label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Boot
+knn label Jargon
+svm label English
+docs sharing KNN label ['Idiom', 'Jargon', 'Slang', 'Word']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Bankruptcy
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Breakfast sausage
+knn label Sausage
+svm label English
+docs sharing KNN label ['Andouille', 'Black pudding', 'Breakfast sausage', 'Chorizo', 'Sausage']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Browser
+knn label Website
+svm label MediaWiki:Blockedtext
+docs sharing KNN label ['Everything2', 'Home page', 'Search engine', 'World Wide Web', 'Website', 'Webpage']
+docs sharing SVM label ['Wikipedia:Mailing lists', 'MediaWiki:Emailforlost', 'MediaWiki:Blockedtext', 'MediaWiki:Uploadtext', 'MediaWiki:Blockiptext', 'Template:1911', 'MediaWiki:Loginend', 'Wikipedia:Image use policy']
+********************
+title Beekeeping
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title British English
+knn label English
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Being
+knn label Good
+svm label Universe
+docs sharing KNN label ['Ethics', 'Economics', 'Good', 'Goodness', 'Moral reasoning', 'Philosophy', 'Want']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Beijing
+knn label Capital
+svm label Italy
+docs sharing KNN label ['Autonomous communities of Spain', 'Beijing', 'Embassy', 'Financial capital', 'Provinces and territories of Canada', 'Social capital', 'Capital city', 'Capital']
+docs sharing SVM label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+********************
+title Bottle
+knn label English
+svm label English
+docs sharing KNN label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Berry
+knn label English
+svm label English
+docs sharing KNN label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Boil
+knn label English
+svm label English
+docs sharing KNN label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Beard
+knn label Goatee
+svm label English
+docs sharing KNN label ['Beard', 'Goatee', 'Mustache']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Black
+knn label Red
+svm label Universe
+docs sharing KNN label ['Green', 'Red', 'Bavaria', 'Yellow']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Bubonic plague
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Biology
+knn label Seed
+svm label Universe
+docs sharing KNN label ['Berry', 'Botany', 'Fruit', 'Plant', 'Seed']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Botany
+knn label Seed
+svm label English
+docs sharing KNN label ['Berry', 'Botany', 'Fruit', 'Plant', 'Seed']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Belgium
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Brazil
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Britain
+knn label Capitalization
+svm label Britain
+docs sharing KNN label ['Capitalization', 'Grammar', 'Noun', 'Orthography', 'Proper noun', 'Wikipedia:Spelling', 'Plural']
+docs sharing SVM label ['Britain']
+********************
+title Chemistry
+knn label Atom
+svm label Universe
+docs sharing KNN label ['Atom', 'Chemistry', 'Chemical element', 'Molecule', 'Ion']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Compound
+knn label Spache Readability Formula
+svm label English
+docs sharing KNN label ['Flesch Reading Ease', 'Spache Readability Formula', 'Textual difficulty']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Computer science
+knn label Computer science
+svm label Computer science
+docs sharing KNN label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+docs sharing SVM label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+********************
+title Wikipedia:Wikipedia down
+knn label Wikipedia:Blocks and bans
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Computer
+knn label Computer science
+svm label Computer science
+docs sharing KNN label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+docs sharing SVM label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+********************
+title Chinese
+knn label Mainland China
+svm label English
+docs sharing KNN label ['China', 'Political divisions of China', "People's Republic of China", 'Political problems of China', 'Taiwan', 'Republic of China', 'Mainland China']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Continent
+knn label Continent
+svm label Universe
+docs sharing KNN label ['Continent', 'North America', 'Uranus', 'Antarctica', 'South America', 'Eurasia', 'Oceania']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Classical element
+knn label Atom
+svm label Mainland China
+docs sharing KNN label ['Atom', 'Chemistry', 'Chemical element', 'Molecule', 'Ion']
+docs sharing SVM label ['China', 'Political divisions of China', "People's Republic of China", 'Political problems of China', 'Taiwan', 'Republic of China', 'Mainland China']
+********************
+title China
+knn label Mainland China
+svm label Universe
+docs sharing KNN label ['China', 'Political divisions of China', "People's Republic of China", 'Political problems of China', 'Taiwan', 'Republic of China', 'Mainland China']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Country
+knn label Italy
+svm label English
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Colchester
+knn label Rome
+svm label English
+docs sharing KNN label ['City', 'Vatican City', 'Rome']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Wikipedia:Copyrights
+knn label Wikipedia:Blocks and bans
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Cartography
+knn label Computer science
+svm label English
+docs sharing KNN label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Creator
+knn label Universe
+svm label Universe
+docs sharing KNN label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Contact network
+knn label Law
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['Constitution', 'Government', 'Law', 'Politics', 'Society', 'Social contract']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Chorizo
+knn label Sausage
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['Andouille', 'Black pudding', 'Breakfast sausage', 'Chorizo', 'Sausage']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Creativity
+knn label Law
+svm label Capital
+docs sharing KNN label ['Constitution', 'Government', 'Law', 'Politics', 'Society', 'Social contract']
+docs sharing SVM label ['Autonomous communities of Spain', 'Beijing', 'Embassy', 'Financial capital', 'Provinces and territories of Canada', 'Social capital', 'Capital city', 'Capital']
+********************
+title Catharism
+knn label Miracle
+svm label English
+docs sharing KNN label ['Angel', 'Sabbath in Christianity', 'Ten Commandments', 'Miracle', 'Bible']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Cosmology
+knn label Universe
+svm label Universe
+docs sharing KNN label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Church
+knn label Rome
+svm label English
+docs sharing KNN label ['City', 'Vatican City', 'Rome']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title City
+knn label Capital
+svm label Capital
+docs sharing KNN label ['Autonomous communities of Spain', 'Beijing', 'Embassy', 'Financial capital', 'Provinces and territories of Canada', 'Social capital', 'Capital city', 'Capital']
+docs sharing SVM label ['Autonomous communities of Spain', 'Beijing', 'Embassy', 'Financial capital', 'Provinces and territories of Canada', 'Social capital', 'Capital city', 'Capital']
+********************
+title Cooking
+knn label Sausage
+svm label English
+docs sharing KNN label ['Andouille', 'Black pudding', 'Breakfast sausage', 'Chorizo', 'Sausage']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Chat
+knn label Computer science
+svm label Wikipedia:Blocks and bans
+docs sharing KNN label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+docs sharing SVM label ['Wikipedia:Useful', 'MediaWiki:Passwordremindertext', 'MediaWiki:Blockipsuccesstext', 'MediaWiki:Blocklistline', 'MediaWiki:Autoblocker', 'MediaWiki:Blocklogtext', 'Wikipedia:Special pages', 'Wikipedia:Statistics', 'Wikipedia:Vandalism in progress', 'Wikipedia:Announcements', 'Wikipedia:Rules', 'Wikipedia:Contact us', 'Wikipedia:Blocks and bans', 'Spamming']
+********************
+title Cup
+knn label English
+svm label Universe
+docs sharing KNN label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Crime
+knn label Law
+svm label English
+docs sharing KNN label ['Constitution', 'Government', 'Law', 'Politics', 'Society', 'Social contract']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Time Cube
+knn label String theory
+svm label Universe
+docs sharing KNN label ['Physics', 'String theory', 'Albert Einstein', 'Gravity']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Census of Marine Life
+knn label Arctic Ocean
+svm label Italy
+docs sharing KNN label ['Atlantic Ocean', 'Pacific Ocean', 'Indian Ocean', 'Arctic Ocean', 'Southern Ocean']
+docs sharing SVM label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+********************
+title Maize
+knn label Seed
+svm label May
+docs sharing KNN label ['Berry', 'Botany', 'Fruit', 'Plant', 'Seed']
+docs sharing SVM label ['April', 'August', 'December', 'Ethnic group', 'June', 'July', 'March', 'May', 'November', 'October', 'September']
+********************
+title Civics
+knn label Law
+svm label Capital
+docs sharing KNN label ['Constitution', 'Government', 'Law', 'Politics', 'Society', 'Social contract']
+docs sharing SVM label ['Autonomous communities of Spain', 'Beijing', 'Embassy', 'Financial capital', 'Provinces and territories of Canada', 'Social capital', 'Capital city', 'Capital']
+********************
+title Calculus
+knn label Infinity
+svm label Computer science
+docs sharing KNN label ['Circle', 'Infinity', 'Mathematics', 'Number', 'Pi', 'Zero']
+docs sharing SVM label ['Computer science', 'Computer', 'Network', 'Operating system', 'Program', 'Engineering', 'Computer program']
+********************
+title Coin
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Conceptual metaphor
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Crust
+knn label Arctic Ocean
+svm label Universe
+docs sharing KNN label ['Atlantic Ocean', 'Pacific Ocean', 'Indian Ocean', 'Arctic Ocean', 'Southern Ocean']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Comedy
+knn label Wikipedia:Username
+svm label English
+docs sharing KNN label ['Name', 'Wikipedia:Neutral point of view', 'Help:User settings', 'Wikipedia:Username', 'Wikipedia:What Wikipedia is not']
+docs sharing SVM label ['American English', 'British English', 'Boil', 'English', 'Special English', 'Wikipedia:Simple English Wikipedia', 'You', 'MediaWiki:Wikititlesuffix', 'MediaWiki:Passwordremindertitle', 'Simple English', 'English as a second language', 'English language', 'MediaWiki:Defemailsubject']
+********************
+title Comet
+knn label Universe
+svm label Universe
+docs sharing KNN label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Cytology
+knn label Developmental biology
+svm label Universe
+docs sharing KNN label ['Cytology', 'Life', 'Developmental biology', 'Blood']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Christian
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Cheese
+knn label Italy
+svm label Universe
+docs sharing KNN label ['Afghanistan', 'Armenia', 'Belgium', 'France', 'Italy', 'Italian', 'India', 'Africa', 'Romania', 'Trier']
+docs sharing SVM label ['Cosmology', 'Fecund universes', 'Galaxy', 'Litre', 'Multiverse', 'Milky Way', 'Neptune', 'Saturn', 'Universe', 'Light year', 'Shape of the universe', 'Outer space']
+********************
+title Constitution
+knn label Law
+svm label May
+docs sharing KNN label ['Constitution', 'Government', 'Law', 'Politics', 'Society', 'Social contract']
+docs sharing SVM label ['April', 'August', 'December', 'Ethnic group', 'June', 'July', 'March', 'May', 'November', 'October', 'September']
+********************
+2016-09-14 00:36:09,267 [MainThread  ] [INFO ]  Finished classification
+2016-09-14 00:36:09,273 [MainThread  ] [INFO ]  Function 'classify_svm' took 111.121 s to finish
+2016-09-14 00:36:09,273 [MainThread  ] [INFO ]  Function 'process' took 234.587 s to finish
+TIME_FOR ********** TIMES **********
+TIME_FOR proc 4
+TIME_FOR item 1000
+TIME_FOR parse 5.167
+TIME_FOR distance 28.409
+TIME_FOR cluster 68.064
+TIME_FOR _prepare_new_doc 2.341
+TIME_FOR _prepare_new_doc 0.098
+TIME_FOR _prepare_new_doc 0.059
+TIME_FOR _prepare_new_doc 0.012
+TIME_FOR _prepare_new_doc 0.011
+TIME_FOR _prepare_new_doc 0.107
+TIME_FOR _prepare_new_doc 0.007
+TIME_FOR _prepare_new_doc 0.083
+TIME_FOR _prepare_new_doc 0.093
+TIME_FOR _prepare_new_doc 0.016
+TIME_FOR _prepare_new_doc 0.003
+TIME_FOR _prepare_new_doc 0.07
+TIME_FOR _prepare_new_doc 0.006
+TIME_FOR _prepare_new_doc 0.019
+TIME_FOR _prepare_new_doc 1.069
+TIME_FOR _prepare_new_doc 0.019
+TIME_FOR _prepare_new_doc 0.001
+TIME_FOR _prepare_new_doc 0.007
+TIME_FOR _prepare_new_doc 0.057
+TIME_FOR _prepare_new_doc 0.008
+TIME_FOR _prepare_new_doc 0.006
+TIME_FOR _prepare_new_doc 0.209
+TIME_FOR _prepare_new_doc 0.005
+TIME_FOR _prepare_new_doc 0.097
+TIME_FOR _prepare_new_doc 0.235
+TIME_FOR _prepare_new_doc 0.223
+TIME_FOR _prepare_new_doc 0.068
+TIME_FOR _prepare_new_doc 0.005
+TIME_FOR _prepare_new_doc 0.009
+TIME_FOR _prepare_new_doc 1.758
+TIME_FOR _prepare_new_doc 0.111
+TIME_FOR _prepare_new_doc 0.347
+TIME_FOR _prepare_new_doc 0.222
+TIME_FOR _prepare_new_doc 0.338
+TIME_FOR _prepare_new_doc 0.016
+TIME_FOR _prepare_new_doc 0.002
+TIME_FOR _prepare_new_doc 0.034
+TIME_FOR _prepare_new_doc 0.013
+TIME_FOR _prepare_new_doc 0.348
+TIME_FOR _prepare_new_doc 0.03
+TIME_FOR _prepare_new_doc 0.005
+TIME_FOR _prepare_new_doc 0.006
+TIME_FOR _prepare_new_doc 0.017
+TIME_FOR _prepare_new_doc 0.035
+TIME_FOR _prepare_new_doc 0.005
+TIME_FOR _prepare_new_doc 0.001
+TIME_FOR _prepare_new_doc 0.006
+TIME_FOR _prepare_new_doc 0.039
+TIME_FOR _prepare_new_doc 0.001
+TIME_FOR _prepare_new_doc 0.022
+TIME_FOR _prepare_new_doc 0.001
+TIME_FOR _prepare_new_doc 0.01
+TIME_FOR _prepare_new_doc 0.0
+TIME_FOR _prepare_new_doc 0.003
+TIME_FOR _prepare_new_doc 0.007
+TIME_FOR _prepare_new_doc 0.05
+TIME_FOR _prepare_new_doc 0.012
+TIME_FOR _prepare_new_doc 0.025
+TIME_FOR _prepare_new_doc 1.196
+TIME_FOR _prepare_new_doc 0.257
+TIME_FOR _prepare_new_doc 0.0
+TIME_FOR _prepare_new_doc 0.051
+TIME_FOR _prepare_new_doc 0.0
+TIME_FOR _prepare_new_doc 0.049
+TIME_FOR _prepare_new_doc 0.01
+TIME_FOR _prepare_new_doc 0.521
+TIME_FOR _prepare_new_doc 0.001
+TIME_FOR _prepare_new_doc 0.038
+TIME_FOR _prepare_new_doc 0.002
+TIME_FOR _prepare_new_doc 0.635
+TIME_FOR _prepare_new_doc 0.005
+TIME_FOR _prepare_new_doc 0.009
+TIME_FOR _prepare_new_doc 0.044
+TIME_FOR _prepare_new_doc 0.002
+TIME_FOR _prepare_new_doc 0.004
+TIME_FOR _prepare_new_doc 0.001
+TIME_FOR _prepare_new_doc 0.002
+TIME_FOR _prepare_new_doc 0.014
+TIME_FOR _prepare_new_doc 0.087
+TIME_FOR _prepare_new_doc 0.01
+TIME_FOR _prepare_new_doc 0.09
+TIME_FOR _prepare_new_doc 0.076
+TIME_FOR _prepare_new_doc 0.014
+TIME_FOR _prepare_new_doc 0.002
+TIME_FOR _prepare_new_doc 0.001
+TIME_FOR _prepare_new_doc 0.016
+TIME_FOR _prepare_new_doc 0.004
+TIME_FOR _prepare_new_doc 0.003
+TIME_FOR _prepare_new_doc 0.009
+TIME_FOR _prepare_new_doc 0.001
+TIME_FOR _prepare_new_doc 0.082
+TIME_FOR _prepare_new_doc 0.008
+TIME_FOR _prepare_new_doc 0.027
+TIME_FOR _prepare_new_doc 0.001
+TIME_FOR _prepare_new_doc 0.031
+TIME_FOR _prepare_new_doc 0.023
+TIME_FOR _prepare_new_doc 0.004
+TIME_FOR _prepare_new_doc 0.021
+TIME_FOR _prepare_new_doc 0.021
+TIME_FOR _prepare_new_doc 0.02
+TIME_FOR classify 21.82
+TIME_FOR classify_svm 111.121
+TIME_FOR process 234.587
