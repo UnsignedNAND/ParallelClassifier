@@ -2,6 +2,7 @@ import itertools
 import math
 import multiprocessing
 import operator
+from sqlalchemy import and_
 
 from collections import Counter
 from core.process.classification import Classification
@@ -30,10 +31,7 @@ tokens_idf = {}
 
 
 class Main(object):
-    k_closest = None
-    k_classes = None
-    new_doc = None
-    knn_result = None
+    new_docs = []
 
     def __init__(self):
         pass
@@ -259,15 +257,17 @@ class Main(object):
 
     @timer
     def classify(self):
+        min_doc_id = int(CONF['classification']['new_doc_start_id'])
+        max_doc_id = int(CONF['classification']['number']) + min_doc_id
         Db.init()
         session = Db.create_session()
         docs = session.query(Models.Doc).filter(
-            Models.Doc.id == int(CONF['classification']['new_doc_start_id'])
+            and_(max_doc_id > Models.Doc.id, Models.Doc.id >= min_doc_id)
         )
         if docs.count():
             for doc in docs:
                 LOG.info('Classifying "{0}"'.format(doc.title))
-                self.new_doc = self._prepare_new_doc(doc)
+                new_doc = self._prepare_new_doc(doc)
                 class_distances = multiprocessing.Array('d', (largest_id + 1))
                 class_ps = []
                 for i in range(PROCESSES):
@@ -277,7 +277,7 @@ class Main(object):
                         class_distances=class_distances,
                         largest_id=largest_id,
                         parsed_docs=parsed_docs,
-                        new_doc=self.new_doc,
+                        new_doc=new_doc,
                     )
                     class_p.start()
                     class_ps.append(class_p)
@@ -302,89 +302,109 @@ class Main(object):
                 # finding most frequent center in close neighborhood
                 id_dist.sort(key=lambda x: x['distance'], reverse=True)
                 k_closest = id_dist[:int(CONF['classification']['k'])]
-                self.k_closest = k_closest
+                k_closest = k_closest
                 classes = [c['class'] for c in k_closest]
                 counted_classes = Counter(classes)
-                self.k_classes = counted_classes
+                k_classes = counted_classes
 
                 #########
 
-                self.new_doc.center_id, _ = counted_classes.most_common(1)[0]
+                new_doc.center_id, _ = counted_classes.most_common(1)[0]
                 LOG.info('New doc ({0}) classified as belonging to {1} : {2}'.
-                         format(self.new_doc.title, self.new_doc.center_id,
-                         parsed_docs[self.new_doc.center_id].title))
-                self.knn_result = parsed_docs[self.new_doc.center_id]
+                         format(new_doc.title, new_doc.center_id,
+                         parsed_docs[new_doc.center_id].title))
+                knn_result = parsed_docs[new_doc.center_id]
                 LOG.info('KNN group id: {0} ({1})'.format(
-                    self.knn_result.id, self.knn_result.title))
+                    knn_result.id, knn_result.title))
                 LOG.info([parsed_docs[doc].title for doc in parsed_docs if
-                          parsed_docs[
-                              doc].center_id == self.new_doc.center_id])
+                          parsed_docs[doc].center_id == new_doc.center_id])
+                self.new_docs.append(
+                    {
+                        'new_doc': new_doc,
+                        'knn_result': knn_result,
+                        'k_classes': k_classes,
+                        'k_closest': k_closest
+                    }
+                )
 
         else:
             LOG.info('No documents to classify')
 
     @timer
     def classify_svm(self):
-        if len(self.k_classes) < 2:
-            LOG.info('There is only one possible class, not need to run SVM')
-            return
+        for doc in self.new_docs:
+            if len(doc['k_classes']) < 2:
+                LOG.info('There is only one possible class, not need to run SVM')
+                return
 
-        LOG.debug('Document classes for SVM: {0}'.format(self.k_classes))
+            LOG.debug('Document classes for SVM: {0}'.format(doc['k_classes']))
 
-        ### Gather all documents, grouped into classes
-        classes_doc = {}
-        for class_id in self.k_classes:
-            # select *ALL* documents that belong to classes indicated by kNN
-            docs_id_in_class = [parsed_docs[doc_id].id for doc_id in
-                             parsed_docs if
-                             parsed_docs[doc_id].center_id == class_id]
-            classes_doc[class_id] = docs_id_in_class
+            ### Gather all documents, grouped into classes
+            classes_doc = {}
+            for class_id in doc['k_classes']:
+                # select *ALL* documents that belong to classes indicated by kNN
+                docs_id_in_class = [parsed_docs[doc_id].id for doc_id in
+                                 parsed_docs if
+                                 parsed_docs[doc_id].center_id == class_id]
+                classes_doc[class_id] = docs_id_in_class
 
-        pair_queue = multiprocessing.Queue()
-        result_queue = multiprocessing.Queue()
-        results = {}
-        svm_ps = []
-        for pid in range(PROCESSES):
-            svm_p = SVM(
-                pair_queue=pair_queue,
-                result_queue=result_queue,
-                classes_doc=classes_doc,
-                parsed_docs=parsed_docs,
-                new_doc=self.new_doc
+            pair_queue = multiprocessing.Queue()
+            result_queue = multiprocessing.Queue()
+            results = {}
+            svm_ps = []
+            for pid in range(PROCESSES):
+                svm_p = SVM(
+                    pair_queue=pair_queue,
+                    result_queue=result_queue,
+                    classes_doc=classes_doc,
+                    parsed_docs=parsed_docs,
+                    new_doc=doc['new_doc']
+                )
+                svm_p.start()
+                svm_ps.append(svm_p)
+
+            # generate n(n-1)/2 class pairs
+            combinations = itertools.combinations(doc['k_classes'], 2)
+
+            for pair in combinations:
+                LOG.debug('Sending class pair: {0}'.format(pair))
+                pair_queue.put(pair)
+
+            for i in range(PROCESSES):
+                pair_queue.put(None)
+
+            not_finished = PROCESSES
+            while not_finished:
+                res = result_queue.get()
+                if not res:
+                    not_finished -= 1
+                    continue
+                LOG.debug('Received SVM pair: {0} {1} with winner: {2}'.format(
+                    res['class1'], res['class2'], res['result']))
+                try:
+                    results[res['result']] += 1
+                except:
+                    results[res['result']] = 1
+            print('DUPA', results)
+            class_id, _ = sorted(results.items(), key=operator.itemgetter(1))[-1]
+            LOG.debug('SVM group id: {0} ({1})'.format(
+                class_id,
+                parsed_docs[class_id].title),
             )
-            svm_p.start()
-            svm_ps.append(svm_p)
+            doc['svm_result'] = parsed_docs[class_id]
 
-        # generate n(n-1)/2 class pairs
-        combinations = itertools.combinations(self.k_classes, 2)
-
-        for pair in combinations:
-            LOG.debug('Sending class pair: {0}'.format(pair))
-            pair_queue.put(pair)
-
-        for i in range(PROCESSES):
-            pair_queue.put(None)
-
-        not_finished = PROCESSES
-        while not_finished:
-            res = result_queue.get()
-            if not res:
-                not_finished -= 1
-                continue
-            LOG.debug('Received SVM pair: {0} {1} with result {2}'.format(
-                res['class1'], res['class2'], res['result']))
-            try:
-                results[res['result']] += 1
-            except:
-                results[res['result']] = 1
-
-        class_id, _ = sorted(results.items(), key=operator.itemgetter(1))[-1]
-        LOG.info('SVM group id: {0} ({1})'.format(
-            class_id,
-            parsed_docs[class_id].title),
-        )
-
-        for svm_p in svm_ps:
-            svm_p.join()
-
+            for svm_p in svm_ps:
+                svm_p.join()
+        print('*' * 20)
+        for doc in self.new_docs:
+            print('title', doc['new_doc'].title)
+            print('knn label', doc['knn_result'].title)
+            print('svm label', doc['svm_result'].title)
+            print('docs sharing KNN label',
+                  [parsed_docs[d].title for d in parsed_docs.keys()
+                   if parsed_docs[d].center_id == doc['knn_result'].id])
+            print('docs sharing SVM label',
+                  [parsed_docs[d].title for d in parsed_docs.keys()
+                   if parsed_docs[d].center_id == doc['svm_result'].id])
+            print('*' * 20)
         LOG.info('Finished classification')
