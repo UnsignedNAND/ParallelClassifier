@@ -385,7 +385,6 @@ class Main(object):
                     results[res['result']] += 1
                 except:
                     results[res['result']] = 1
-            print('DUPA', results)
             class_id, _ = sorted(results.items(), key=operator.itemgetter(1))[-1]
             LOG.debug('SVM group id: {0} ({1})'.format(
                 class_id,
