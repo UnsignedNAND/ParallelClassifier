@@ -1,2 +1,16 @@
-\chapter{Conclusions}
-\label{conclusions}
+\chapter{Conclusions} \label{conclusions}
+
+\section{Project overview}
+The aim of this project was to create a platform that would allow for text document classification in parallel envoronment. Such platform was to classify documents using multi-tier approach, with first layer giving general decision basing on which the second layer would give the precise answer. In order to deliver this goal, many other features which are described in this paper had to be introduced to the system.
+Conducted research shows that proposed implementation scores acceptaple accuracy when classifying documents and that it can be scaled using multiple processes.
+
+\section{Future work}
+
+Although the results are promising, they are only preliminary and should be furtherly confirmed. 
+
+Test results indicated performance bottleneck that could be removed in future release. Main performance issue is having a single master process. While worker processes were quite efficent in executing their tasks, master process was burdened with scheduling tasks and aggregating received results. Many memory operations and need to communicate data between processes created overhead that could not be easily shadowed by sheer computing power of multiple worker processes.
+
+Fixing this issue would require changing architecture from master-slave into a processing tree or map-reduce. Introducing multiple master processes instead of one would offload work and distribute it not only in width but also in depth. Master processes would create branches and would take care of preliminary data aggregation and send back to main master process only important results that would be crucial for whole application.
+
+\section{Conclusion}
+All tasks set for this project were completed. Created system allows for text document classification with multi-tier classifiers and the whole flow is executed in parallel using multiprocessing techniques. Based on results of performed tests the conclusions were formed which may help in the future extensions of this application and works.
