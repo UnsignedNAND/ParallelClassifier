@@ -1,2 +1,12 @@
 \chapter*{Abstrakt}
 \addcontentsline{toc}{chapter}{Abstrakt}
+
+Mimo wielu prowadzonych badań klasyfikacja dokumentów tekstowych pozostaje nadal skomplikowanym problemem. Wraz z wzrastającą potrzebą archiwizacji danych wzrosła również koneczność umożliwienia szybkiego i automatycznego dostępu do skategoryzowanych informacji. Obecnie klasifykacja dokumentów tekstowych jest używana w wielu profesjonalnych dziedzinach, od baz wiedzy poprzez aplikacje medyczne aż do filtrowania poczty elektronicznej w celu identyfikacji spamu.
+
+W tej pracy algorytmy klasifykacji w środowisku rozproszonych zostały opracowane, zaimplementowane i przetestowane pod kątem czasu przetwarzania i specyficzności zdefiniowanej jako procent poprawnie sklasyfikowanych dokumentów spośród wszystkich klasyfikowanych dokumentów.
+
+W celu klasteryzacji zastosowano wielowątkową implementację algorytmu k-means. Wybór parametru k oraz jego wpływu na poprawność rezultatów został również przetestowany. Następnie wielowarstwowa metoda klasyfikacji składająca się z dwóch algorytmów klasyfikacji kNN oraz SVM została opracowana. Oba algorytmy zostały zaprojektowane i zoptymalizowane do wykorzystywania wielordzeniowych procesorów. Klasyfikator kNN jest odpowiedzialny za zawężenie zbioru klas do których nowy dokument może zostać przypisany. Algorytm SVM, bazując na zawężonym zbiorze, podejmował precyzyjną decyzję do jakiej klasy dokument powinien należeć.
+
+W pracy zaprezentowano także główne ograniczenia omówionych metod. Obejmują one czas potrzebny do komunikacji i przesyłania danych między procesami. Sposoby eliminacji opisanych problemów zostały również przedyskutowane.
+
+Wstępne wyniki wskazują, iż klasyfikacja nowego dokumentu przy zbiorze 100 jest możliwa w satysfakcjonującym czasie (6 sekund). Dodatkowo, uzyskane rezultaty skalują się niemal liniowo dla wzrastającej liczby dokumentow przy systemach 10 korowych. Uzyskane wyniki pozwalają przypuszczą, iż zaprezentowane rozwiązanie może byś częścią wiekszej platformy, która klasyfikuje dokumentu w istniejących systemach. Jednakże uzyskane rezultaty są jedynie wstępne i powinny być dalej przebadane i przetestowane.
