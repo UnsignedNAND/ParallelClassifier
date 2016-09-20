@@ -1,0 +1,30 @@
+TIME_FOR ********** TIMES **********
+TIME_FOR proc 1
+TIME_FOR item 10
+TIME_FOR parse 2.224
+TIME_FOR distance 0.019
+TIME_FOR cluster 0.003
+TIME_FOR _prepare_new_doc 1.738
+TIME_FOR classify 1.76
+TIME_FOR classify_svm 0.094
+TIME_FOR process 4.104
+TIME_FOR ********** TIMES **********
+TIME_FOR proc 1
+TIME_FOR item 100
+TIME_FOR parse 4.859
+TIME_FOR distance 1.025
+TIME_FOR cluster 0.18
+TIME_FOR _prepare_new_doc 1.7
+TIME_FOR classify 1.777
+TIME_FOR classify_svm 0.0
+TIME_FOR process 7.844
+TIME_FOR ********** TIMES **********
+TIME_FOR proc 1
+TIME_FOR item 1000
+TIME_FOR parse 16.658
+TIME_FOR distance 67.773
+TIME_FOR cluster 1.509
+TIME_FOR _prepare_new_doc 1.788
+TIME_FOR classify 2.298
+TIME_FOR classify_svm 0.0
+TIME_FOR process 88.241
