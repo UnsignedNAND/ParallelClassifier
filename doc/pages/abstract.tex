@@ -1,12 +1,27 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-The problem of text document categorization has became more complex than ever. With continuously increasing needs for storing huge amounts of data, need for quick access to data and automatic association also rises. Nowadays, document classification is used in wide range of application, varrying from knowledge databases, medical applications and spam filtering.
+The problem of text document categorization has become more complex than ever. With continuously increasing needs for storing huge amounts of data, need for quick access to data and automatic association also rises. Nowadays, document classification is used in a wide range of use cases. Data mining algorithms play an essential role not only in business and science applications but also in medicine as second-opinion diagnostic tools. They are also often used for spam filtering. 
 
-In this work algorithms of classification in parallel environment were designed, implemented and tested for processing time and recall defined as percentage of properly classified documents to all documents. 
+The motivation for this work is to provide algorithms for documents features extraction, documents clusterization and classification. Next step is to scale this solution into application based on parallel processing. Taking it into account, algorithms of classification in parallel environment were designed, implemented and tested for processing time and recall defined as percentage of properly classified documents to all documents. 
 
-For clusterization a parallel implementation of k-means algorithm was introduced. The choice of \textit{k} parameter and its influence on correctness of final results was also tested. Next, a multi-tier classification method was designed. First layer of classification consisted of kNN classifier, while second was based on SVM. Both methods were adapted to take advantage of available multi-core systems. kNN classifier was responsible for initial narrowing of possible labels for new document. Next, SVM algorithm was utilized to define final document class.
+In order to perform clusterization and classification, specific features have to be extracted from documents. Document consists of sentences, words, notes linking one article with another, marking relation between them. Base on this knowledge documents can be divided into groups that share similar features. 
 
-The main limitations of all methods were also highlighted in this work. They include time needed to communicate and send data between processes. The ways to overcome them are also discussed.
+For clusterization a parallel implementation of k-means algorithm was introduced. This algorithm was chosen because it has linear time complexity in relevance to the number of documents and it is possible to run it concurrently on multiple threads. First step in K-means is to select \textit{k} centers of groups. Usually at the beginning they are selected randomly and the distance between each document and each center is calculated.
+Knowing the distances between each pair of documents, we divide them into K groups. Each group is a set of documents with the distances closest to center of each group. 
+
+Next, a multi-tier classification method was designed. Classification is process of assigning a label to new document. It is basing on knowledge gathered in previous step and assumes that documents are grouped and labeled. First layer of classification consisted of kNN classifier, while second was based on SVM. Both methods were adapted to take advantage of available multi-core systems. kNN classifier was responsible for initial narrowing of possible labels for new document. Next, SVM algorithm was utilized to define final document class. The choice of \textit{k} parameter both in kNN and K-means and its influence on correctness of final results was tested. 
+
+Changing \textit{k} parameter in kNN has influence on results. Increasing it from 10 to 40 allows to achieve better recall for kNN by 8\% and for SVM by 12\%. Also, for kNN it does not affect total processing time, but in case of SVM it extends it significantly (21 times in presented test case). On the other hand, test results indicate that increasing \textit{k} parameter in k-means brings small recall improvement for both kNN and SVM classificators.
+
+The main limitations of all methods were highlighted in this work. They include time needed to communicate and send data between processes. It can be noticed that the best performance gain is when around 6 worker processes are working upon completing tasks. Using more workers than that results in no further gains and constant processing time, or even makes processing longer. The ways to overcome all problems were also discussed.
 
 Initial results show that it is possible to classify a new document in satisfactory time interval of 6 seconds for a hundred of documents and scales nearly linearly on 10 core system. These values are indicators for the assumptions that this system can be a part of bigger platforms that cope with document classifications in real use cases. However, the results are only preliminary and should further tested in the future researches.
+
+\vspace{12pt}
+\noindent\textbf{Keywords:} document classification, documents clusterization, kNN, SVM, k-means
+
+\vspace{12pt}
+\noindent\textbf{Field of science and technology in accordance with OECD requirements}: \textless{}1.2 Computer and information sciences\textgreater{}
+
+

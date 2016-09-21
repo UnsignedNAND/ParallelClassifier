@@ -1,6 +1,6 @@
 \pdfoptionpdfminorversion=5
 \documentclass[10pt,a4paper, twoside]{report}
-\usepackage{a_style}
+\usepackage{gutthesis}
 \usepackage{booktabs}
 
 \begin{document}
@@ -11,30 +11,28 @@
 	\newpage
 	\thispagestyle{empty}
 	\mbox{}
-	\newpage
-	\input{pages/title.tex}
-	\newpage
-	\thispagestyle{empty}
-	\mbox{}
+%	\newpage
+%	\input{pages/title.tex}
+%	\newpage
+%	\thispagestyle{empty}
+%	\mbox{}
 	\newpage
 	\input{pages/statement_pl.tex}
 	\newpage
 	\thispagestyle{empty}
-	\mbox{}
-	\newpage
-	\input{pages/statement.tex}
-	\newpage
-	\thispagestyle{empty}
-	\mbox{}
-	\newpage
-	\input{pages/dedication.tex}
+%	\mbox{}
+%	\newpage
+%	\input{pages/statement.tex}
 	\newpage
 	\thispagestyle{empty}
 	\mbox{}
-	\newpage
-	\input{pages/abstract.tex}
 	\newpage
 	\input{pages/abstract_pl.tex}
+	\newpage
+		\thispagestyle{empty}
+		\mbox{}
+		\newpage
+	\input{pages/abstract.tex}
 	
 	% Table of contents
 	\setcounter{tocdepth}{2}
@@ -50,6 +48,7 @@
 	\input{pages/tests.tex}
 	\input{pages/conclusion.tex}
 	
+	\input{pages/bibliography.tex}
 	
 	% List of figures
 	\cleardoublepage
@@ -69,7 +68,6 @@
 	\addcontentsline{toc}{chapter}{List of listings}
 	\lstlistoflistings
 	
-	\input{pages/bibliography.tex}
 	\input{pages/appendix.tex}
 	
 \end{document}
