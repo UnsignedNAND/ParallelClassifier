@@ -1,1 +1,0 @@
-cd /home/maciek/repos/ParallelClassifier/source; JAVA_HOME=/usr/lib/jvm/java-8-oracle /home/maciek/netbeans-8.1/java/maven/bin/mvn "-Dexec.args=-classpath %classpath com.mszankin.parallelclassifier.main.Msc" -Dexec.executable=/usr/lib/jvm/java-8-oracle/bin/java org.codehaus.mojo:exec-maven-plugin:1.2.1:exec
